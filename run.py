@@ -1,17 +1,18 @@
 import uvicorn
 
-from app.config import settings
+from src.config.settings.deps import get_settings
 
 
 def run():
+    settings = get_settings()
     uvicorn.run(
-        "app.main:app",
+        "src.server.core.app:app",
         host=settings.PROJECT.HOST,
         port=settings.PROJECT.PORT,
-        reload=True
+        reload=True,
+        use_colors=True,
     )
 
 
 if __name__ == '__main__':
-    print('PyCharm', settings.PROJECT.PORT)
     run()
