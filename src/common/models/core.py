@@ -1,10 +1,20 @@
 from datetime import datetime
 
+from sqlalchemy import DateTime
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+
+from src.common.utils import CustomDatetime
 
 
 class CoreModel(DeclarativeBase):
-    # TODO: created_at, updated_at
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(), default=CustomDatetime.get_utc_datetime
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(),
+        default=CustomDatetime.get_utc_datetime,
+        onupdate=CustomDatetime.get_utc_datetime,
+    )
 
     @classmethod
     @declared_attr

@@ -16,5 +16,4 @@ class ProjectSettings(BaseSettings):
     HOST: str = Field(default="localhost")
     SUPERUSER_LOGIN: str = Field(default="login")
     SUPERUSER_PASSW: str = Field(default="passw")
-    TZ: str = Field(default=" Europe/Moscow")  # TODO: откуда?
     DEBUG: bool = Field(default=True)
