@@ -4,6 +4,6 @@ class TagsMetadata:
         return [
             {
                 "name": "User",
-                "description": "TODO"
+                "description": "Account info"
             },
         ]

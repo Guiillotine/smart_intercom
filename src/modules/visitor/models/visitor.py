@@ -1,12 +1,13 @@
 from uuid import UUID, uuid4
 
 from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
+from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
 
 
-class VisitorModel(DeclarativeBase):
+class VisitorModel(CoreModel):
     __table_args__ = {
         "schema": SchemaNamesEnum.VISITS.value
     }
@@ -15,6 +16,4 @@ class VisitorModel(DeclarativeBase):
 
     full_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
-    photo: Mapped[str] # TODO: см
-
-    is_deleted: Mapped[bool] = mapped_column(default=False)
+    photo: Mapped[str]

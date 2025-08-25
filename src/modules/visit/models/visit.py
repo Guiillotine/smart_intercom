@@ -2,25 +2,25 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, DateTime, CheckConstraint
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
+from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
 
 
-class VisitModel(DeclarativeBase):
-    # TODO: добавить схему
+class VisitModel(CoreModel):
     __table_args__ = (
         CheckConstraint(
-            "(employee_sid IS NOT NULL OR visitor_sid IS NOT NULL)",
-            #name='ck_at_least_one_fk'
-        )
+            "((employee_sid IS NOT NULL OR visitor_sid IS NOT NULL)"
+            "AND (employee_sid IS NULL OR visitor_sid IS NULL))",
+            name='employee_xor_visitor_fk'
+        ),
+        {"schema": SchemaNamesEnum.VISITS.value}
     )
-
-    # TODO: ограничение хоть один сид не null
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
-    photo: Mapped[str] # TODO: см
+    photo: Mapped[str]
 
     detected_sex: Mapped[int] = mapped_column()
 

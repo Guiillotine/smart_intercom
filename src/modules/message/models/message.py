@@ -8,7 +8,6 @@ from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
 
 
-
 class MessageModel(CoreModel):
     __table_args__ = {
         "schema": SchemaNamesEnum.VISITS.value
@@ -22,4 +21,6 @@ class MessageModel(CoreModel):
 
     time: Mapped[datetime] = mapped_column(DateTime())
 
-    visit_sid: Mapped[UUID] = mapped_column(ForeignKey("visit.sid")) # TODO
+    visit_sid: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{SchemaNamesEnum.VISITS.value}.visit.sid")
+    )

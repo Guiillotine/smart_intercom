@@ -15,6 +15,7 @@ class CoreModel(DeclarativeBase):
         default=CustomDatetime.get_utc_datetime,
         onupdate=CustomDatetime.get_utc_datetime,
     )
+    is_archived: Mapped[bool] = mapped_column(default=False)
 
     @classmethod
     @declared_attr
