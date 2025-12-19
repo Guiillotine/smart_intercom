@@ -15,5 +15,5 @@ class AuthErrorsEnum(Enum):
 
 class ErrorCodesEnums:
     def __init__(self):
-        self.CommonErrors = CommonErrorsEnum
-        self.AuthErrors = AuthErrorsEnum
+        self.Common = CommonErrorsEnum
+        self.Auth = AuthErrorsEnum

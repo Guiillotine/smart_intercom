@@ -14,7 +14,6 @@ def get_postgres_session_provider() -> PostgresSessionProvider:
     Initializes a PostgresSessionProvider with a session context manager, allowing it
     to provide context-aware PostgreSQL sessions.
     """
-
     return PostgresSessionProvider(
         engine_creator=get_psql_engine_provider(),
         context_manager=get_psql_context_manager(),
@@ -29,15 +28,8 @@ async def get_db(
     """
     Provides a PostgreSQL database session.
 
-    This dependency can be used to inject a PostgreSQL database session into FastAPI
-    routes or services that need to interact with the database.
-
     The session is automatically closed after the request lifecycle.
-
-    :param session_provider: The provider responsible for providing PostgreSQL sessions.
-    :return: A PostgreSQL database session instance.
     """
-
     db = session_provider.get_session()
     try:
         yield db
