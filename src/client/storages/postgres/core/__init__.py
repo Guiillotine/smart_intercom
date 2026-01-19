@@ -1,2 +1,2 @@
 from .engine import PostgresEngineProvider
-from .context_manager import PostgresContextManager
+from .context_manager import PostgresSessionContextManager

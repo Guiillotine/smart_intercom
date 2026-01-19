@@ -2,14 +2,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, \
     async_scoped_session
 
 from src.client.storages.postgres.core import PostgresEngineProvider, \
-    PostgresContextManager
+    PostgresSessionContextManager
 
 
 class PostgresSessionProvider:
     def __init__(
         self,
         engine_creator: PostgresEngineProvider,
-        context_manager: PostgresContextManager
+        context_manager: PostgresSessionContextManager
     ):
         self._context_manager = context_manager
         self._session_factory = async_sessionmaker(
@@ -23,7 +23,7 @@ class PostgresSessionProvider:
         )
 
     def get_session(self) -> AsyncSession:
-        """
-        Creates and returns a new asynchronous session for PostgreSQL.
-        """
-        return self._scoped_session
+        """Return current scoped AsyncSession."""
+        session: AsyncSession = self._scoped_session() # TODO: проверить, меняла
+
+        return session

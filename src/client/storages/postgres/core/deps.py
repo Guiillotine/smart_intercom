@@ -1,11 +1,18 @@
-from sqlalchemy.ext.asyncio import AsyncEngine
+from typing import Annotated
 
-from src.client.storages.postgres.core import PostgresContextManager, \
+from fastapi import Depends
+
+from src.client.storages.postgres.core import PostgresSessionContextManager, \
     PostgresEngineProvider
+from src.config.settings import Settings
+from src.config.settings.deps import get_settings
 
 
-def get_psql_context_manager() -> PostgresContextManager:
-    return PostgresContextManager()
+def get_psql_session_context_manager() -> PostgresSessionContextManager:
+    return PostgresSessionContextManager()
 
-def get_psql_engine_provider() -> PostgresEngineProvider:
-    return PostgresEngineProvider()
+
+def get_psql_engine_provider(
+    settings: Annotated[Settings, Depends(get_settings)]
+) -> PostgresEngineProvider:
+    return PostgresEngineProvider(settings=settings)

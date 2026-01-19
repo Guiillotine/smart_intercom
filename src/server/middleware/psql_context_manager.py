@@ -3,6 +3,8 @@ from collections.abc import Awaitable, Callable
 from starlette.requests import Request
 from starlette.responses import Response
 
+from src.client.storages import PostgresSessionProvider
+from src.client.storages.postgres.core import PostgresSessionContextManager
 from src.common.constants import ErrorCodesEnums
 
 
@@ -23,8 +25,8 @@ class PostgresContextSessionMiddleware:
     def __init__(
         self,
         errors: ErrorCodesEnums,
-        postgres_session_provider: IPostgresSessionProvider,
-        postgres_session_context_manager: IPostgresSessionContextManager,
+        postgres_session_provider: PostgresSessionProvider,
+        postgres_session_context_manager: PostgresSessionContextManager,
     ):
         """
         Initialize the middleware with dependencies for error handling and session
@@ -65,7 +67,7 @@ class PostgresContextSessionMiddleware:
 
         except Exception:  # noqa: BLE001
             return Response(
-                "Internal server error", status_code=self._errors.Common.UNDEFINED
+                "Internal server error", status_code=self._errors.Common.UNDEFINED.value
             )
         finally:
             self._postgres_session_context_manager.remove_session_context()

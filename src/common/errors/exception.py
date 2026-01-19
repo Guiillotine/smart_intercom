@@ -1,10 +1,11 @@
-from fastapi import HTTPException
+from enum import Enum
 
-from src.common.constants import ErrorCodesEnums
+from fastapi import HTTPException
 
 
 class BackendException(HTTPException):
-    def __init__(self, error: ErrorCodesEnums, cause: str = ""):
+    def __init__(self, error: Enum, cause: str = ""):
+
         self.error_code = error.value[0]
         self.status_code = error.value[1]
         self.detail = error.value[2]

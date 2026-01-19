@@ -1,7 +1,7 @@
 from src.server.constants import session_context
 
 
-class PostgresContextManager:
+class PostgresSessionContextManager:
 
     @staticmethod
     def get_session_context() -> int:

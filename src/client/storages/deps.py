@@ -3,11 +3,15 @@ from typing import Annotated, AsyncGenerator
 from fastapi import Depends
 
 from src.client.storages import PostgresSessionProvider
-from src.client.storages.postgres.core.deps import get_psql_context_manager, \
+from src.client.storages.postgres.core.deps import get_psql_session_context_manager, \
     get_psql_engine_provider
+from src.config.settings import Settings
+from src.config.settings.deps import get_settings
 
 
-def get_postgres_session_provider() -> PostgresSessionProvider:
+def get_postgres_session_provider(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> PostgresSessionProvider:
     """
     Construct and return an instance of PostgresSessionProvider.
 
@@ -15,8 +19,8 @@ def get_postgres_session_provider() -> PostgresSessionProvider:
     to provide context-aware PostgreSQL sessions.
     """
     return PostgresSessionProvider(
-        engine_creator=get_psql_engine_provider(),
-        context_manager=get_psql_context_manager(),
+        engine_creator=get_psql_engine_provider(settings=settings),
+        context_manager=get_psql_session_context_manager(),
     )
 
 
