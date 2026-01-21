@@ -3,8 +3,8 @@ from enum import Enum
 
 class CommonErrorsEnum(Enum):
     UNDEFINED = (0, 500, "Unknown error")
-    NOT_FOUND = (1, 404, "Entry not found")
-    NOT_ALLOWED = (2, 405, "Access Denied")
+    UNPROCESSABLE_ENTITY = (2, 422, "Unprocessable entity")
+    NOT_FOUND = (4, 404, "Entry not found")
 
 
 class AuthErrorsEnum(Enum):
