@@ -17,3 +17,5 @@ class ProjectSettings(BaseSettings):
     SUPERUSER_LOGIN: str = Field(default="login")
     SUPERUSER_PASSW: str = Field(default="passw")
     DEBUG: bool = Field(default=True)
+
+    LOG_LEVEL: str = Field(default="debug")

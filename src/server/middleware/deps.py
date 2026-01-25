@@ -1,21 +1,24 @@
 from src.client.storages.deps import get_postgres_session_provider
 from src.client.storages.postgres.core.deps import get_psql_session_context_manager
 from src.common.constants.deps import get_error_codes_enums
+from src.common.logger.constants.deps import get_logger_config
+from src.common.logger.deps import get_base_logger, get_logger_manager
 from src.config.settings.deps import get_settings
 from src.server.middleware import BackendExceptionHandler
-from src.server.middleware.exception import ValidationExceptionHandler
+from src.server.middleware.exception import ValidationExceptionHandler, \
+    ExceptionMiddleware
 from src.server.middleware.psql_context_manager import PostgresContextSessionMiddleware
 
 
-def get_backend_exception_handler():
-    return BackendExceptionHandler()
+def get_exception_middleware() -> ExceptionMiddleware:
+    return ExceptionMiddleware(
+        logger=get_base_logger(get_logger_manager(get_logger_config())),
+        errors=get_error_codes_enums(),
+    )
 
-# TODO
-#def get_exception_middleware() -> IExceptionMiddleware:
-#    return ExceptionMiddleware(
-#        logger=get_base_logger(get_logger_manager(get_logger_config())),
-#        errors=get_error_codes(),
-#    )
+
+def get_backend_exception_handler() -> BackendExceptionHandler:
+    return BackendExceptionHandler()
 
 
 def get_validation_exception_handler() -> ValidationExceptionHandler:
