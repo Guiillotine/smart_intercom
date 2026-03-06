@@ -20,9 +20,9 @@ settings = get_settings()
 
 
 app = FastAPI(
-    debug=settings.PROJECT.DEBUG,
-    title=settings.PROJECT.PROJECT_NAME,
-    version=settings.PROJECT.PROJECT_VERSION,
+    debug=settings.project.DEBUG,
+    title=settings.project.PROJECT_NAME,
+    version=settings.project.PROJECT_VERSION,
     openapi_tags=get_tags_metadata().get_tags_metadata(),
     exception_handlers={BackendException: get_backend_exception_handler().handle},
 )

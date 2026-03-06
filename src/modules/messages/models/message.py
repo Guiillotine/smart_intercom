@@ -10,7 +10,7 @@ from src.common.repositories.postgres.constants import SchemaNamesEnum
 
 class MessageModel(CoreModel):
     __table_args__ = {
-        "schema": SchemaNamesEnum.VISITS.value
+        "schema": SchemaNamesEnum.MESSAGES.value
     }
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
@@ -20,6 +20,8 @@ class MessageModel(CoreModel):
     role: Mapped[int] = mapped_column(String(50))
 
     time: Mapped[datetime] = mapped_column(DateTime())
+
+    audio: Mapped[str] = mapped_column(comment="S3 path to audio file")
 
     visit_sid: Mapped[UUID] = mapped_column(
         ForeignKey(f"{SchemaNamesEnum.VISITS.value}.visit.sid")

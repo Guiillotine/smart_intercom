@@ -32,7 +32,7 @@ class UserModel(CoreModel):
         ForeignKey(f"{SchemaNamesEnum.USERS.value}.role.sid")
     )
 
-    is_active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(default=True, server_default="true")
 
     # Relationships
 

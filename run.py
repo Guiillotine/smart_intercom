@@ -7,8 +7,8 @@ def run():
     settings = get_settings()
     uvicorn.run(
         "src.server.core.app:app",
-        host=settings.PROJECT.HOST,
-        port=settings.PROJECT.PORT,
+        host=settings.project.HOST,
+        port=settings.project.PORT,
         reload=True,
         use_colors=True,
     )

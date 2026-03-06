@@ -3,5 +3,5 @@ from src.config.settings.project import ProjectSettings
 
 
 class Settings:
-    PROJECT = ProjectSettings()
-    POSTGRES = PostgresSettings()
+    project = ProjectSettings()
+    postgres = PostgresSettings()
