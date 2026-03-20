@@ -6,15 +6,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.utils import table_args
 
 if TYPE_CHECKING:
     from src.modules.users.models import RoleModel
 
 
 class UserModel(CoreModel):
-    __table_args__ = {
-        "schema": SchemaNamesEnum.USERS.value
-    }
+    __table_args__ = table_args(schema=SchemaNamesEnum.USERS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 

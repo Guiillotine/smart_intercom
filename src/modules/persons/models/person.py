@@ -5,13 +5,14 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.utils import table_args
 from src.config.settings.deps import get_settings
 
 settings = get_settings()
 
 
 class PersonInfoModel(CoreModel):
-    __table_args__ = {"schema": SchemaNamesEnum.PERSONS.value}
+    __table_args__ = table_args(schema=SchemaNamesEnum.PERSONS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 

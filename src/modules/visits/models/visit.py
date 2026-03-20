@@ -6,10 +6,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
 from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.utils import table_args
 
 
 class VisitModel(CoreModel):
-    __table_args__ = ({"schema": SchemaNamesEnum.VISITS.value})
+    __table_args__ = table_args(schema=SchemaNamesEnum.VISITS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
@@ -43,7 +44,7 @@ class VisitModel(CoreModel):
 
 
 class VisitPersonModel(CoreModel):
-    __table_args__ = ( {"schema": SchemaNamesEnum.VISITS.value})
+    __table_args__ = table_args(schema=SchemaNamesEnum.VISITS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
