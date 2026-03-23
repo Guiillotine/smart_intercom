@@ -1,19 +1,18 @@
-import typing
+from __future__ import annotations
+
 from dataclasses import Field
 from uuid import UUID, uuid4
 
 from src.common.schemas import CoreSchema
-
-if typing.TYPE_CHECKING:
-    from src.common.constants.enums import GenderEnum
-    from src.modules.visits.constants.enums import VisitStatusEnum
+from src.common.constants.enums import GenderEnum
+from src.modules.visits.constants.enums import VisitStatusEnum
 
 
 class VisitPersonBase(CoreSchema):
     visit_sid: UUID
     person_sid: UUID
     detected_age: int
-    detected_sex: "GenderEnum"
+    detected_sex: GenderEnum
     photo: str
 
 
@@ -27,4 +26,4 @@ class VisitPerson(VisitPersonBase):
 
 class Visit(CoreSchema):
     sid: UUID
-    status: "VisitStatusEnum"
+    status: VisitStatusEnum

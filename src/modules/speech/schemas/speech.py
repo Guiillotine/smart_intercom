@@ -1,9 +1,7 @@
-import typing
+from __future__ import annotations
 
 from src.common.schemas import CoreSchema
-
-if typing.TYPE_CHECKING:
-    from src.common.constants.enums import LanguageEnum
+from src.common.constants.enums import LanguageEnum
 
 
 class SpeechInfo(CoreSchema):

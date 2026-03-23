@@ -1,18 +1,17 @@
-import typing
+from __future__ import annotations
+
 from uuid import UUID, uuid4
 
 from pydantic import Field
 
 from src.common.schemas import CoreSchema
-
-if typing.TYPE_CHECKING:
-    from src.modules.persons.constants.enums import PersonTypeEnum
+from src.modules.persons.constants.enums import PersonTypeEnum
 
 
 class PersonInfoBase(CoreSchema):
     full_name: str | None = None
     photo: str
-    person_type: "PersonTypeEnum"
+    person_type: PersonTypeEnum
 
 
 class PersonInfoCreate(PersonInfoBase):
