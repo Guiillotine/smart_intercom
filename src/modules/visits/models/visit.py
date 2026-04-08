@@ -24,17 +24,18 @@ class VisitModel(CoreModel):
         comment="Bot's recommendation to grant access",
     )
 
-    arrival_datetime: Mapped[datetime] = mapped_column(DateTime())
+    start_datetime: Mapped[datetime] = mapped_column(DateTime())
 
-    decision_datetime: Mapped[datetime | None] = mapped_column(
-        DateTime(),
-        nullable=True,
-    )
+    finish_datetime: Mapped[datetime] = mapped_column(DateTime(), nullable=True,)
 
     status: Mapped[int] = mapped_column()
 
     purpose: Mapped[str | None] = mapped_column(
         nullable=True, comment="Purpose of the visit detected by bot",
+    )
+
+    finish_reason: Mapped[str | None] = mapped_column(
+        nullable=True, comment="The reason the visit was finished",
     )
 
     decision_by_user_sid: Mapped[UUID | None] = mapped_column(

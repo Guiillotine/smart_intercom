@@ -1,10 +1,11 @@
 import logging
 import sys
 
+from src.common.interfaces import ILoggerManager
 from src.common.logger.constants import LoggerConfigEnums, LoggerConfig
 
 
-class LoggerManager:
+class LoggerManager(ILoggerManager):
     """
     Centralized logger manager that provides configured loggers based on predefined
     configuration enums.

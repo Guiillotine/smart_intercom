@@ -3,17 +3,23 @@ from enum import Enum
 
 class CommonErrorsEnum(Enum):
     # 400
-    NOT_FOUND = (4, 404, "Entry not found")
-    UNPROCESSABLE_ENTITY = (2, 422, "Unprocessable entity")
+    NOT_FOUND = ("not_found", 404, "Entry not found")
+    # --- 422 Unprocessable Entity ---
+    UNPROCESSABLE_ENTITY = ("unprocessable_entity", 422, "Unprocessable entity")
+    NUMBER_OUT_OF_BOUNDS = (
+        "number_out_of_bounds",
+        422,
+        "Numeric field is out of bounds",
+    )
     # 500
-    UNDEFINED = (0, 500, "Unknown error")
+    UNDEFINED = ("undefined", 500, "Unknown error")
 
 
 class AuthErrorsEnum(Enum):
     # 400
-    BAD_REFRESH_TOKEN = (100, 401, "Invalid refresh token")
-    BAD_ACCESS_TOKEN = (101, 401, "Invalid access token")
-    INCORRECT_CREDENTIALS = (103, 401, "Incorrect login/password")
+    INVALID_REFRESH_TOKEN = ("invalid_refresh_token", 401, "Invalid refresh token")
+    INVALID_ACCESS_TOKEN = ("invalid_access_token", 401, "Invalid access token")
+    INCORRECT_CREDENTIALS = ("incorrect_credentials", 401, "Incorrect login/password")
 
 
 class DialogErrorsEnum(Enum):

@@ -6,7 +6,7 @@ authors = [
     {name = "e.kozlova",email = "kozlova03@inbox.ru"}
 ]
 readme = "README.md"
-requires-python = ">=3.12,<4.0"
+requires-python = ">=3.12,<3.15"
 dependencies = [
     "pydantic-core (>=2.37.2,<3.0.0)",
     "pydantic (>=2.11.7,<3.0.0)",
@@ -15,7 +15,8 @@ dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
     "sqlalchemy (>=2.0.42,<3.0.0)",
     "pytz (>=2025.2,<2026.0)",
-    "fastapi-filter (>=2.0.1,<3.0.0)"
+    "fastapi-filter (>=2.0.1,<3.0.0)",
+    "httpx (>=0.28.1,<0.29.0)"
 ]
 
 
