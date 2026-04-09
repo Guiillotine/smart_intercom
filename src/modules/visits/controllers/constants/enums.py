@@ -16,6 +16,10 @@ class VisitCtrlEnums:
 
     Provides centralized access to controller-related enums.
     """
+    get_visit = "/{sid}"
+    get_all_visits = ""
+    get_waiting_decision = "/waiting_decision"
+    make_door_open_decision = "/{sid}/decision"
 
     def __init__(
         self,

@@ -3,11 +3,10 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, TypeVar
 from uuid import UUID
 
-from httpx import Response
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy.sql.base import ExecutableOption
 
-from src.common.schemas.core_schema import SQLFilterBase
+from src.common.schemas import SQLFilterBase
 
 if TYPE_CHECKING:
     from src.common.models import CoreModel

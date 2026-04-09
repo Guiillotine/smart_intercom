@@ -8,5 +8,5 @@ from src.common.constants.enums import LanguageEnum
 class ITTSService(ABC):
 
     @abstractmethod
-    def synthesize(self, text: str, lang: LanguageEnum):
+    async def synthesize(self, text: str, lang: LanguageEnum):
         ...

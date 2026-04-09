@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from src.modules.visits.controllers.constants import VisitCtrlEnums
 from src.modules.visits.interfaces import IVisitController
 
 
@@ -13,7 +14,7 @@ class VisitController(IVisitController):
         self,
         enums: VisitCtrlEnums,
     ):
-        """Initialize the visits controller.
+        """Initialize the visit controller.
 
         :param enums: Controller enums containing paths and request types
         """
