@@ -1,0 +1,72 @@
+import logging
+from collections.abc import Sequence
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.base import ExecutableOption
+
+from src.common.adapters.repositories.postgres import PostgresBaseRepo
+from src.common.constants import ErrorCodesEnums
+from src.common.decorators import LoggingFunctionInfo
+from src.common.schemas import Pagination, SortBase
+from src.modules.persons.constants.enums import PersonTypeEnum
+from src.modules.persons.filters import PersonFilter
+from src.modules.persons.interfaces import IPersonPostgresRepo
+from src.modules.persons.models import PersonsModel
+from src.modules.persons.schemas import PersonCreate, PersonUpdate
+
+
+class PersonPostgresRepo(
+    PostgresBaseRepo[PersonsModel, PersonCreate, PersonUpdate],
+    IPersonPostgresRepo,
+):
+    def __init__(
+        self,
+        db: AsyncSession,
+        logger: logging.Logger,
+        errors: ErrorCodesEnums,
+        person_type: PersonTypeEnum | None = None,
+    ):
+        super().__init__(db=db, model=PersonsModel, logger=logger, errors=errors)
+        self._person_type = person_type
+
+    @LoggingFunctionInfo(description="Retrieve a paginated list of persons.")
+    async def get_all_paginated(
+        self,
+        pagination_params: Pagination,
+        filters: PersonFilter = None,
+        sort_params: SortBase = None,
+        custom_options: tuple[ExecutableOption, ...] = None,
+    ) -> tuple[Sequence[PersonsModel], int]:
+        if self._person_type is not None:
+            filters = filters or PersonFilter()
+            filters.person_type = self._person_type
+
+        return await super().get_all_paginated(
+            pagination_params=pagination_params,
+            filters=filters,
+            sort_params=sort_params,
+            custom_options=custom_options,
+        )
+
+    @LoggingFunctionInfo(
+        description="Create a new content partition in the collection."
+    )
+    async def create(
+        self,
+        obj_in: PersonCreate,
+    ) -> PersonsModel:
+        err_msg = "Person type is not set"
+
+        person_type = (
+            self._person_type
+            if self._person_type is not None
+            else obj_in.person_type
+        )
+
+        if person_type is None:
+            raise ValueError(err_msg)
+
+        obj_in.person_type = person_type
+
+        return await super().create(obj_in=obj_in)

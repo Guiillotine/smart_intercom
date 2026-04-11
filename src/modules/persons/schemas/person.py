@@ -8,16 +8,22 @@ from src.common.schemas import CoreSchema
 from src.modules.persons.constants.enums import PersonTypeEnum
 
 
-class PersonInfoBase(CoreSchema):
+class PersonBase(CoreSchema):
     full_name: str | None = None
     photo: str
-    person_type: PersonTypeEnum
 
 
-class PersonInfoCreate(PersonInfoBase):
+class PersonCreate(PersonBase):
     face_embedding: list[float]
+    person_type: PersonTypeEnum | None = None
 
 
-class PersonInfo(PersonInfoBase):
+@partial_schema
+class PersonUpdate(PersonBase):
+    pass
+
+
+class Person(PersonBase):
     sid: UUID = Field(default_factory=uuid4) # TODO: временное решение
     face_embedding: list[float]
+    person_type: PersonTypeEnum

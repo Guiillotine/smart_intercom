@@ -1,4 +1,4 @@
-from src.common.repositories.postgres import PostgresBaseRepo
+from src.common.adapters.repositories.postgres import PostgresBaseRepo
 
 
 def get_pg_base_repo() -> PostgresBaseRepo:

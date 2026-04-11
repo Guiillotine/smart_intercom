@@ -1,1 +1,1 @@
-from .person import PersonInfoModel
+from .person import PersonsModel

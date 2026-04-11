@@ -1,11 +1,11 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import ForeignKey, DateTime, CheckConstraint
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
-from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.adapters.repositories.postgres.constants import SchemaNamesEnum
 from src.common.utils import table_args
 
 

@@ -6,7 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy.sql.base import ExecutableOption
 
-from src.common.schemas import SQLFilterBase
+from src.common.schemas import SQLFilterBase, SortBase
 
 if TYPE_CHECKING:
     from src.common.models import CoreModel
@@ -38,13 +38,15 @@ class IPostgresBaseRepo[ModelType, CreateSchemaType, UpdateSchemaType](ABC):
     async def get_all(
         self,
         filters: SQLFilterBase = None,
+        sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
     ) -> Sequence[ModelType]:
         """
         Retrieve all records for the model.
 
-        :param custom_options: Optional SQLAlchemy query options.
         :param filters: Optional FastApi SQLAlchemy model filters.
+        :param sort_params: Optional sort params.
+        :param custom_options: Optional SQLAlchemy query options.
         :return: List of all model instances.
         """
 

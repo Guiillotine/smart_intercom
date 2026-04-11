@@ -5,19 +5,19 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
-from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.adapters.repositories.postgres.constants import SchemaNamesEnum
 from src.common.utils import table_args
 from src.config.settings.deps import get_settings
 
 settings = get_settings()
 
 
-class PersonInfoModel(CoreModel):
+class PersonsModel(CoreModel):
     __table_args__ = table_args(schema=SchemaNamesEnum.PERSONS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
-    full_name: Mapped[str] = mapped_column(String(100))
+    full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     photo: Mapped[str] = mapped_column(comment="S3 path to person photo")
 
@@ -25,6 +25,6 @@ class PersonInfoModel(CoreModel):
         Vector(get_settings().postgres.DIMENTION)
     )
 
-    person_type: Mapped[int] = mapped_column(comment="Employee or Visitor")
+    person_type: Mapped[int] = mapped_column(index=True, comment="Employee or Visitor")
 
-    is_archived: Mapped[bool]
+    is_archived: Mapped[bool] = mapped_column(default=False)

@@ -1,4 +1,4 @@
-from src.common.repositories.postgres.constants import SchemaNamesEnum
+from src.common.adapters.repositories.postgres.constants import SchemaNamesEnum
 
 
 def table_args(schema: SchemaNamesEnum, comment: str | None = None) -> dict:

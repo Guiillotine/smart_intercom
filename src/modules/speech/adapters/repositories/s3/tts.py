@@ -1,7 +1,7 @@
 import logging
 
 from src.client.interfaces import IS3SessionProvider
-from src.common.repositories.s3 import S3BaseRepo
+from src.common.adapters.repositories.s3 import S3BaseRepo
 from src.config.settings import Settings
 from src.modules.speech.interfaces import ISpeechS3Repo
 
