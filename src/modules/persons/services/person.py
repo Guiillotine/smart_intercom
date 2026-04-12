@@ -1,13 +1,17 @@
 import logging
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from src.common.constants import ErrorCodesEnums
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
-from src.common.schemas import Msg, Pagination, PaginationResult
+from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
+from src.modules.persons.filters import PersonFilter
 from src.modules.persons.interfaces import IPersonPostgresRepo, IPersonSrv
-from src.modules.persons.schemas import PersonCreate, Person, PersonUpdate, \
-    PersonCreate
+from src.modules.persons.schemas import PersonCreate, Person, PersonUpdate
+
+if TYPE_CHECKING:
+    from src.modules.persons.models import PersonsModel
 
 
 class PersonSrv(IPersonSrv):
@@ -44,9 +48,7 @@ class PersonSrv(IPersonSrv):
 
     @LoggingFunctionInfo(description="Update person.")
     async def update(self, sid: UUID, person_in: PersonUpdate) -> Person:
-        person = await self._person_postgres_repo.get_by_sid(sid=sid)
-        if not person:
-            raise BackendException(error=self._errors.Common.ENTITY_NOT_FOUND)
+        person = await self._get_model_by_sid(sid)
 
         return Person.model_validate(
             await self._person_postgres_repo.update(
@@ -56,14 +58,16 @@ class PersonSrv(IPersonSrv):
         )
 
     @LoggingFunctionInfo(description="Get person list.")
-    async def get_all(
+    async def get_all_paginated(
         self,
         pagination_params: Pagination,
-        person_type: int | None = None,
+        filters: PersonFilter = None,
+        sort_params: SortBase = None,
     ) -> PaginationResult[Person]:
         persons, total = await self._person_postgres_repo.get_all_paginated(
             pagination_params=pagination_params,
         )
+
         return PaginationResult(
             items=[Person.model_validate(person) for person in persons],
             limit=pagination_params.limit,
@@ -72,9 +76,26 @@ class PersonSrv(IPersonSrv):
         )
 
     @LoggingFunctionInfo(description="Delete person.")
-    async def delete(self, sid: UUID) -> Msg:
-        person = await self._person_postgres_repo.delete(sid=sid)
+    async def soft_delete(self, sid: UUID) -> Msg:
+        person = await self._get_model_by_sid(sid)
+
         if not person:
             raise BackendException(error=self._errors.Common.ENTITY_NOT_FOUND)
 
+        await self._person_postgres_repo.update(
+            db_obj=person,
+            obj_in=PersonUpdate(is_archived=True),
+        )
+
         return Msg()
+
+    async def _get_model_by_sid(
+        self,
+        sid: UUID,
+    ) -> "PersonsModel":
+        person = await self._person_postgres_repo.get_by_sid(sid)
+
+        if not person:
+            raise BackendException(self._errors.Person.PERSON_NOT_FOUND)
+
+        return person

@@ -37,9 +37,15 @@ class IntercomErrorsEnum(Enum):
     DIALOG_IS_OVER = ("dialog_is_over", 400, "Dialog is over")
 
 
+class PersonErrorsEnum(Enum):
+    # 404
+    PERSON_NOT_FOUND = ("person_not_found", 404, "Person not found")
+
+
 class ErrorCodesEnums:
     def __init__(self):
         self.Common = CommonErrorsEnum
         self.Auth = AuthErrorsEnum
         self.Dialog = DialogErrorsEnum
+        self.Person = PersonErrorsEnum
         self.Intercom = IntercomErrorsEnum

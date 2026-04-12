@@ -8,7 +8,10 @@ class EmployeeCtrlPathEnum(StrEnum):
 
     Defines all API route paths used by employee controllers.
     """
-    pass
+    get_employee_list = ""
+    create_employee = ""
+    update_employee = "/{sid}"
+    delete_employee = "/{sid}"
 
 
 class EmployeeCtrlEnums:

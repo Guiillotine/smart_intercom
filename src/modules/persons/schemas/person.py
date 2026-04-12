@@ -20,7 +20,7 @@ class PersonCreate(PersonBase):
 
 @partial_schema
 class PersonUpdate(PersonBase):
-    pass
+    is_archived: bool
 
 
 class Person(PersonBase):

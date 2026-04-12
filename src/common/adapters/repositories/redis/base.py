@@ -65,7 +65,7 @@ class BaseRedisRepo(IBaseRedisRepo):
         :return: Number of keys actually deleted (1 or 0)
         """
 
-        return await self._redis.delete(key)
+        return await self._redis.soft_delete(key)
 
     async def delete_by_prefix(self, prefix: str):
         """
@@ -84,7 +84,7 @@ class BaseRedisRepo(IBaseRedisRepo):
                 count=50,
             )
             if keys:
-                await self._redis.delete(*keys)
+                await self._redis.soft_delete(*keys)
             if cursor == b"0":
                 break
 

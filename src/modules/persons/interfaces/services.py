@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from src.common.schemas import Msg, Pagination, PaginationResult
+from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
+from src.modules.persons.filters import PersonFilter
 from src.modules.persons.schemas import PersonCreate, PersonUpdate, Person
 
 
@@ -11,15 +14,18 @@ class IPersonSrv(ABC):
     """
 
     @abstractmethod
-    async def get_all(
+    async def get_all_paginated(
         self,
         pagination_params: Pagination,
+        filters: PersonFilter = None,
+        sort_params: SortBase = None,
     ) -> PaginationResult[Person]:
         """
         Retrieve a paginated list of persons.
 
         :param pagination_params: Pagination settings.
-        :param person_type: Optional person type identifier.
+        :param filters: Optional FastApi SQLAlchemy filters.
+        :param sort_params: Optional sort params.
         :return: Paginated list of persons.
         """
         ...
@@ -46,9 +52,9 @@ class IPersonSrv(ABC):
         ...
 
     @abstractmethod
-    async def delete(self, sid: UUID) -> Msg:
+    async def soft_delete(self, sid: UUID) -> Msg:
         """
-        Delete a person record by SID.
+        Soft delete a person record by SID.
 
         :param sid: UUID of the target person.
         :return: Confirmation message.

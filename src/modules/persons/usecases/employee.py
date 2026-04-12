@@ -1,0 +1,72 @@
+from uuid import UUID
+
+from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
+from src.modules.persons.interfaces import IEmployeeUC, IPersonSrv
+from src.modules.persons.schemas import (
+    EmployeeCreate,
+    Employee,
+    EmployeeUpdate,
+    PersonCreate,
+    PersonUpdate,
+)
+from src.modules.persons.usecases.constants import EmployeeUCEnums
+
+
+class EmployeeUC(IEmployeeUC):
+    """
+    Use case class for employee operations over shared person records.
+
+    This class maps employee API actions to the common person service and applies the
+    employee person type where needed.
+    """
+
+    def __init__(
+        self,
+        enums: EmployeeUCEnums,
+        employee_service: IPersonSrv,
+    ):
+        """
+        Initializes EmployeeUC with the employee service dependency.
+
+        :param employee_service: Service for managing employee records.
+        """
+
+        self._enums = enums
+        self._employee_service = employee_service
+
+    async def get_all(
+        self, pagination_params: Pagination
+    ) -> PaginationResult[Employee]:
+        persons = await self._employee_service.get_all_paginated(
+            pagination_params=pagination_params,
+            sort_params=SortBase(
+                sort_field=self._enums.PersonSchema.PersonSortField.full_name
+            )
+        )
+        return PaginationResult(
+            items=[Employee.model_validate(person) for person in persons.items],
+            limit=persons.limit,
+            offset=persons.offset,
+            total=persons.total,
+        )
+
+    async def create(self, employee_in: EmployeeCreate) -> Employee:
+        person = await self._employee_service.create(
+            person_in=PersonCreate.model_validate(employee_in)
+        )
+
+        return Employee.model_validate(person)
+
+    async def update(
+        self,
+        sid: UUID,
+        employee_in: EmployeeUpdate,
+    ) -> Employee:
+        person = await self._employee_service.update(
+            sid=sid,
+            person_in=PersonUpdate.model_validate(EmployeeUpdate),
+        )
+        return Employee.model_validate(person)
+
+    async def delete(self, sid: UUID) -> Msg:
+        return await self._employee_service.soft_delete(sid)
