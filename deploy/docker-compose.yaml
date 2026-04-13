@@ -1,0 +1,8 @@
+
+
+services:
+  postgres-smart-imtercom:
+    container_name: "postgres-smart-imtercom"
+    build:
+      context: .
+      dockerfile:
