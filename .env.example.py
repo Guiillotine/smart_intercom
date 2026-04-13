@@ -1,3 +1,22 @@
+# ------------- Project -------------
+HOST="localhost"
+PORT=8080
+SERVER_WORKERS_NUM=1
+SUPERUSER_LOGIN="login"
+SUPERUSER_PASSW="passw"
+LOG_LEVEL="debug"
+DEBUG=True
+SESSION_SECRET_KEY="secret_key"
+
+# --================ PostgreSQL ================-- #
+POSTGRES_DB="smart_intercom"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="postgres"
+POSTGRES_HOST=0.0.0.0
+POSTGRES_PORT=5432
+DB_POOL_SIZE=20
+
+# ------------- Runtime -------------
 DEVICE="cuda" # cpu | cuda
 
 # ------------- Automatic Speech Recognition -------------
@@ -8,11 +27,11 @@ ASR_COMPUTE_TYPE="float16" # int8 | float16
 
 # ------------------------- TTS --------------------------
 
-TTS_MODEL_ID_RU='v5_ru'
-TTS_SPEAKER_RU='xenia'
+TTS_MODEL_ID_RU="v5_ru"
+TTS_SPEAKER_RU="xenia"
 
-TTS_MODEL_ID_EN='v3_en'
-TTS_SPEAKER_EN='en_0'
+TTS_MODEL_ID_EN="v3_en"
+TTS_SPEAKER_EN="en_0"
 
 TTS_SAMPLE_RATE=48000
 
@@ -30,4 +49,4 @@ MODEL="openai/gpt-4o-mini"
 
 MODEL_SUPPORTS_STRUCTURED_OUTPUTS=False
 
-API_KEY=api_key
+API_KEY="api_key"

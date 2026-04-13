@@ -47,8 +47,8 @@ class EmployeeCtrl(IEmployeeCtrl):
         """
 
         self._controller.add_api_route(
-            path="",
-            endpoint=self._enums.EmployeeCtrlPath.get_employee_list,
+            path=self._enums.EmployeeCtrlPath.get_all_employees,
+            endpoint=self.get_all_employees,
             methods=[self._enums.Common.RequestType.GET],
             response_model=PaginationResult[Employee],
         )

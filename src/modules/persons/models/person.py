@@ -22,7 +22,7 @@ class PersonsModel(CoreModel):
     photo: Mapped[str] = mapped_column(comment="S3 path to person photo")
 
     face_embedding: Mapped[list[float]] = mapped_column(
-        Vector(get_settings().postgres.DIMENTION)
+        Vector(get_settings().postgres.DIMENSION)
     )
 
     person_type: Mapped[int] = mapped_column(index=True, comment="Employee or Visitor")

@@ -4,6 +4,7 @@ from dataclasses import Field
 from datetime import datetime
 from uuid import UUID, uuid4
 
+from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.common.constants.enums import GenderEnum
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum
@@ -30,10 +31,9 @@ class VisitBase(CoreSchema):
     start_datetime: datetime
 
 
-class VisitUpdate(CoreSchema):
-    status: VisitStatusEnum | None = None
+@partial_schema
+class VisitUpdate(VisitBase):
     visitor_goal: str | None = None
-    start_datetime: datetime | None = None
     finish_datetime: datetime | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None

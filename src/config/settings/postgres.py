@@ -14,4 +14,4 @@ class PostgresSettings(BaseSettings):
     DB: str = Field(default="example", alias="POSTGRES_DB")
     USER: str = Field(default="example", alias="POSTGRES_USER")
     PASSWORD: str = Field(default="example", alias="POSTGRES_PASSWORD")
-    DIMENSION: str = Field(default=1536)
+    DIMENSION: int = Field(default=1536)

@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 from pydantic import Field
 
+from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.modules.persons.constants.enums import PersonTypeEnum
 
