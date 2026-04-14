@@ -49,7 +49,7 @@ class ExceptionMiddleware:
             return JSONResponse(
                 content={
                     "code": undefined_error.error_code,
-                    "detail": undefined_error.description,
+                    "detail": undefined_error.detail,
                 },
                 status_code=undefined_error.status_code,
             )

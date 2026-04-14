@@ -12,7 +12,7 @@ from src.config.settings.deps import get_settings
 settings = get_settings()
 
 
-class PersonsModel(CoreModel):
+class PersonModel(CoreModel):
     __table_args__ = table_args(schema=SchemaNamesEnum.PERSONS)
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)

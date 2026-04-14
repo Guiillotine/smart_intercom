@@ -4,7 +4,7 @@ from fastapi_filter.contrib.sqlalchemy import Filter
 
 from src.common.schemas import SQLFilterBase
 from src.modules.persons.constants.enums import PersonTypeEnum
-from src.modules.persons.models import PersonsModel
+from src.modules.persons.models import PersonModel
 
 
 class PersonFilter(SQLFilterBase):
@@ -13,4 +13,4 @@ class PersonFilter(SQLFilterBase):
 
 
     class Constants(Filter.Constants):
-        model = PersonsModel
+        model = PersonModel

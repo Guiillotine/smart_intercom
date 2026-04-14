@@ -11,6 +11,14 @@ from src.server.middleware.psql_context_manager import PostgresContextSessionMid
 
 
 def get_exception_middleware() -> ExceptionMiddleware:
+    """
+    This function provides the middleware that handles any uncaught exceptions during
+    the request-response cycle. It logs the exception and returns a default error
+    response when an unhandled error occurs.
+
+    :return: An instance of `ExceptionMiddleware`, which handles uncaught exceptions in
+            FastAPI.
+    """
     return ExceptionMiddleware(
         logger=get_base_logger(get_logger_manager(get_logger_config())),
         errors=get_error_codes_enums(),

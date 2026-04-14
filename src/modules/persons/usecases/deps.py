@@ -4,17 +4,24 @@ from fastapi import Depends
 
 from src.modules.persons.interfaces import IEmployeeUC, IPersonSrv
 from src.modules.persons.services.deps import get_person_service
+from src.modules.persons.usecases.constants import EmployeeUCEnums
+from src.modules.persons.usecases.constants.deps import get_employee_usecase_enums
 from src.modules.persons.usecases.employee import EmployeeUC
 
 
 async def get_employee_usecase(
-    person_service: Annotated[IPersonSrv, Depends(get_person_service)],
+    enums: Annotated[EmployeeUCEnums, Depends(get_employee_usecase_enums)],
+    employee_service: Annotated[IPersonSrv, Depends(get_person_service)],
 ) -> IEmployeeUC:
     """
     Dependency factory that provides a configured employee use case instance.
 
-    :param person_service: Service handling shared person records.
+    :param enums: Enums for employee usecase layer.
+    :param employee_service: Service handling shared employee records.
     :return: Initialized employee use case instance.
     """
 
-    return EmployeeUC(person_service=person_service)
+    return EmployeeUC(
+        enums=enums,
+        employee_service=employee_service,
+    )

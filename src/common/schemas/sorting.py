@@ -28,11 +28,3 @@ class SortBase(CoreSchema, Generic[FieldsEnum]):
         if self.sort_field:
             self.sort_field = camel_to_snake(self.sort_field)
         return self
-
-    def to_mongo_sort(self) -> tuple[str, int] | None:
-        if not self.sort_field_snake:
-            return None
-        return (
-            self.sort_field_snake,
-            1 if self.direction == SortDirectionEnum.ASC else -1,
-        )

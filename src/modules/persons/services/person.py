@@ -11,7 +11,7 @@ from src.modules.persons.interfaces import IPersonPostgresRepo, IPersonSrv
 from src.modules.persons.schemas import PersonCreate, Person, PersonUpdate
 
 if TYPE_CHECKING:
-    from src.modules.persons.models import PersonsModel
+    from src.modules.persons.models import PersonModel
 
 
 class PersonSrv(IPersonSrv):
@@ -92,7 +92,7 @@ class PersonSrv(IPersonSrv):
     async def _get_model_by_sid(
         self,
         sid: UUID,
-    ) -> "PersonsModel":
+    ) -> "PersonModel":
         person = await self._person_postgres_repo.get_by_sid(sid)
 
         if not person:

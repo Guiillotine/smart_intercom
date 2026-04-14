@@ -12,12 +12,12 @@ from src.common.schemas import Pagination, SortBase
 from src.modules.persons.constants.enums import PersonTypeEnum
 from src.modules.persons.filters import PersonFilter
 from src.modules.persons.interfaces import IPersonPostgresRepo
-from src.modules.persons.models import PersonsModel
+from src.modules.persons.models import PersonModel
 from src.modules.persons.schemas import PersonCreate, PersonUpdate
 
 
 class PersonPostgresRepo(
-    PostgresBaseRepo[PersonsModel, PersonCreate, PersonUpdate],
+    PostgresBaseRepo[PersonModel, PersonCreate, PersonUpdate],
     IPersonPostgresRepo,
 ):
     def __init__(
@@ -27,7 +27,7 @@ class PersonPostgresRepo(
         errors: ErrorCodesEnums,
         person_type: PersonTypeEnum | None = None,
     ):
-        super().__init__(db=db, model=PersonsModel, logger=logger, errors=errors)
+        super().__init__(db=db, model=PersonModel, logger=logger, errors=errors)
         self._person_type = person_type
 
     @LoggingFunctionInfo(description="Retrieve a paginated list of persons.")
@@ -37,7 +37,7 @@ class PersonPostgresRepo(
         filters: PersonFilter = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[PersonsModel], int]:
+    ) -> tuple[Sequence[PersonModel], int]:
         if self._person_type is not None:
             filters = filters or PersonFilter()
             filters.person_type = self._person_type
@@ -55,7 +55,7 @@ class PersonPostgresRepo(
     async def create(
         self,
         obj_in: PersonCreate,
-    ) -> PersonsModel:
+    ) -> PersonModel:
         err_msg = "Person type is not set"
 
         person_type = (

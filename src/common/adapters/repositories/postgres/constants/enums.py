@@ -1,11 +1,11 @@
-from enum import StrEnum
+from enum import StrEnum, auto
 
 
 class SchemaNamesEnum(StrEnum):
-    USERS = "USERS"
-    VISITS = "VISITS"
-    PERSONS = "PERSONS"
-    MESSAGES = "MESSAGES"
+    USERS = auto()
+    VISITS = auto()
+    PERSONS = auto()
+    MESSAGES = auto()
 
 
 class PostgresEnums:

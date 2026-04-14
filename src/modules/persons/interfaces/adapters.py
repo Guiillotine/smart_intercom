@@ -6,12 +6,12 @@ from sqlalchemy.sql.base import ExecutableOption
 from src.common.interfaces import IPostgresBaseRepo
 from src.common.schemas import Pagination, SortBase
 from src.modules.persons.filters import PersonFilter
-from src.modules.persons.models import PersonsModel
+from src.modules.persons.models import PersonModel
 from src.modules.persons.schemas import PersonCreate, PersonUpdate
 
 
 class IPersonPostgresRepo(
-    IPostgresBaseRepo[PersonsModel, PersonCreate, PersonUpdate], ABC
+    IPostgresBaseRepo[PersonModel, PersonCreate, PersonUpdate], ABC
 ):
     """
     Abstract interface for person-specific repository operations.
@@ -27,7 +27,7 @@ class IPersonPostgresRepo(
         filters: PersonFilter = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[PersonsModel], int]:
+    ) -> tuple[Sequence[PersonModel], int]:
         """
         Retrieve a paginated list of persons.
 
@@ -42,7 +42,7 @@ class IPersonPostgresRepo(
     @abstractmethod
     async def create(
         self, obj_in: PersonCreate, with_commit: bool = True
-    ) -> PersonsModel:
+    ) -> PersonModel:
         """
         Create a new person record in the database.
 
