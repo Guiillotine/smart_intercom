@@ -13,10 +13,10 @@ def get_employee_usecase_enums(
     person_common_enums: Annotated[PersonEnums, Depends(get_person_common_enums)],
     person_schema_enums: Annotated[PersonSchemaEnums, Depends(get_person_schema_enums)],
 ) -> EmployeeUCEnums:
-    """Dependency provider for EmployeeUCEnums instance.
+    """
+    Dependency provider for EmployeeUCEnums instance.
 
-    ## Returns:
-    - EmployeeUCEnums: Initialized Employee usecase enums instance
+    :return: Initialized Employee usecase enums instance
     """
     return EmployeeUCEnums(
         person_common_enums=person_common_enums,

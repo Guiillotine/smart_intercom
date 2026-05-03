@@ -31,6 +31,16 @@ class IPersonSrv(ABC):
         ...
 
     @abstractmethod
+    async def get_by_sid(self, sid: UUID) -> Person:
+        """
+        Retrieve a person by sid.
+
+        :param sid: Person identifier.
+        :return: Person data.
+        """
+        ...
+
+    @abstractmethod
     async def create(self, person_in: PersonCreate) -> Person:
         """
         Create a person record.

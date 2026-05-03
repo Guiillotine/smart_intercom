@@ -40,6 +40,12 @@ class PersonSrv(IPersonSrv):
         self._logger = logger
         self._person_postgres_repo = person_postgres_repo
 
+    @LoggingFunctionInfo(description="Get person by sid.")
+    async def get_by_sid(self, sid: UUID) -> Person:
+        return Person.model_validate(
+            await self._person_postgres_repo.get_by_sid(sid)
+        )
+
     @LoggingFunctionInfo(description="Create person.")
     async def create(self, person_in: PersonCreate) -> Person:
         return Person.model_validate(

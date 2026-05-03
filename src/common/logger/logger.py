@@ -80,3 +80,7 @@ class LoggerManager(ILoggerManager):
     def get_user_logger(self) -> logging.Logger:
         """Get logger for user-specific application logs."""
         return self._get_logger(self._config.Config.USER.value)
+
+    def get_face_logger(self) -> logging.Logger:
+        """Get logger for face-specific application logs."""
+        return self._get_logger(self._config.Config.FACE.value)

@@ -35,3 +35,7 @@ class ILoggerManager(ABC):
     def get_user_logger(self) -> logging.Logger:
         """Get logger for user-specific application logs."""
         ...
+
+    def get_face_logger(self) -> logging.Logger:
+        """Get logger for face-specific application logs."""
+        ...

@@ -103,8 +103,11 @@ class EmployeeCtrl(IEmployeeCtrl):
     @staticmethod
     async def update_employee(
         sid: UUID,
-        employee_in: EmployeeUpdate,
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
+        full_name: str | None = Form(
+            None, alias="fullName", validation_alias="fullName"
+        ),
+        photo: UploadFile | None = File(None),
     ) -> Employee:
         """
         Update an employee person record.
@@ -115,7 +118,8 @@ class EmployeeCtrl(IEmployeeCtrl):
 
         return await employee_usecase.update(
             sid=sid,
-            employee_in=employee_in,
+            photo=photo,
+            employee_in=EmployeeUpdate(full_name=full_name),
         )
 
     @staticmethod

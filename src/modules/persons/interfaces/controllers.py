@@ -60,14 +60,16 @@ class IEmployeeCtrl(ABC):
     @abstractmethod
     async def update_employee(
         sid: UUID,
-        employee_in: EmployeeUpdate,
         employee_usecase: IEmployeeUC,
+        full_name: str | None = None,
+        photo: UploadFile | None = None,
     ) -> Employee:
         """
         Update an employee person record.
 
         :param sid: UUID of the target employee person.
-        :param employee_in: Updated employee fields from request body.
+        :param full_name: Updated employee name.
+        :param photo: Updated employee photo.
         :param employee_usecase: Use case instance handling employee logic.
         :return: Updated employee data.
         """

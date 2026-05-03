@@ -46,12 +46,14 @@ class IEmployeeUC(ABC):
         self,
         sid: UUID,
         employee_in: EmployeeUpdate,
+        photo: UploadFile | None = None,
     ) -> Employee:
         """
         Update an employee person record.
 
         :param sid: UUID of the target employee person.
         :param employee_in: Updated employee fields.
+        :param photo: Updated employee photo.
         :return: Updated employee data.
         """
         ...

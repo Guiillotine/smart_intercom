@@ -78,12 +78,29 @@ class EmployeeUC(IEmployeeUC):
         self,
         sid: UUID,
         employee_in: EmployeeUpdate,
+        photo: UploadFile | None = None,
     ) -> Employee:
-        person = await self._employee_service.update(
-            sid=sid,
-            person_in=PersonUpdate.model_validate(EmployeeUpdate),
+        employee = await self._employee_service.get_by_sid(sid)
+
+        person_in = PersonUpdate.model_validate(employee_in)
+
+        if photo is not None:
+            # TODO: replace photo employee.photo -> photo
+            photo_s3_path = ""
+
+            # TODO: calculate embedding
+            random.seed(42)
+            face_embedding = [random.random() for _ in range(1536)]
+
+            person_in.photo = photo_s3_path
+            person_in.face_embedding = face_embedding
+
+        return Employee.model_validate(
+            await self._employee_service.update(
+                sid=sid,
+                person_in=person_in,
+            )
         )
-        return Employee.model_validate(person)
 
     async def delete(self, sid: UUID) -> Msg:
         return await self._employee_service.soft_delete(sid)

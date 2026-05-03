@@ -17,6 +17,7 @@ class EmployeeCreate(EmployeeBase):
 @partial_schema
 class EmployeeUpdate(EmployeeBase):
     photo: str
+    face_embedding: list[float]
 
 
 class Employee(EmployeeBase):

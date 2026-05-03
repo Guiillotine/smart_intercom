@@ -42,3 +42,9 @@ def get_user_logger(
     logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
 ) -> logging.Logger:
     return logger_manager.get_user_logger()
+
+
+def get_face_logger(
+    logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
+) -> logging.Logger:
+    return logger_manager.get_face_logger()

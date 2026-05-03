@@ -10,4 +10,4 @@ class CustomDatetime:
 
     @staticmethod
     def get_utc_datetime() -> datetime:
-        return datetime.now(UTC).replace(microsecond=0)
+        return datetime.now(UTC).replace(microsecond=0).replace(tzinfo=None)

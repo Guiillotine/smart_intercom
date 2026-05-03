@@ -25,7 +25,10 @@ dependencies = [
     "asyncpg (>=0.30.0,<0.31.0)",
     "alembic (>=1.16.1,<2.0.0)",
     "psycopg2-binary (>=2.9.10,<3.0.0)",
-    "python-multipart (>=0.0.20,<0.0.21)"
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "insightface (>=0.7.3,<0.8.0)",
+    "onnx (>=1.21.0,<2.0.0)",
+    "onnxruntime (>=1.25.1,<2.0.0)"
 ]
 
 

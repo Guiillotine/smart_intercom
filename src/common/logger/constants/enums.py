@@ -19,6 +19,7 @@ class LoggerNameEnum(StrEnum):
     PERSON = "PERSON"
     MESSAGE = "MESSAGE"
     USER = "USER"
+    FACE = "FACE"
 
 
 class LoggerLevelEnum(StrEnum):
@@ -61,6 +62,11 @@ class LoggerConfigEnum(Enum):
     )
     USER = LoggerConfig(
         LoggerNameEnum.USER,
+        get_settings().project.LOG_LEVEL.upper(),
+        LoggerFormatEnum.BASE,
+    )
+    FACE = LoggerConfig(
+        LoggerNameEnum.FACE,
         get_settings().project.LOG_LEVEL.upper(),
         LoggerFormatEnum.BASE,
     )

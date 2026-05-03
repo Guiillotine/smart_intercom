@@ -10,12 +10,12 @@ from src.modules.persons.constants.enums import PersonTypeEnum
 
 
 class PersonBase(CoreSchema):
-    full_name: str | None = None
     photo: str
+    full_name: str | None = None
+    face_embedding: list[float]
 
 
 class PersonCreate(PersonBase):
-    face_embedding: list[float]
     person_type: PersonTypeEnum | None = None
 
 
@@ -26,5 +26,4 @@ class PersonUpdate(PersonBase):
 
 class Person(PersonBase):
     sid: UUID
-    face_embedding: list[float]
     person_type: PersonTypeEnum
