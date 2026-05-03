@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from fastapi import UploadFile
+
 from src.common.schemas import Msg, Pagination, PaginationResult
-from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate
+from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate, \
+    EmployeeCreate
 
 
 class IEmployeeUC(ABC):
@@ -26,11 +29,13 @@ class IEmployeeUC(ABC):
     @abstractmethod
     async def create(
         self,
+        photo: UploadFile,
         employee_in: EmployeeCreate,
     ) -> Employee:
         """
         Create an employee person record.
 
+        :param photo: Employee photo.
         :param employee_in: Employee data for creation.
         :return: Created employee data.
         """

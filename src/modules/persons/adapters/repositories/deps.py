@@ -38,6 +38,7 @@ async def get_employee_pg_repo(
         person_type=PersonTypeEnum.EMPLOYEE,
     )
 
+
 async def get_visitor_pg_repo(
     db: Annotated[AsyncSession, Depends(get_db)],
     logger: Annotated[logging.Logger, Depends(get_base_logger)],

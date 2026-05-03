@@ -1,13 +1,15 @@
+import random
 from uuid import UUID
+
+from fastapi import UploadFile
 
 from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
 from src.modules.persons.interfaces import IEmployeeUC, IPersonSrv
 from src.modules.persons.schemas import (
-    EmployeeCreate,
     Employee,
     EmployeeUpdate,
     PersonCreate,
-    PersonUpdate,
+    PersonUpdate, EmployeeCreate,
 )
 from src.modules.persons.usecases.constants import EmployeeUCEnums
 
@@ -50,12 +52,27 @@ class EmployeeUC(IEmployeeUC):
             total=persons.total,
         )
 
-    async def create(self, employee_in: EmployeeCreate) -> Employee:
-        person = await self._employee_service.create(
-            person_in=PersonCreate.model_validate(employee_in)
-        )
+    async def create(
+        self,
+        photo: UploadFile,
+        employee_in: EmployeeCreate,
+    ) -> Employee:
+        # TODO: save photo
+        photo_s3_path = ""
 
-        return Employee.model_validate(person)
+        # TODO: calculate embedding
+        random.seed(42)
+        face_embedding = [random.random() for _ in range(1536)]
+
+        return Employee.model_validate(
+            await self._employee_service.create(
+                person_in=PersonCreate(
+                    **employee_in.model_dump(),
+                    photo=photo_s3_path,
+                    face_embedding=face_embedding,
+                )
+            )
+        )
 
     async def update(
         self,

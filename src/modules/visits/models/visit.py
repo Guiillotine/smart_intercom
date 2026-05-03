@@ -38,8 +38,12 @@ class VisitModel(CoreModel):
         nullable=True, comment="The reason the visit was finished",
     )
 
+    dialog_lang: Mapped[int] = mapped_column(comment="Visit dialog language")
+
+    photo: Mapped[str] = mapped_column(comment="S3 path to photo of the visit")
+
     decision_by_user_sid: Mapped[UUID | None] = mapped_column(
-        ForeignKey("UserModel.sid"),
+        ForeignKey(f"{SchemaNamesEnum.USERS.value}.user.sid"),
         nullable=True,
     )
 
@@ -53,8 +57,14 @@ class VisitPersonModel(CoreModel):
 
     detected_age: Mapped[int | None] = mapped_column(nullable=True)
 
-    person_sid: Mapped[UUID] = mapped_column(ForeignKey("PersonInfoModel.sid"))
+    photo: Mapped[str] = mapped_column(
+        comment="S3 path to photo of a person taken during a visit"
+    )
 
-    visit_sid: Mapped[UUID] = mapped_column(ForeignKey("VisitModel.sid"))
+    person_sid: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{SchemaNamesEnum.PERSONS.value}.person.sid"),
+    )
 
-    photo: Mapped[str] = mapped_column(comment="S3 path to photo of the visit")
+    visit_sid: Mapped[UUID] = mapped_column(
+        ForeignKey(f"{SchemaNamesEnum.VISITS.value}.visit.sid"),
+    )

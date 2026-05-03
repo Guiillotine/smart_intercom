@@ -27,14 +27,12 @@ class UserModel(CoreModel):
 
     password_hash: Mapped[str]
 
-    role_sid: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{SchemaNamesEnum.USERS.value}.role.sid")
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey(f"{SchemaNamesEnum.USERS.value}.role.id")
     )
 
     is_active: Mapped[bool] = mapped_column(default=True, server_default="true")
 
     # Relationships
 
-    role: Mapped["RoleModel"] = relationship(
-        "RoleModel", lazy="joined", viewonly=True
-    )
+    role: Mapped["RoleModel"] = relationship(lazy="joined", viewonly=True)

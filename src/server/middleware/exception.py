@@ -117,7 +117,7 @@ class ValidationExceptionHandler:
         self._logger.error(f"{request}: {exc_str}")
         content = {
             "status_code": unprocessable_entity_error.status_code,
-            "messages": unprocessable_entity_error.description,
+            "messages": unprocessable_entity_error.detail,
             "data": exc.__dict__.get("_errors", []),
         }
         return JSONResponse(

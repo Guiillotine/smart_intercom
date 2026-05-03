@@ -1,13 +1,15 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File, Body
+from fastapi.params import Form
 
 from src.common.schemas import Msg, Pagination, PaginationResult
 from src.modules.persons.controllers.constants import EmployeeCtrlEnums
 from src.modules.persons.interfaces import IEmployeeCtrl
 from src.modules.persons.interfaces.usecases import IEmployeeUC
-from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate
+from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate, \
+    EmployeeCreate
 from src.modules.persons.usecases.deps import get_employee_usecase
 
 
@@ -79,27 +81,24 @@ class EmployeeCtrl(IEmployeeCtrl):
         """
         Retrieve a paginated list of employee person records.
 
-        :param pagination_params: Pagination settings.
-        :param employee_usecase: Use case instance handling employee logic.
-        :return: Paginated list of employees.
+        ## Returns:
+        - Paginated list of employees.
         """
 
         return await employee_usecase.get_all(pagination_params=pagination_params)
 
     @staticmethod
     async def create_employee(
-        employee_in: EmployeeCreate,
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
+        full_name: Annotated[
+            str, Form(..., alias="fullName", validation_alias="fullName")
+        ],
+        photo: Annotated[UploadFile, File(...)],
     ) -> Employee:
-        """
-        Create an employee person record.
-
-        :param employee_in: Employee data from request body.
-        :param employee_usecase: Use case instance handling employee logic.
-        :return: Created employee data.
-        """
-
-        return await employee_usecase.create(employee_in=employee_in)
+        return await employee_usecase.create(
+            photo=photo,
+            employee_in=EmployeeCreate(full_name=full_name),
+        )
 
     @staticmethod
     async def update_employee(
@@ -110,10 +109,8 @@ class EmployeeCtrl(IEmployeeCtrl):
         """
         Update an employee person record.
 
-        :param sid: UUID of the employee person.
-        :param employee_in: Updated employee fields from request body.
-        :param employee_usecase: Use case instance handling employee logic.
-        :return: Updated employee data.
+        ## Returns:
+        - Updated employee data.
         """
 
         return await employee_usecase.update(
@@ -129,9 +126,8 @@ class EmployeeCtrl(IEmployeeCtrl):
         """
         Delete an employee person record.
 
-        :param sid: UUID of the employee person.
-        :param employee_usecase: Use case instance handling employee logic.
-        :return: Confirmation message.
+        ## Returns:
+        - Confirmation message.
         """
 
         return await employee_usecase.delete(sid=sid)

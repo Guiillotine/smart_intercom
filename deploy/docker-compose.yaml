@@ -3,9 +3,9 @@ x-env: &default-env
     - ../.env
 
 services:
-  postgres-smart-imtercom:
-    container_name: postgres-smart-imtercom
-    image: postgres:15
+  postgres-smart-intercom:
+    container_name: postgres-smart-intercom
+    image: pgvector/pgvector:pg15
     <<: *default-env
     ports:
       - "5432:5432"

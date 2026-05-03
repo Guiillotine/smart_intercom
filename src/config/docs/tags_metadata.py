@@ -6,4 +6,8 @@ class TagsMetadata:
                 "name": "User",
                 "description": "Account info"
             },
+            {
+                "name": "Employees",
+                "description": "Employee management"
+            },
         ]

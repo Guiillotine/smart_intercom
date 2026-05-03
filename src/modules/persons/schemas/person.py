@@ -25,6 +25,6 @@ class PersonUpdate(PersonBase):
 
 
 class Person(PersonBase):
-    sid: UUID = Field(default_factory=uuid4) # TODO: временное решение
+    sid: UUID
     face_embedding: list[float]
     person_type: PersonTypeEnum

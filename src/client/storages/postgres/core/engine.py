@@ -10,11 +10,6 @@ class PostgresEngineProvider:
 
     def get_engine(self) -> AsyncEngine:
         if self._engine is None:
-            self._engine = create_async_engine(
-                url=f"postgresql+asyncpg://{self._settings.postgres.USER}"
-                f":{self._settings.postgres.PASSWORD}@{self._settings.postgres.HOST}:"
-                f"{self._settings.postgres.PORT}"
-                f"/{self._settings.postgres.DB}"
-            )
+            self._engine = create_async_engine(url=self._settings.postgres.async_url)
 
         return self._engine

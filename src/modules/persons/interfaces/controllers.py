@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 
 from src.common.schemas import Msg, Pagination, PaginationResult
 from src.modules.persons.interfaces.usecases import IEmployeeUC
-from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate
+from src.modules.persons.schemas import Employee, EmployeeUpdate, \
+    EmployeeCreate
 
 
 class IEmployeeCtrl(ABC):
@@ -41,13 +42,15 @@ class IEmployeeCtrl(ABC):
     @staticmethod
     @abstractmethod
     async def create_employee(
-        employee_in: EmployeeCreate,
+        photo: UploadFile,
+        full_name: str,
         employee_usecase: IEmployeeUC,
     ) -> Employee:
         """
         Create an employee person record.
 
-        :param employee_in: Employee data from request body.
+        :param photo: Employee photo.
+        :param full_name: Employee full name.
         :param employee_usecase: Use case instance handling employee logic.
         :return: Created employee data.
         """

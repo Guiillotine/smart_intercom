@@ -8,17 +8,17 @@ from src.common.schemas import CoreSchema
 
 class EmployeeBase(CoreSchema):
     full_name: str
-    photo: str
 
 
 class EmployeeCreate(EmployeeBase):
-    face_embedding: list[float]
+    pass
 
 
 @partial_schema
 class EmployeeUpdate(EmployeeBase):
-    pass
+    photo: str
 
 
 class Employee(EmployeeBase):
     sid: UUID
+    photo: str
