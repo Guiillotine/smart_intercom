@@ -11,6 +11,12 @@ class S3Settings(BaseSettings):
     SECRET_KEY: str = Field(default="default_secret_key", alias="S3_SECRET_KEY")
     ENDPOINT_URL: str = Field(default="default_url", alias="S3_ENDPOINT_URL")
     REGION_NAME: str = Field(default="default_region_name", alias="S3_REGION_NAME")
-    VISIT_BUCKET_NAME: str = Field(default="visit", alias="S3_VISIT_BUCKET_NAME")
-    PERSON_BUCKET_NAME: str = Field(default="person", alias="S3_PERSON_BUCKET_NAME")
-    MESSAGE_BUCKET_NAME: str = Field(default="message", alias="S3_MESSAGE_BUCKET_NAME")
+    VISIT_PHOTO_BUCKET_NAME: str = Field(
+        default="visit_photo", alias="S3_VISIT_PHOTO_BUCKET_NAME"
+    )
+    PERSON_PHOTO_BUCKET_NAME: str = Field(
+        default="visit_photo", alias="S3_PERSON_PHOTO_BUCKET_NAME"
+    )
+    BOT_MESSAGE_BUCKET_NAME: str = Field(
+        default="bot_audio", alias="S3_BOT_MESSAGE_BUCKET_NAME"
+    )

@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
@@ -30,17 +31,16 @@ class VisitModel(CoreModel):
 
     status: Mapped[int] = mapped_column()
 
-    purpose: Mapped[str | None] = mapped_column(
+    visitor_goal: Mapped[str | None] = mapped_column(
         nullable=True, comment="Purpose of the visit detected by bot",
-    )
-
-    finish_reason: Mapped[str | None] = mapped_column(
-        nullable=True, comment="The reason the visit was finished",
     )
 
     dialog_lang: Mapped[int] = mapped_column(comment="Visit dialog language")
 
-    photo: Mapped[str] = mapped_column(comment="S3 path to photo of the visit")
+    photo: Mapped[str | None] = mapped_column(
+        nullable=True,
+        comment="S3 path to photo of the visit",
+    )
 
     decision_by_user_sid: Mapped[UUID | None] = mapped_column(
         ForeignKey(f"{SchemaNamesEnum.USERS.value}.user.sid"),
@@ -57,12 +57,13 @@ class VisitPersonModel(CoreModel):
 
     detected_age: Mapped[int | None] = mapped_column(nullable=True)
 
-    photo: Mapped[str] = mapped_column(
-        comment="S3 path to photo of a person taken during a visit"
+    crop_coords: Mapped[list[int]] = mapped_column(
+        JSONB,
+        comment="Visitor face coords on photo: y1, y2, x1, x2"
     )
 
-    person_sid: Mapped[UUID] = mapped_column(
-        ForeignKey(f"{SchemaNamesEnum.PERSONS.value}.person.sid"),
+    person_sid: Mapped[UUID | None] = mapped_column(
+        ForeignKey(f"{SchemaNamesEnum.PERSONS.value}.person.sid"), nullable=True
     )
 
     visit_sid: Mapped[UUID] = mapped_column(

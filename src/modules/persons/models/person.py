@@ -17,7 +17,11 @@ class PersonModel(CoreModel):
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
-    full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    first_name: Mapped[str]
+
+    last_name: Mapped[str]
+
+    middle_name: Mapped[str | None] = mapped_column(nullable=True)
 
     photo: Mapped[str] = mapped_column(comment="S3 path to person photo")
 

@@ -4,7 +4,7 @@ import numpy as np
 from insightface.app.common import Face
 
 from src.common.constants import ErrorCodesEnums
-from src.modules.faces.interfaces import IFaceAnalyzerSrv
+from src.modules.faces.interfaces import IFaceAnalyzerSrv, IFaceAnalysisModelManager
 from src.modules.faces.schemas import FaceInfo
 from src.modules.faces.services.constants import FaceAnalyzerSrvEnums
 
@@ -21,16 +21,18 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
         logger: logging.Logger,
         enums: FaceAnalyzerSrvEnums,
         errors: ErrorCodesEnums,
+        face_analysis_model_manager: IFaceAnalysisModelManager,
     ):
         self._logger = logger
         self._enums = enums
         self._errors = errors
+        self._app = face_analysis_model_manager.app
 
     def analyse_photo(
         self,
         image: np.ndarray,
     ) -> list[FaceInfo]:
-        faces = app.get(image)  # TODO: app manager
+        faces = self._app.get(image)
 
         h, w = image.shape[:2]
 
@@ -40,8 +42,6 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
         for face in faces:
             x1, y1, x2, y2 = face.bbox
 
-            crop = image[y1:y2, x1:x2]  # TODO: save to S3
-
             face_embedding = self._l2_norm_embedding(embedding=face.embedding)
 
             faces_info.append(
@@ -50,6 +50,7 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
                     detected_sex=self._enums.Common.Gender(face.gender),
                     photo="crop/path_to_s3",
                     face_embedding=face_embedding,
+                    crop=image[y1:y2, x1:x2],
                 )
             )
 
