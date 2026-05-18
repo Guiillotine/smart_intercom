@@ -10,4 +10,8 @@ class IntercomStartedVisit(CoreSchema):
 
 class IntercomAnswer(CoreSchema):
     answer_message_audio_path: str
-    
+    dialog_finished: bool = False
+
+
+class Decision(CoreSchema):
+    open: bool

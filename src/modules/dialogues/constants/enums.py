@@ -2,8 +2,11 @@ from enum import IntEnum
 
 
 class DialogueModeEnum(IntEnum):
-    MAIN = 0
-    WANT_TO_ENTER = 1
+    DETECT_LANGUAGE = 0
+    VISITOR_CALL_EMPLOYEE = 1
+    GOAL = 2
+    GRANT_ACCESS = 3
+    WANT_TO_ENTER = 4
 
 
 class DialogueEnums:

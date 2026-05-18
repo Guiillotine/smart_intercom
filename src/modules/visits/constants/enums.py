@@ -2,7 +2,8 @@ from enum import StrEnum, auto
 
 
 class VisitStatusEnum(StrEnum):
-    ACTIVE = auto()
+    IN_PROCESS = auto()
+    ASKED_WANT_TO_ENTER = auto()
     WAITING_DECISION = auto()
     OVER = auto()
 
@@ -11,7 +12,7 @@ class VisitFinishReasonEnum(StrEnum):
     EMPLOYEE_DECISION = auto()
     CANCELLED_BY_VISITOR = auto()
     BOT_ERROR = auto()
-    TIMEOUT = auto() # TODO
+    TIMEOUT = auto()
 
 
 class VisitEnums:

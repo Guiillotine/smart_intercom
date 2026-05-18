@@ -6,8 +6,11 @@ from uuid import UUID, uuid4
 
 from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
-from src.common.constants.enums import GenderEnum
+from src.common.constants.enums import GenderEnum, LanguageEnum
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum
+
+
+# Visit person
 
 
 class VisitPersonBase(CoreSchema):
@@ -23,20 +26,30 @@ class VisitPersonCreate(VisitPersonBase):
 
 
 class VisitPerson(VisitPersonBase):
-    sid: UUID = Field(default_factory=uuid4) # TODO: временное решение
+    sid: UUID
+
+
+# Visit
 
 
 class VisitBase(CoreSchema):
     status: VisitStatusEnum
-    start_datetime: datetime
+    arrival_datetime: datetime
+    dialog_lang: LanguageEnum
 
 
 @partial_schema
-class VisitUpdate(VisitBase):
-    visitor_goal: str | None = None
-    finish_datetime: datetime | None = None
-    bot_granted_access: bool | None = None
-    finish_reason: VisitFinishReasonEnum | None = None
+class VisitUpdateShort(CoreSchema):
+    dialog_lang: LanguageEnum
+
+
+class VisitUpdate(VisitUpdateShort):
+    status: VisitStatusEnum
+    visitor_goal: str
+    arrival_datetime: datetime
+    finish_datetime: datetime
+    bot_granted_access: bool
+    finish_reason: VisitFinishReasonEnum
 
 
 class VisitCallEmployee(CoreSchema):
@@ -58,3 +71,4 @@ class Visit(CoreSchema):
     finish_datetime: datetime | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
+    dialog_lang: LanguageEnum

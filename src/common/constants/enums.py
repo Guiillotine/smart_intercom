@@ -16,6 +16,11 @@ class LanguageEnum(StrEnum):
     def get_all_langs(cls) -> list[str]:
       return [lang.value for lang in cls]
 
+    @classmethod
+    def get_langs_str_list(cls) -> str:
+      langs = [f"\"{lang.value}\"" for lang in cls]
+      return ", ".join(langs)
+
 
 class MessageAuthorRoleEnum(StrEnum):
     SYSTEM = "system"
