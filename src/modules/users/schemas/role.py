@@ -5,17 +5,16 @@ from src.common.schemas import CoreSchema
 class RoleBase(CoreSchema):
     id: int
     name: str
-    description: str | None = None
 
 
 class RoleCreate(RoleBase):
-    pass
+    description: str | None = None
 
 
 @partial_schema
 class RoleUpdate(RoleBase):
-    pass
+    description: str | None = None
 
 
 class Role(RoleBase):
-    pass
+    description: str | None = None

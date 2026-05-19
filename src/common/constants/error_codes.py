@@ -44,8 +44,8 @@ class PersonErrorsEnum(Enum):
 
 class ErrorCodesEnums:
     def __init__(self):
-        self.Common = CommonErrorsEnum
         self.Auth = AuthErrorsEnum
+        self.Common = CommonErrorsEnum
         self.Dialog = DialogErrorsEnum
         self.Person = PersonErrorsEnum
         self.Intercom = IntercomErrorsEnum

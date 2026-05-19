@@ -9,6 +9,8 @@ class ProjectSettings(BaseSettings):
         extra="allow"
     )
 
+    TZ: str = Field(default="Europe/Moscow")
+
     # API
     API_V1_STR: str = "/api/v1"
 
@@ -23,5 +25,3 @@ class ProjectSettings(BaseSettings):
     DEBUG: bool = Field(default=True)
 
     LOG_LEVEL: str = Field(default="debug")
-
-    SESSION_SECRET_KEY: str = Field("secret_key")
