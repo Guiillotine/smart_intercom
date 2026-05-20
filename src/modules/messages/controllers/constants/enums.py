@@ -8,7 +8,7 @@ class MessageCtrlPathEnum(StrEnum):
 
     Defines all API route paths used by messages controllers.
     """
-    pass
+    get_visit_message_history = ""
 
 
 class MessageCtrlEnums:

@@ -15,7 +15,13 @@ class VisitFinishReasonEnum(StrEnum):
     TIMEOUT = auto()
 
 
+class VisitSortFieldsEnum(StrEnum):
+    START_DATETIME = "startDatetime"
+    FINISH_DATETIME = "finishDatetime"
+
+
 class VisitEnums:
     def __init__(self):
         self.VisitStatus = VisitStatusEnum
+        self.VisitSortFields = VisitSortFieldsEnum
         self.VisitFinishReason = VisitFinishReasonEnum

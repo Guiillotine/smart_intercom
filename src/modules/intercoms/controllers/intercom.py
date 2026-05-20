@@ -41,7 +41,41 @@ class IntercomController(IIntercomController):
 
     def _add_controllers(self) -> None:
         """Register all common intercoms endpoints to the router."""
-        ...
+
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.start_visit,
+            endpoint=self.start_visit,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=IntercomStartedVisit,
+        )
+        
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.process_visit_photo,
+            endpoint=self.process_visit_photo,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=Msg,
+        )
+        
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.get_answer,
+            endpoint=self.get_answer,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=IntercomAnswer,
+        )
+        
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.get_answer_on_text_message,
+            endpoint=self.get_answer_on_text_message,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=IntercomAnswer,
+        )
+        
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.get_user_decision,
+            endpoint=self.get_user_decision,
+            methods=[self._enums.Common.RequestType.GET],
+            response_model=Decision,
+        )
 
     @staticmethod
     def start_visit(

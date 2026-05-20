@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from src.common.constants.enums import MessageAuthorRoleEnum
@@ -28,3 +29,10 @@ class MessageUpdate(CoreSchema):
 class Message(MessageBase):
   role: MessageAuthorRoleEnum
   audio_s3_path: str | None = None
+
+
+class MessageInHistory(CoreSchema):
+  time: datetime
+  role: MessageAuthorRoleEnum
+  content: str
+

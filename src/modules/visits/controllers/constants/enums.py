@@ -18,7 +18,7 @@ class VisitCtrlEnums:
     """
     get_visit = "/{sid}"
     get_all_visits = ""
-    get_waiting_decision = "/waiting_decision"
+    get_waiting_decision_visits = "/waiting_decision"
     make_door_open_decision = "/{sid}/decision"
 
     def __init__(

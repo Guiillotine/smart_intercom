@@ -8,6 +8,7 @@ from starlette.responses import JSONResponse
 from src.common.deps.oauth_scheme import oauth2_scheme
 from src.common.schemas import Msg
 from src.modules.users.constants.enums import LogoutType
+from src.modules.users.controllers.constants import UserCtrlEnums
 from src.modules.users.interfaces import IAuthCtrl
 from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate
 
@@ -23,7 +24,7 @@ class AuthCtrl(IAuthCtrl):
 
     def __init__(
         self,
-        enums: AuthCtrlEnums,
+        enums: UserCtrlEnums,
     ):
         """
         Initializes the AuthRouters instance.
@@ -53,27 +54,27 @@ class AuthCtrl(IAuthCtrl):
         """
 
         self._controller.add_api_route(
-            path=self._enums.CtrlPath.login,
+            path=self._enums.AuthCtrlPath.login,
             endpoint=self.login,
-            methods=[self._enums.Common.RequestTypes.POST],
+            methods=[self._enums.Common.RequestType.POST],
             response_model=LoginToken,
         )
         self._controller.add_api_route(
-            path=self._enums.CtrlPath.logout,
+            path=self._enums.AuthCtrlPath.logout,
             endpoint=self.logout,
-            methods=[self._enums.Common.RequestTypes.POST],
+            methods=[self._enums.Common.RequestType.POST],
             response_model=Msg,
         )
         self._controller.add_api_route(
-            path=self._enums.CtrlPath.refresh_token,
+            path=self._enums.AuthCtrlPath.refresh_token,
             endpoint=self.update_access_token,
-            methods=[self._enums.Common.RequestTypes.POST],
+            methods=[self._enums.Common.RequestType.POST],
             response_model=LoginToken,
         )
         self._controller.add_api_route(
-            path=self._enums.CtrlPath.register,
+            path=self._enums.AuthCtrlPath.register,
             endpoint=self.register,
-            methods=[self._enums.Common.RequestTypes.POST],
+            methods=[self._enums.Common.RequestType.POST],
             response_model=LoginToken,
         )
 
