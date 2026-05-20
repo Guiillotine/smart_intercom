@@ -90,7 +90,7 @@ def upgrade() -> None:
     sa.Column('content', sa.String(), nullable=False),
     sa.Column('role', sa.String(length=50), nullable=False),
     sa.Column('time', sa.DateTime(), nullable=False),
-    sa.Column('audio', sa.String(), nullable=False, comment='S3 path to audio file'),
+    sa.Column('audio', sa.String(), nullable=True, comment='S3 path to audio file'),
     sa.Column('visit_sid', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),

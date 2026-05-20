@@ -1,6 +1,8 @@
 import logging
 from uuid import UUID
 
+from fastapi import UploadFile
+
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.enums import LanguageEnum
 from src.common.errors import BackendException
@@ -14,6 +16,7 @@ from src.modules.dialogues.schemas.dialogue import (
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
 from src.modules.intercoms.schemas.intercom import IntercomStartedVisit, IntercomAnswer
 from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate
+from src.modules.speech.interfaces import ITTSService
 from src.modules.speech.services.tts import TTSService
 from src.modules.visits.constants.enums import VisitStatusEnum
 from src.modules.visits.schemas import Visit, VisitCallEmployee, VisitFinish, \
@@ -33,7 +36,8 @@ class IntercomUC(IIntercomUC):
         logger: logging.Logger,
         errors: ErrorCodesEnums,
         settings: Settings,
-        tts_service: TTSService,
+        asr_service: IASRService,
+        tts_service: ITTSService,
         visit_service: IVisitSrv,
         dialog_service: IDialogSrv,
         message_service: IMessageSrv,
@@ -46,6 +50,7 @@ class IntercomUC(IIntercomUC):
         self._errors = errors
         self._logger = logger
         self._settings = settings
+        self._asr_service = asr_service
         self._tts_service = tts_service
         self._visit_service = visit_service
         self._dialog_service = dialog_service
@@ -68,6 +73,23 @@ class IntercomUC(IIntercomUC):
         )
 
     async def get_answer(
+        self,
+        audio: UploadFile,
+        visit_sid: UUID,
+        dialog_lang: LanguageEnum | None = None,
+    ) -> IntercomAnswer:
+        text_message = await self._asr_service.speech_to_text(
+            audio=audio,
+            dialog_lang=dialog_lang,
+        )
+
+        return await self.get_answer_on_text_message(
+            message=text_message,
+            visit_sid=visit_sid,
+            dialog_lang=dialog_lang,
+        )
+
+    async def get_answer_on_text_message(
         self,
         message: str,
         visit_sid: UUID,

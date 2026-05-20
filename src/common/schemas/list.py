@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar
 
-from src.common.schemas import CoreSchema
+from src.common.schemas.core_schema import CoreSchema
 
 ListItemSchema = TypeVar("ListItemSchema")
 

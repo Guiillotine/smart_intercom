@@ -20,7 +20,9 @@ class MessageModel(CoreModel):
 
     time: Mapped[datetime] = mapped_column(DateTime())
 
-    audio: Mapped[str] = mapped_column(comment="S3 path to audio file")
+    audio: Mapped[str | None] = mapped_column(
+        nullable=True, comment="S3 path to audio file"
+    )
 
     visit_sid: Mapped[UUID] = mapped_column(
         ForeignKey(f"{SchemaNamesEnum.VISITS.value}.visit.sid")

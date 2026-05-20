@@ -95,7 +95,8 @@ class IntercomController(IIntercomController):
     ) -> Msg:
         # TODO:
         # 1. Process photo
-        # 2. Call user if employee was detected
+        # 2. Identification by embedding (Person table)
+        # 3. Call user if employee was detected
         pass
 
     @staticmethod
@@ -104,7 +105,11 @@ class IntercomController(IIntercomController):
         audio: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> IntercomAnswer:
-        pass
+        await intercom_usecase.get_answer(
+            message: str,
+            visit_sid: UUID,
+            dialog_lang: LanguageEnum | None = None,
+        )
 
     @staticmethod
     def get_answer_on_text_message(
@@ -112,8 +117,10 @@ class IntercomController(IIntercomController):
         message: Annotated[str, Body()],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> IntercomAnswer:
-        # Get bot answer on text visitor message
-        pass
+        return await intercom_usecase.get_answer_on_text_message(
+            message=message,
+            visit_sid=visit_sid,
+        )
 
     @staticmethod
     def get_user_decision(

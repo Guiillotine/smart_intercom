@@ -2,7 +2,7 @@ import re
 from typing import Generic, TypeVar
 
 from pydantic import computed_field, model_validator
-from src.common.schemas import CoreSchema
+from src.common.schemas.core_schema import CoreSchema
 from src.common.schemas.constants.enums import SortDirectionEnum
 
 FieldsEnum = TypeVar("FieldsEnum")
