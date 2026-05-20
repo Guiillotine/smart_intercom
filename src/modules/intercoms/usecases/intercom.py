@@ -76,17 +76,17 @@ class IntercomUC(IIntercomUC):
         self,
         audio: UploadFile,
         visit_sid: UUID,
-        dialog_lang: LanguageEnum | None = None,
     ) -> IntercomAnswer:
-        text_message = await self._asr_service.speech_to_text(
+         # TODO: get visit, get dialog_lang
+
+        speech_info = await self._asr_service.speech_to_text(
             audio=audio,
-            dialog_lang=dialog_lang,
         )
 
         return await self.get_answer_on_text_message(
-            message=text_message,
+            message=speech_info.text,
             visit_sid=visit_sid,
-            dialog_lang=dialog_lang,
+            dialog_lang=speech_info.lang,
         )
 
     async def get_answer_on_text_message(

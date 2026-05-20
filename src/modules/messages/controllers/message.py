@@ -4,9 +4,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 
 from src.common.deps import get_user_sid
+from src.common.schemas import PaginationResult, Pagination
 from src.modules.messages.controllers.constants import MessageCtrlEnums
-from src.modules.messages.interfaces import IMessageCtrl
+from src.modules.messages.interfaces import IMessageCtrl, IMessageUC
 from src.modules.messages.schemas import MessageInHistory
+from src.modules.messages.usecases.deps import get_message_usecase
 
 
 class MessageCtrl(IMessageCtrl):
@@ -48,15 +50,16 @@ class MessageCtrl(IMessageCtrl):
             path=self._enums.MessageCtrlPath.get_visit_message_history,
             endpoint=self.get_visit_message_history,
             methods=[self._enums.Common.RequestType.GET],
-            response_model=MessageInHistory,
+            response_model=PaginationResult[MessageInHistory],
         )
 
     @staticmethod
     async def get_visit_message_history(
         user_sid: Annotated[UUID, Depends(get_user_sid)],
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
+        pagination_params: Annotated[Pagination, Depends(Pagination)],
         message_usecase: Annotated[IMessageUC, Depends(get_message_usecase)],
-    ) -> MessageInHistory:
+    ) -> PaginationResult[MessageInHistory]:
         """
         Get visit message history.
 

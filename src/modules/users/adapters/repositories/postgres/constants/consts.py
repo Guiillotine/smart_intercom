@@ -1,0 +1,2 @@
+class UserRepoConsts:
+    pass

@@ -1,0 +1,2 @@
+class VisitUCEnums:
+    pass

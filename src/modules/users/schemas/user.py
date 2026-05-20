@@ -6,6 +6,7 @@ from pydantic import EmailStr, Field, field_validator
 from src.common.constants import ErrorCodesEnums
 from src.common.errors import BackendException
 from src.common.schemas import CoreSchema
+from src.modules.users.constants.enums import RoleEnum
 from src.modules.users.schemas import RoleBase
 
 
@@ -30,9 +31,11 @@ class UserBase(CoreSchema):
             )
         return v
 
-    @field_validator("name")
+    @field_validator("first_name", "last_name", "middle_name")
     @classmethod
-    def validate_name(cls, v: str) -> str:
+    def validate_name(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
         if not (2 <= len(v) <= 50):  # noqa: PLR2004
             raise BackendException(
                 error=ErrorCodesEnums().Common.UNPROCESSABLE_ENTITY,
@@ -77,6 +80,20 @@ class UserCreate(UserBase):
                 cause="Password must contain at least one special symbol",
             )
         return v
+
+class UserCreateInDB(UserBase):
+    password_hash: str
+    role_id: int = RoleEnum.USER
+
+
+class UserUpdate(CoreSchema):
+    first_name: str | None = None
+    last_name: str | None = None
+    middle_name: str | None = None
+    email: EmailStr | None = None
+    password_hash: str | None = None
+    role_id: int | None = None
+    is_active: bool | None = None
 
 
 class User(UserBase):

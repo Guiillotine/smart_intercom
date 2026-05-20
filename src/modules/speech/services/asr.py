@@ -9,15 +9,18 @@ from src.config.settings import Settings
 from src.modules.speech.schemas import SpeechInfo
 
 
-def ASRService(IASRService):
+class ASRService(IASRService):
     def __init__(
         self,
         consts: ASRServiceConsts,
         logger: logging.Logger,
         settings: Settings,
+        model: WhisperModel,
     ):
         self._consts = consts
         self._logger = logger
+        self._model = model
+
         self._model = WhisperModel(
             model_size_or_path=settings.asr.ASR_MODEL_SIZE,
             device=settings.runtime.DEVICE,
@@ -25,12 +28,12 @@ def ASRService(IASRService):
         )
 
     @LoggingFunctionInfo("Speech to text")
-    async def speech_to_text(
+    def speech_to_text(
         self,
         audio: UploadFile,
         dialog_lang: LanguageEnum | None = None,
     ) -> SpeechInfo:
-        segments, info = await self._model.transcribe(audio, beam_size=4)
+        segments, info = self._model.transcribe(audio, beam_size=4)
 
         if info.language not in LanguageEnum.get_all_langs():
             self._logger.warning("Couldn't recognize language.")

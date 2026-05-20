@@ -1,2 +1,2 @@
 from .controllers import IIntercomController
-from .usecases import IIntercomUsecase
+from .usecases import IIntercomUC

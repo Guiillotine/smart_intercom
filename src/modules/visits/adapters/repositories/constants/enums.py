@@ -1,0 +1,2 @@
+class VisitRepoEnums:
+    pass

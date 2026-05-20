@@ -1,43 +1,48 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
-from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate
+from src.modules.users.constants.enums import LogoutType
+from src.modules.users.interfaces.usecases import IAuthUC, IUserUC
+from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate, UserWithRole
 
 
 class IAuthCtrl(ABC):
     """
-    Interface for authentication-related route definitions.
+    Interface for authentication controller operations.
 
-    This abstract base class defines the contract for authentication routers,
-    ensuring consistent implementation of auth-related endpoints across different
-    authentication providers or implementations.
+    Defines the contract for authentication-related API endpoints.
     """
 
     @property
     @abstractmethod
     def controller(self) -> APIRouter:
         """
-        Returns the FastAPI router with all registered authentication endpoints.
+        Get the configured APIRouter instance.
 
-        :return: Configured APIRouter instance containing auth routes.
+        :return: Configured FastAPI router with auth routes.
         """
         ...
 
     @staticmethod
     @abstractmethod
     async def login(
-        form_data: OAuth2PasswordRequestForm, auth_service: IAuthUC, user_agent: str
+        form_data: OAuth2PasswordRequestForm,
+        auth_usecase: IAuthUC,
+        user_agent: str | None = None,
     ) -> LoginToken:
         """
-        Authenticate user using form credentials and return a token pair.
+        Authenticate user and return token pair.
 
-        :param form_data: Login form data (username and password).
-        :param user_agent: The User-Agent string from the client request.
-        :param auth_service: Authentication use case instance.
-        :return: JWT access and refresh tokens.
+        :param form_data: OAuth2 password form data.
+        :param auth_usecase: Auth use case dependency.
+        :param user_agent: Optional User-Agent request header.
+        :return: Access and refresh token pair.
         """
         ...
 
@@ -46,33 +51,32 @@ class IAuthCtrl(ABC):
     async def logout(
         token: str,
         auth_usecase: IAuthUC,
-        everywhere: bool,
+        logout_type: LogoutType,
     ) -> JSONResponse:
         """
-        Log out the user by invalidating tokens.
+        Log out user by invalidating token data.
 
-        :param token: Access or refresh token to invalidate.
-        :param auth_usecase: Authentication use case instance containing business logic.
-        :param everywhere: If True, log out from all sessions; otherwise, current
-                session only.
-        :return: JSON response confirming successful logout.
+        :param token: Current bearer token.
+        :param auth_usecase: Auth use case dependency.
+        :param logout_type: Logout scope.
+        :return: JSON response with operation result.
         """
         ...
 
     @staticmethod
     @abstractmethod
     async def update_access_token(
-        body: RefreshToken,
-        user_agent: str,
         auth_usecase: IAuthUC,
+        body: RefreshToken,
+        user_agent: str | None = None,
     ) -> LoginToken:
         """
-        Refresh the access token using a valid refresh token.
+        Refresh access token.
 
-        :param body: RefreshToken instance containing the refresh token data.
-        :param user_agent: The User-Agent string from the client request.
-        :param auth_usecase: Authentication use case instance containing business logic.
-        :return: New login tokens including access and refresh tokens.
+        :param auth_usecase: Auth use case dependency.
+        :param body: Refresh token request body.
+        :param user_agent: Optional User-Agent request header.
+        :return: New access and refresh token pair.
         """
         ...
 
@@ -80,15 +84,60 @@ class IAuthCtrl(ABC):
     @abstractmethod
     async def register(
         user_in: UserCreate,
-        user_agent: str,
         auth_usecase: IAuthUC,
+        user_agent: str | None = None,
     ) -> LoginToken:
         """
-        Register a new user in the system.
+        Register a user and return token pair.
 
-        :param user_in: UserCreate schema containing the data for the new user.
-        :param user_agent: The User-Agent string from the client request.
-        :param auth_usecase: Use case handler for authentication operations.
-        :return: CreatedUser instance representing the newly registered user.
+        :param user_in: User registration schema.
+        :param auth_usecase: Auth use case dependency.
+        :param user_agent: Optional User-Agent request header.
+        :return: Access and refresh token pair.
+        """
+        ...
+
+
+class IUserCtrl(ABC):
+    """
+    Interface for user controller operations.
+
+    Defines the contract for user-related API endpoints.
+    """
+
+    @property
+    @abstractmethod
+    def controller(self) -> APIRouter:
+        """
+        Get the configured APIRouter instance.
+
+        :return: Configured FastAPI router with user routes.
+        """
+        ...
+
+    @staticmethod
+    @abstractmethod
+    async def me(user_sid: UUID, user_usecase: IUserUC) -> UserWithRole:
+        """
+        Get current user information.
+
+        :param user_sid: Current authorized user SID.
+        :param user_usecase: User use case dependency.
+        :return: Current user data with role.
+        """
+        ...
+
+    @staticmethod
+    @abstractmethod
+    async def get_user(
+        sid: UUID, user_sid: UUID, user_usecase: IUserUC
+    ) -> UserWithRole:
+        """
+        Get user information by identifier.
+
+        :param sid: Target user SID.
+        :param user_sid: Current authorized user SID.
+        :param user_usecase: User use case dependency.
+        :return: User data with role.
         """
         ...

@@ -1,5 +1,8 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from faster_whisper import WhisperModel
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -19,10 +22,22 @@ origins = [
 settings = get_settings()
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.whisper_model = WhisperModel(
+        model_size_or_path=settings.asr.ASR_MODEL_SIZE,
+        device=settings.runtime.DEVICE,
+        compute_type=settings.asr.ASR_COMPUTE_TYPE,
+    )
+    yield
+    del app.state.whisper_model
+
+
 app = FastAPI(
     debug=settings.project.DEBUG,
     title=settings.project.PROJECT_NAME,
     version=settings.project.PROJECT_VERSION,
+    lifespan=lifespan,
     openapi_tags=get_tags_metadata().get_tags_metadata(),
     exception_handlers={BackendException: get_backend_exception_handler().handle},
 )

@@ -1,0 +1,2 @@
+class MessageRepoConsts:
+    pass

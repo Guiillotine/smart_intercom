@@ -5,7 +5,7 @@ from src.common.constants.enums import MessageAuthorRoleEnum, LanguageEnum
 
 
 class ChatMessage(CoreSchema):
-    role: MessageAuthorRole
+    role: MessageAuthorRoleEnum
     content: str
 
 
@@ -43,7 +43,7 @@ class WantToEnterBotAnswer(ChatBotAnswerBase):
     want_to_enter: bool
 
 
-ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogBotAnswer | GoalDialogBotAnswer | GrantAccessDialogBotAnswer | WantToEnterBotAnswer
+ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogBotAnswer | GoalDialogBotAnswer | BotReplica | WantToEnterBotAnswer
 
 
 class DialogConfig(CoreSchema):

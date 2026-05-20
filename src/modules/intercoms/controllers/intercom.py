@@ -105,10 +105,9 @@ class IntercomController(IIntercomController):
         audio: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> IntercomAnswer:
-        await intercom_usecase.get_answer(
-            message: str,
-            visit_sid: UUID,
-            dialog_lang: LanguageEnum | None = None,
+        return await intercom_usecase.get_answer(
+            audio=audio,
+            visit_sid=visit_sid,
         )
 
     @staticmethod
@@ -125,7 +124,6 @@ class IntercomController(IIntercomController):
     @staticmethod
     def get_user_decision(
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
-        audio: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> Decision:
         pass
