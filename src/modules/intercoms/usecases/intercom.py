@@ -5,7 +5,9 @@ from fastapi import UploadFile
 
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.enums import LanguageEnum
+from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
+from src.common.schemas import Msg
 from src.config.settings import Settings
 from src.modules.dialogues.constants.enums import DialogueModeEnum
 from src.modules.dialogues.schemas.dialogue import (
@@ -14,13 +16,16 @@ from src.modules.dialogues.schemas.dialogue import (
     BotReplica,
 )
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
-from src.modules.intercoms.schemas.intercom import IntercomStartedVisit, IntercomAnswer
+from src.modules.intercoms.schemas.intercom import IntercomStartedVisit, IntercomAnswer, \
+    Decision
+from src.modules.intercoms.usecases.constants import IntercomUCEnums, IntercomUCConsts
+from src.modules.messages.interfaces import IMessageSrv
 from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate
 from src.modules.speech.interfaces import ITTSService
-from src.modules.speech.services.tts import TTSService
 from src.modules.visits.constants.enums import VisitStatusEnum
+from src.modules.visits.interfaces import IVisitSrv
 from src.modules.visits.schemas import Visit, VisitCallEmployee, VisitFinish, \
-    VisitUpdateShort
+    VisitUpdateShort, VisitUpdate
 
 
 class IntercomUC(IIntercomUC):
@@ -57,6 +62,10 @@ class IntercomUC(IIntercomUC):
         self._message_service = message_service
 
     async def start_visit(self) -> IntercomStartedVisit:
+        # TODO:
+        # 1. Get all unfinished visits
+        # 2. Delete unfinished visits without data (no user messages) + s3
+
         visit = await self._visit_service.create_visit()
 
         hello_bot_answer = self._dialog_service.get_hello_bot_answer()
@@ -71,6 +80,14 @@ class IntercomUC(IIntercomUC):
             visit_sid = visit.sid,
             hello_message_audio_path = intercom_answer.answer_message_audio_path,
         )
+
+    @LoggingFunctionInfo(description="Process visit photo.")
+    async def process_visit_photo(self, visit_sid: UUID, photo: UploadFile) -> Msg:
+        # TODO:
+        # 1. Process photo
+        # 2. Identification by embedding (Person table)
+        # 3. Call user if employee was detected
+        ...
 
     async def get_answer(
         self,
@@ -162,7 +179,8 @@ class IntercomUC(IIntercomUC):
 
     def _validate_get_answer(self, visit: Visit) -> None:
         if visit.status in (
-            self._enums.Visit.VisitStatus.OVER, self._enums.VisitStatus.WAITING_DECISION
+            self._enums.Visit.VisitStatus.OVER,
+            self._enums.Visit.VisitStatus.WAITING_DECISION
         ):
             raise BackendException(error=self._errors.Intercom.DIALOG_IS_OVER)
 
@@ -174,7 +192,7 @@ class IntercomUC(IIntercomUC):
     ) -> tuple[BotReplica, bool]:
         bot_answer = await self._get_bot_answer(
             visit_sid,
-            mode=self._enums.Common.VISITOR_CALL_EMPLOYEE,
+            mode=self._enums.Dialogue.DialogueMode.VISITOR_CALL_EMPLOYEE,
             messages=[ChatMessage(role=self._enums.Common.MessageAuthorRole.USER, content=message)],
             dialog_lang=dialog_lang,
         )
@@ -208,7 +226,7 @@ class IntercomUC(IIntercomUC):
 
         bot_answer = await self._get_bot_answer(
             visit_sid,
-            mode=self._enums.Common.DialogMode.DETECT_LANGUAGE,
+            mode=self._enums.Dialogue.DialogueMode.DETECT_LANGUAGE,
             messages=[
                 ChatMessage(role=self._enums.Common.MessageAuthor.USER, content=message)
             ],
@@ -223,7 +241,9 @@ class IntercomUC(IIntercomUC):
         if visit_dialog_lang != delected_lang:
             await self._visit_service.update_visit(
                 sid=visit_sid,
-                visit_in=VisitUpdateShort(dialog_lang=delected_lang),
+                visit_in=VisitUpdate.model_validate(
+                    VisitUpdateShort(dialog_lang=delected_lang)
+                ),
             )
 
         return delected_lang
@@ -243,7 +263,9 @@ class IntercomUC(IIntercomUC):
 
         await self._visit_service.update_visit(
               sid=visit_sid,
-              visit_in=VisitUpdateShort(dialog_lang=dialog_lang),
+              visit_in=VisitUpdate.model_validate(
+                  VisitUpdateShort(dialog_lang=dialog_lang)
+              ),
           )
 
         return dialog_lang
@@ -258,7 +280,6 @@ class IntercomUC(IIntercomUC):
             normalized_message
         ) >= self._settings.bot.MIN_CHARS_TO_SWITCH_DIALOG_LANG
 
-
     async def _find_out_visitor_goal(
         self,
         visit_sid: UUID,
@@ -270,7 +291,7 @@ class IntercomUC(IIntercomUC):
 
         bot_goal_answer = await self._get_bot_answer(
             visit_sid,
-            mode=self._enums.Common.DialogMode.GOAL,
+            mode=self._enums.Dialogue.DialogueMode.GOAL,
             messages=chat_message_history,
             dialog_lang=dialog_lang,
         )
@@ -288,7 +309,7 @@ class IntercomUC(IIntercomUC):
             # Transition from state 2 to state 3
             bot_goal_relevant_answer = await self._get_bot_answer(
                 visit_sid,
-                mode=self._enums.Dialog.DialogMode.GRANT_ACCESS,
+                mode=self._enums.Dialogue.DialogueMode.GRANT_ACCESS,
                 messages=[
                     ChatMessage(
                         role=self._enums.Message.MessageAuthorRole.USER,
@@ -314,7 +335,6 @@ class IntercomUC(IIntercomUC):
             lang=dialog_lang,
         )
 
-
     async def _process_want_to_enter_visitor_answer(
         self,
         message: str,
@@ -328,7 +348,7 @@ class IntercomUC(IIntercomUC):
 
         bot_answer = await self._get_bot_answer(
             visit_sid,
-            mode=self._enums.DialogMode.WANT_TO_ENTER,
+            mode=self._enums.Dialogue.DialogueMode.WANT_TO_ENTER,
             messages=messages,
             visitor_goal=visitor_goal,
             bot_granted_access=bot_granted_access,
@@ -361,7 +381,6 @@ class IntercomUC(IIntercomUC):
             )
 
         return bot_replica
-
 
     async def _get_bot_answer(
         self,
@@ -417,11 +436,11 @@ class IntercomUC(IIntercomUC):
                 text=bot_replica.content, lang=bot_replica.lang,
             )
 
-            await self._message_service.create_bot_message(
+            created_message = await self._message_service.create_bot_message(
                 message_in=MessageBotCreate(
-                    visit_sid=visit_sid,
+                    audio=audio_data.audio,
                     content=bot_replica.content,
-                    audio_s3_path=audio_data.s3_path,
+                    visit_sid=visit_sid,
                 )
             )
 
@@ -430,13 +449,12 @@ class IntercomUC(IIntercomUC):
             )
 
             return IntercomAnswer(
-                answer_message_audio_path=audio_data.s3_path,
+                answer_message_audio_path=created_message.audio_s3_path,
                 dialog_finished=dialog_finished,
             )
 
         except Exception as e:
             return await self._get_fallback_intercom_answer(visit_sid)
-
 
     async def _get_fallback_intercom_answer(
         self,
@@ -452,14 +470,18 @@ class IntercomUC(IIntercomUC):
             text=bot_replica.content, lang=bot_replica.lang,
         )
 
-        await self._message_service.create_bot_message(
+        created_message = await self._message_service.create_bot_message(
             message_in=MessageBotCreate(
-                visit_sid=visit_sid,
+                audio=audio_data.audio,
                 content=bot_replica.content,
-                audio_s3_path=audio_data.s3_path,
+                visit_sid=visit_sid,
             )
         )
 
         return IntercomAnswer(
-            answer_message_audio_path=audio_data.s3_path,
+            answer_message_audio_path=created_message.audio_s3_path,
         )
+
+    @LoggingFunctionInfo(description="Get user door opening decision for visit.")
+    async def get_user_decision(self, visit_sid: UUID) -> Decision:
+        ...

@@ -16,11 +16,11 @@ from src.modules.messages.adapters.repositories.constants.deps import (
     get_message_repo_consts,
     get_message_repo_enums,
 )
-from src.modules.messages.adapters.repositories.message import MessagePostgresRepo
+from src.modules.messages.adapters.repositories.postgres.message import MessagePostgresRepo
 from src.modules.messages.interfaces import IMessagePostgresRepo
 
 
-async def get_message_pg_repo(
+async def get_message_postgres_repo(
     db: Annotated[AsyncSession, Depends(get_db)],
     logger: Annotated[logging.Logger, Depends(get_message_logger)],
     error_codes: Annotated[ErrorCodesEnums, Depends(get_error_codes_enums)],

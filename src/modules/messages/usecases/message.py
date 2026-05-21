@@ -23,7 +23,7 @@ class MessageUC(IMessageUC):
         visit_sid: UUID,
         pagination_params: Pagination,
     ) -> PaginationResult[MessageInHistory]:
-        # TODO: pagination
         return await self._message_service.get_message_history(
-            visit_sid=visit_sid
+            visit_sid=visit_sid,
+            pagination_params=pagination_params,
         )

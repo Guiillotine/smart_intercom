@@ -9,14 +9,12 @@ from src.modules.speech.schemas import TTSModelParams
 
 
 class TTSModelManager(ITTSModelManager[SileroTTSProtocol]):
-
     def __init__(
         self,
         consts: TTSModelManagerConsts,
     ):
         self._models = {}
         self._consts = consts
-
 
         for lang in LanguageEnum:
             params = self._consts.LangTTSModelMap[lang]

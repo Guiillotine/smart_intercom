@@ -1,5 +1,7 @@
+import io
 from logging import Logger
-from uuid import uuid4
+
+import soundfile as sf
 
 from src.common.constants.enums import LanguageEnum
 from src.config.settings import Settings
@@ -14,12 +16,10 @@ class TTSService(ITTSService):
         logger: Logger,
         settings: Settings,
         tts_model_manager: TTSModelManager,
-        speech_s3_repo: ISpeechS3Repo,
     ):
         self._logger = logger
         self._settings = settings
         self._tts_model_manager = tts_model_manager
-        self._speech_s3_repo = speech_s3_repo
 
     async def synthesize(self, text: str, lang: LanguageEnum=LanguageEnum.RU) -> AudioData:
         model, params = self._tts_model_manager.get_model(lang=lang)
@@ -31,11 +31,16 @@ class TTSService(ITTSService):
             sample_rate=self._settings.tts.TTS_SAMPLE_RATE,
         )
 
-        s3_path = await self._speech_s3_repo.put_audio_message(
-            key=str(uuid4()), # TODO: тестовая заглушка
-            data=audio,
+        buffer = io.BytesIO()
+
+        sf.write(
+            file=buffer,
+            data=audio.cpu().numpy(),
+            samplerate=self._settings.tts.TTS_SAMPLE_RATE,
+            format="WAV",
         )
 
         return AudioData(
-            s3_path=s3_path
+            data=buffer.getvalue(),
+            content_type="audio/wav",
         )

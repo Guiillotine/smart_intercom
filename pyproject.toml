@@ -30,7 +30,8 @@ dependencies = [
     "onnx (>=1.21.0,<2.0.0)",
     "onnxruntime (>=1.25.1,<2.0.0)",
     "python-jose (>=3.4.0,<4.0.0)",
-    "faster-whisper (>=1.2.1,<2.0.0)"
+    "faster-whisper (>=1.2.1,<2.0.0)",
+    "soundfile (>=0.13.1,<0.14.0)",
 ]
 
 

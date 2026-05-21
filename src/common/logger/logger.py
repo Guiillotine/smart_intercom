@@ -84,3 +84,11 @@ class LoggerManager(ILoggerManager):
     def get_face_logger(self) -> logging.Logger:
         """Get logger for face-specific application logs."""
         return self._get_logger(self._config.Config.FACE.value)
+
+    def get_speech_logger(self) -> logging.Logger:
+        """Get logger for speech-specific application logs."""
+        return self._get_logger(self._config.Config.SPEECH.value)
+
+    def get_dialogue_logger(self) -> logging.Logger:
+        """Get logger for dialogue-specific application logs."""
+        return self._get_logger(self._config.Config.DIALOGUE.value)

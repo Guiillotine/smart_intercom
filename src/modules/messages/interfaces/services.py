@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from src.common.schemas import PaginationResult, Pagination
 from src.modules.messages.schemas import (
     Message,
     MessageBotCreate,
@@ -49,11 +50,16 @@ class IMessageSrv(ABC):
         ...
 
     @abstractmethod
-    async def get_message_history(self, visit_sid: UUID) -> list[MessageInHistory]:
+    async def get_message_history(
+        self,
+        visit_sid: UUID,
+        pagination_params: Pagination,
+    ) -> PaginationResult[MessageInHistory]:
         """
         Get public message history for a visit.
 
         :param visit_sid: Visit identifier.
+        :param pagination_params: Pagination params.
         :return: Message history list.
         """
         ...

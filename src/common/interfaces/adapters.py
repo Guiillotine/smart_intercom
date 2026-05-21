@@ -6,7 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy.sql.base import ExecutableOption
 
-from src.common.schemas import SQLFilterBase, SortBase
+from src.common.schemas import SQLFilterBase, SortBase, Pagination
 
 if TYPE_CHECKING:
     from src.common.models import CoreModel
@@ -50,6 +50,18 @@ class IPostgresBaseRepo[ModelType, CreateSchemaType, UpdateSchemaType](ABC):
         :return: List of all model instances.
         """
 
+        ...
+
+    async def get_all_paginated(
+        self,
+        pagination_params: Pagination,
+        filters: SQLFilterBase = None,
+        sort_params: SortBase = None,
+        custom_options: tuple[ExecutableOption, ...] = None,
+    ) -> tuple[Sequence[ModelType], int]:
+        """
+        Get paginated items with filters.
+        """
         ...
 
     @abstractmethod

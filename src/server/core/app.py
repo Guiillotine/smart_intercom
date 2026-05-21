@@ -9,6 +9,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from src.common.errors import BackendException
 from src.config.docs.deps import get_tags_metadata
 from src.config.settings.deps import get_settings
+from src.modules.speech.handlers import TTSModelManager
+from src.modules.speech.handlers.constants.deps import get_tts_model_manager_consts
 from src.server.core.controllers import api_controller
 from src.server.middleware.deps import get_backend_exception_handler, \
     get_postgres_context_session_middleware, get_exception_middleware, \
@@ -29,8 +31,12 @@ async def lifespan(app: FastAPI):
         device=settings.runtime.DEVICE,
         compute_type=settings.asr.ASR_COMPUTE_TYPE,
     )
+    app.state.tts_model_manager = TTSModelManager(
+        consts=get_tts_model_manager_consts(settings),
+    )
     yield
     del app.state.whisper_model
+    del app.state.tts_model_manager
 
 
 app = FastAPI(

@@ -37,9 +37,18 @@ class GenderEnum(IntEnum):
     MALE = 1
 
 
+class S3PrefixEnum(StrEnum):
+    """Enum defining S3 object key prefixes for different resource types."""
+
+    VISIT = "visits"
+    PERSON = "persons/employees"
+    BOT_MESSAGE = "bot_messages"
+
+
 class CommonEnums:
     def __init__(self):
         self.Gender = GenderEnum
         self.Language = LanguageEnum
+        self.S3Prefix = S3PrefixEnum
         self.RequestType = RequestTypeEnum
         self.MessageAuthorRole = MessageAuthorRoleEnum

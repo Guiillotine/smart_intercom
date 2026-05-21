@@ -70,4 +70,5 @@ class MessageCtrl(IMessageCtrl):
         return await message_usecase.get_message_history(
             user_sid=user_sid,
             visit_sid=visit_sid,
+            pagination_params=pagination_params,
         )

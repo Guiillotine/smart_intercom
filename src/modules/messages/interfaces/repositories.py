@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from uuid import UUID
 
-from src.common.interfaces import IPostgresBaseRepo
+from src.common.interfaces import IPostgresBaseRepo, IS3BaseRepo
+from src.common.schemas import Pagination
 from src.modules.messages.models import MessageModel
 from src.modules.messages.schemas import MessageCreate, MessageUpdate
 
@@ -15,13 +16,13 @@ class IMessagePostgresRepo(
 
     Extends base PostgreSQL repository with message-specific queries.
     """
+    ...
 
-    @abstractmethod
-    async def get_by_visit_sid(self, visit_sid: UUID) -> Sequence[MessageModel]:
-        """
-        Get all messages for a visit.
 
-        :param visit_sid: Visit identifier.
-        :return: Sequence of message database models.
-        """
-        ...
+class IMessageS3Repo(IS3BaseRepo, ABC):
+    """
+    Interface for a message-specific S3 repository.
+
+    Defines additional message-related S3 operations beyond the basic S3 repository
+    functionality.
+    """

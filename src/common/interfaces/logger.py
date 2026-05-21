@@ -36,6 +36,17 @@ class ILoggerManager(ABC):
         """Get logger for user-specific application logs."""
         ...
 
+    @abstractmethod
     def get_face_logger(self) -> logging.Logger:
         """Get logger for face-specific application logs."""
+        ...
+
+    @abstractmethod
+    def get_speech_logger(self) -> logging.Logger:
+        """Get logger for speech-specific application logs."""
+        ...
+
+    @abstractmethod
+    def get_dialogue_logger(self) -> logging.Logger:
+        """Get logger for dialogue-specific application logs."""
         ...

@@ -10,7 +10,8 @@ class SpeechInfo(CoreSchema):
 
 
 class AudioData(CoreSchema):
-    s3_path: str
+    data: bytes
+    content_type: str
 
 
 class TTSModelParams(CoreSchema):

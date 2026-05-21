@@ -20,6 +20,8 @@ class LoggerNameEnum(StrEnum):
     MESSAGE = "MESSAGE"
     USER = "USER"
     FACE = "FACE"
+    SPEECH = "SPEECH"
+    DIALOGUE = "DIALOGUE"
 
 
 class LoggerLevelEnum(StrEnum):
@@ -67,6 +69,16 @@ class LoggerConfigEnum(Enum):
     )
     FACE = LoggerConfig(
         LoggerNameEnum.FACE,
+        get_settings().project.LOG_LEVEL.upper(),
+        LoggerFormatEnum.BASE,
+    )
+    SPEECH = LoggerConfig(
+        LoggerNameEnum.SPEECH,
+        get_settings().project.LOG_LEVEL.upper(),
+        LoggerFormatEnum.BASE,
+    )
+    DIALOGUE = LoggerConfig(
+        LoggerNameEnum.DIALOGUE,
         get_settings().project.LOG_LEVEL.upper(),
         LoggerFormatEnum.BASE,
     )

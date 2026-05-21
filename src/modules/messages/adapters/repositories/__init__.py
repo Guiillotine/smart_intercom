@@ -1,1 +1,1 @@
-from .message import MessagePostgresRepo
+from src.modules.messages.adapters.repositories.postgres.message import MessagePostgresRepo

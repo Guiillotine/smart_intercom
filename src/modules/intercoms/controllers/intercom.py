@@ -78,29 +78,23 @@ class IntercomController(IIntercomController):
         )
 
     @staticmethod
-    def start_visit(
+    async def start_visit(
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> IntercomStartedVisit:
-        # TODO:
-        # 1. Get all unfinished visits
-        # 2. Delete unfinished visits without data (no user messages) + s3
-        # 3. Create new visit
-        pass
+        """TODO"""
+        return await intercom_usecase.start_visit()
 
     @staticmethod
-    def process_visit_photo(
+    async def process_visit_photo(
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         photo: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> Msg:
-        # TODO:
-        # 1. Process photo
-        # 2. Identification by embedding (Person table)
-        # 3. Call user if employee was detected
-        pass
+        """TODO"""
+        return await intercom_usecase.process_visit_photo(visit_sid, photo)
 
     @staticmethod
-    def get_answer(
+    async def get_answer(
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         audio: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
@@ -111,7 +105,7 @@ class IntercomController(IIntercomController):
         )
 
     @staticmethod
-    def get_answer_on_text_message(
+    async def get_answer_on_text_message(
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         message: Annotated[str, Body()],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
@@ -122,8 +116,8 @@ class IntercomController(IIntercomController):
         )
 
     @staticmethod
-    def get_user_decision(
+    async def get_user_decision(
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> Decision:
-        pass
+        return await intercom_usecase.get_user_decision(visit_sid)

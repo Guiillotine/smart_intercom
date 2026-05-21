@@ -48,3 +48,16 @@ def get_face_logger(
     logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
 ) -> logging.Logger:
     return logger_manager.get_face_logger()
+
+
+def get_speech_logger(
+    logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
+) -> logging.Logger:
+    return logger_manager.get_speech_logger()
+
+
+def get_dialogue_logger(
+    logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
+) -> logging.Logger:
+    return logger_manager.get_dialogue_logger()
+
