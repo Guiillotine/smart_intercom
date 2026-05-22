@@ -1,7 +1,5 @@
-from __future__ import annotations
-
-from src.common.schemas import CoreSchema
 from src.common.constants.enums import MessageAuthorRoleEnum, LanguageEnum
+from src.common.schemas import CoreSchema
 
 
 class ChatMessage(CoreSchema):
@@ -25,13 +23,13 @@ class DetectLanguageBotAnswer(ChatBotAnswerBase):
     lang: LanguageEnum
 
 
-class GoalDialogBotAnswer(ChatBotAnswerBase):
+class GoalDialogueBotAnswer(ChatBotAnswerBase):
     content: str
     visitor_goal: str | None = None
     goal_identified: bool = False
 
 
-class GrantAccessDialogBotAnswer(CoreSchema):
+class GrantAccessDialogueBotAnswer(CoreSchema):
     goal_relevant_to_company: bool = False
 
 
@@ -43,10 +41,10 @@ class WantToEnterBotAnswer(ChatBotAnswerBase):
     want_to_enter: bool
 
 
-ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogBotAnswer | GoalDialogBotAnswer | BotReplica | WantToEnterBotAnswer
+ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogueBotAnswer | GoalDialogueBotAnswer | BotReplica | WantToEnterBotAnswer
 
 
-class DialogConfig(CoreSchema):
+class DialogueConfig(CoreSchema):
     initial_prompt: str
     bot_answer_schema_prompt: str
     bot_answer_schema: type[CoreSchema]

@@ -92,3 +92,7 @@ class LoggerManager(ILoggerManager):
     def get_dialogue_logger(self) -> logging.Logger:
         """Get logger for dialogue-specific application logs."""
         return self._get_logger(self._config.Config.DIALOGUE.value)
+
+    def get_intercom_logger(self) -> logging.Logger:
+        """Get logger for intercom-specific application logs."""
+        return self._get_logger(self._config.Config.INTERCOM.value)

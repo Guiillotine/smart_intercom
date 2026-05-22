@@ -10,8 +10,8 @@ from src.config.settings.deps import get_settings
 from src.modules.speech.adapters.whisper.deps import get_whisper_model
 from src.modules.speech.handlers import TTSModelManager
 from src.modules.speech.handlers.deps import get_tts_model_manager
-from src.modules.speech.interfaces import ITTSService
-from src.modules.speech.services import ASRService, TTSService
+from src.modules.speech.interfaces import ITTSSrv
+from src.modules.speech.services import ASRSrv, TTSSrv
 
 
 def get_asr_service(
@@ -20,7 +20,7 @@ def get_asr_service(
     consts: Annotated[ASRServiceConsts, Depends(get_asr_service_consts)],
     whisper_model: Annotated[WhisperModel, Depends(get_whisper_model)],
 ) -> IASRService:
-    return ASRService(
+    return ASRSrv(
         consts=consts,
         logger=logger,
         settings=settings,
@@ -32,8 +32,8 @@ def get_tts_service(
     logger: Annotated[logging.Logger, Depends(get_speech_logger)],
     settings: Settings = Depends(get_settings),
     tts_model_manager: TTSModelManager = Depends(get_tts_model_manager),
-) -> ITTSService:
-    return TTSService(
+) -> ITTSSrv:
+    return TTSSrv(
         logger=logger,
         settings=settings,
         tts_model_manager=tts_model_manager,

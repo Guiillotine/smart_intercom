@@ -22,7 +22,7 @@ class AuthErrorsEnum(Enum):
     INCORRECT_CREDENTIALS = ("incorrect_credentials", 401, "Incorrect login/password")
 
 
-class DialogErrorsEnum(Enum):
+class DialogueErrorsEnum(Enum):
     # 400
     BAD_REQUEST = ("bad_request", 400, "Bad request to LLM provider")
     INVALID_LLM_RESPONSE = ("invalid_llm_response", 400, "Invalid LLM response format")
@@ -34,7 +34,7 @@ class DialogErrorsEnum(Enum):
 
 class IntercomErrorsEnum(Enum):
     # 400
-    DIALOG_IS_OVER = ("dialog_is_over", 400, "Dialog is over")
+    DIALOGUE_IS_OVER = ("dialogue_is_over", 400, "Dialogue is over")
 
 
 class PersonErrorsEnum(Enum):
@@ -46,6 +46,6 @@ class ErrorCodesEnums:
     def __init__(self):
         self.Auth = AuthErrorsEnum
         self.Common = CommonErrorsEnum
-        self.Dialog = DialogErrorsEnum
         self.Person = PersonErrorsEnum
+        self.Dialogue = DialogueErrorsEnum
         self.Intercom = IntercomErrorsEnum

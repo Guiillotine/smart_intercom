@@ -35,7 +35,7 @@ class VisitModel(CoreModel):
         nullable=True, comment="Purpose of the visit detected by bot",
     )
 
-    dialog_lang: Mapped[int] = mapped_column(comment="Visit dialog language")
+    dialogue_lang: Mapped[int] = mapped_column(comment="Visit dialogue language")
 
     photo: Mapped[str | None] = mapped_column(
         nullable=True,

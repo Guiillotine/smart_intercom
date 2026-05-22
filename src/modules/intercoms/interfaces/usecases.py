@@ -46,7 +46,6 @@ class IIntercomUC(ABC):
 
         :param audio: Uploaded audio file.
         :param visit_sid: Visit identifier.
-        :param dialog_lang: Optional dialog language.
         :return: Intercom answer data.
         """
         ...
@@ -56,14 +55,14 @@ class IIntercomUC(ABC):
         self,
         message: str,
         visit_sid: UUID,
-        dialog_lang: LanguageEnum | None = None,
+        dialogue_lang: LanguageEnum | None = None,
     ) -> IntercomAnswer:
         """
         Get intercom answer for text message.
 
         :param message: Visitor text message.
         :param visit_sid: Visit identifier.
-        :param dialog_lang: Optional dialog language.
+        :param dialogue_lang: Optional dialogue language.
         :return: Intercom answer data.
         """
         ...

@@ -50,3 +50,8 @@ class ILoggerManager(ABC):
     def get_dialogue_logger(self) -> logging.Logger:
         """Get logger for dialogue-specific application logs."""
         ...
+
+    @abstractmethod
+    def get_intercom_logger(self) -> logging.Logger:
+        """Get logger for intercom-specific application logs."""
+        ...

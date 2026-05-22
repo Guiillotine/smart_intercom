@@ -74,7 +74,7 @@ def upgrade() -> None:
     sa.Column('status', sa.Integer(), nullable=False),
     sa.Column('purpose', sa.String(), nullable=True, comment='Purpose of the visit detected by bot'),
     sa.Column('finish_reason', sa.String(), nullable=True, comment='The reason the visit was finished'),
-    sa.Column('dialog_lang', sa.Integer(), nullable=False, comment='Visit dialog language'),
+    sa.Column('dialogue_lang', sa.Integer(), nullable=False, comment='Visit dialogue language'),
     sa.Column('photo', sa.String(), nullable=False, comment='S3 path to photo of the visit'),
     sa.Column('decision_by_user_sid', sa.Uuid(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),

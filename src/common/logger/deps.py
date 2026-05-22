@@ -61,3 +61,8 @@ def get_dialogue_logger(
 ) -> logging.Logger:
     return logger_manager.get_dialogue_logger()
 
+
+def get_intercom_logger(
+    logger_manager: Annotated[LoggerManager, Depends(get_logger_manager)]
+) -> logging.Logger:
+    return logger_manager.get_intercom_logger()

@@ -35,19 +35,19 @@ class VisitPerson(VisitPersonBase):
 class VisitBase(CoreSchema):
     status: VisitStatusEnum
     arrival_datetime: datetime
-    dialog_lang: LanguageEnum
+    dialogue_lang: LanguageEnum
 
 
 class VisitCreate(CoreSchema):
     status: VisitStatusEnum = VisitStatusEnum.IN_PROCESS
     start_datetime: datetime = Field(default_factory=datetime.now(UTC))
-    dialog_lang: LanguageEnum = LanguageEnum.RU
+    dialogue_lang: LanguageEnum = LanguageEnum.RU
     photo: str | None = None
 
 
 @partial_schema
 class VisitUpdateShort(CoreSchema):
-    dialog_lang: LanguageEnum
+    dialogue_lang: LanguageEnum
 
 
 class VisitUpdate(VisitUpdateShort):
@@ -80,7 +80,7 @@ class Visit(CoreSchema):
     finish_datetime: datetime | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
-    dialog_lang: LanguageEnum
+    dialogue_lang: LanguageEnum
 
 
 class VisitFull(Visit):

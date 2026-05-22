@@ -3,7 +3,8 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.common.constants import CommonEnums
-from src.common.constants.deps import get_common_enums
+from src.common.constants.consts import CommonConsts
+from src.common.constants.deps import get_common_enums, get_common_consts
 from src.modules.dialogues.constants import DialogueEnums
 from src.modules.dialogues.constants.deps import get_dialogue_enums
 from src.modules.intercoms.usecases.constants import IntercomUCConsts, IntercomUCEnums
@@ -27,5 +28,7 @@ def get_intercom_usecase_enums(
     )
 
 
-def get_intercom_usecase_consts() -> IntercomUCConsts:
-    return IntercomUCConsts()
+def get_intercom_usecase_consts(
+    common_consts: Annotated[CommonConsts, Depends(get_common_consts)],
+) -> IntercomUCConsts:
+    return IntercomUCConsts(common_consts=common_consts)

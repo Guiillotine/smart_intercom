@@ -1,4 +1,6 @@
-from enum import IntEnum
+from enum import IntEnum, StrEnum, auto
+
+from src.common.constants import CommonEnums
 
 
 class DialogueModeEnum(IntEnum):
@@ -9,6 +11,21 @@ class DialogueModeEnum(IntEnum):
     WANT_TO_ENTER = 4
 
 
+class BotMessageEnum(StrEnum):
+  HELLO = auto()
+  ERROR = auto()
+  ACCESS_GRANTED = auto()
+  ACCESS_NOT_GRANTED = auto()
+  WANT_TO_ENTER_QUESTION = auto()
+  CALL_EMPLOYEE = auto()
+  GOODBYE = auto()
+
+
 class DialogueEnums:
-    def __init__(self):
+    def __init__(
+        self,
+        common_enums: CommonEnums,
+    ):
+        self.Common = common_enums
+        self.BotMessage = BotMessageEnum
         self.DialogueMode = DialogueModeEnum

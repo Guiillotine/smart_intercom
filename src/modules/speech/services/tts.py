@@ -4,13 +4,14 @@ from logging import Logger
 import soundfile as sf
 
 from src.common.constants.enums import LanguageEnum
+from src.common.decorators import LoggingFunctionInfo
 from src.config.settings import Settings
 from src.modules.speech.handlers import TTSModelManager
-from src.modules.speech.interfaces import ITTSService, ISpeechS3Repo
+from src.modules.speech.interfaces import ITTSSrv, ISpeechS3Repo
 from src.modules.speech.schemas import AudioData
 
 
-class TTSService(ITTSService):
+class TTSSrv(ITTSSrv):
     def __init__(
         self,
         logger: Logger,
@@ -21,11 +22,12 @@ class TTSService(ITTSService):
         self._settings = settings
         self._tts_model_manager = tts_model_manager
 
+    @LoggingFunctionInfo("Synthesize speech from text.")
     async def synthesize(self, text: str, lang: LanguageEnum=LanguageEnum.RU) -> AudioData:
         model, params = self._tts_model_manager.get_model(lang=lang)
         print(type(model), type(params))
 
-        audio = model.apply_tts( # TODO: добавить в протокол
+        audio = model.apply_tts(
             text=text,
             speaker=params.speaker,
             sample_rate=self._settings.tts.TTS_SAMPLE_RATE,

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from faster_whisper import WhisperModel
+from openai import OpenAI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -26,17 +27,9 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.whisper_model = WhisperModel(
-        model_size_or_path=settings.asr.ASR_MODEL_SIZE,
-        device=settings.runtime.DEVICE,
-        compute_type=settings.asr.ASR_COMPUTE_TYPE,
-    )
-    app.state.tts_model_manager = TTSModelManager(
-        consts=get_tts_model_manager_consts(settings),
-    )
+    initialize_state()
     yield
-    del app.state.whisper_model
-    del app.state.tts_model_manager
+    clean_state()
 
 
 app = FastAPI(
@@ -90,6 +83,29 @@ def initialize_app():
     """
     setup_middleware()
     include_routers()
+
+
+def initialize_state():
+    app.state.whisper_model = WhisperModel(
+        model_size_or_path=settings.asr.ASR_MODEL_SIZE,
+        device=settings.runtime.DEVICE,
+        compute_type=settings.asr.ASR_COMPUTE_TYPE,
+    )
+    app.state.tts_model_manager = TTSModelManager(
+        consts=get_tts_model_manager_consts(settings),
+    )
+    app.state.client = OpenAI(
+        api_key=settings.bot.API_KEY,
+        base_url=settings.bot.BASE_URL,
+        max_retries=settings.bot.LLM_HTTP_RETRIES,
+        timeout=settings.bot.LLM_RESPONSE_TIMEOUT_SEC,
+    )
+
+
+def clean_state():
+    del app.state.whisper_model
+    del app.state.tts_model_manager
+    del app.state.client
 
 
 # === Run App Initialization === #

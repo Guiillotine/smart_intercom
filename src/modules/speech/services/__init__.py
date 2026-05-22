@@ -1,2 +1,2 @@
-from .asr import ASRService
-from .tts import TTSService
+from .asr import ASRSrv
+from .tts import TTSSrv

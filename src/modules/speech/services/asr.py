@@ -6,10 +6,11 @@ from faster_whisper import WhisperModel
 from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.config.settings import Settings
+from src.modules.speech.interfaces import IASRSrv
 from src.modules.speech.schemas import SpeechInfo
 
 
-class ASRService(IASRService):
+class ASRSrv(IASRSrv):
     def __init__(
         self,
         consts: ASRServiceConsts,
@@ -27,19 +28,19 @@ class ASRService(IASRService):
             compute_type=settings.asr.ASR_COMPUTE_TYPE,
         )
 
-    @LoggingFunctionInfo("Speech to text")
+    @LoggingFunctionInfo("Recognize text from audio.")
     def speech_to_text(
         self,
         audio: UploadFile,
-        dialog_lang: LanguageEnum | None = None,
+        dialogue_lang: LanguageEnum | None = None,
     ) -> SpeechInfo:
-        segments, info = self._model.transcribe(audio, beam_size=4)
+        segments, info = self._model.transcribe(audio.file, beam_size=4)
 
         if info.language not in LanguageEnum.get_all_langs():
             self._logger.warning("Couldn't recognize language.")
             lang = (
-                dialog_lang
-                if dialog_lang is not None
+                dialogue_lang
+                if dialogue_lang is not None
                 else self._consts.Common.Language.DEFAULT_LANG
             )
         else:
