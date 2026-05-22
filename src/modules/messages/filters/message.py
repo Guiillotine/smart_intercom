@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from fastapi_filter.contrib.sqlalchemy import Filter
-from pydantic import Field
 
 from src.common.schemas import SQLFilterBase
 from src.modules.messages.models import MessageModel

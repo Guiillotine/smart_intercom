@@ -7,7 +7,7 @@ class AuthPayloadFields(StrEnum):
     """
 
     SUB = "sub"
-    STATUSES = "statuses"
+    STATUS = "status"
     EXP = "exp"
     JTI = "jti"
     PAIR_ID = "pair_id"

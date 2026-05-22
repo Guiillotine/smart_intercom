@@ -49,11 +49,12 @@ class IAuthUC(ABC):
         self, form_data: OAuth2PasswordRequestForm, user_agent: str | None = None
     ) -> LoginToken:
         """
-        Authenticate user and create token pair.
+        Generates a pair of access and refresh tokens for the user based on provided
+        credentials.
 
-        :param form_data: OAuth2 password form data.
-        :param user_agent: Optional User-Agent request header.
-        :return: Access and refresh token pair.
+        :param form_data: The form data containing the username and password.
+        :param user_agent: The User-Agent string from the client request.
+        :return: A LoginToken instance containing the generated tokens.
         """
         ...
 

@@ -1,1 +1,2 @@
-from .user import AuthUC, UserUC
+from .user import UserUC
+from .auth import AuthUC

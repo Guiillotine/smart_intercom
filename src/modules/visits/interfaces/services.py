@@ -51,6 +51,20 @@ class IVisitSrv(ABC):
         ...
 
     @abstractmethod
+    async def get_all(
+        self, pagination_params: Pagination, filters=VisitFilter, sort_params: SortBase = None
+    ) -> ListResult[Visit]:
+        """
+        Get paginated visits.
+
+        :param pagination_params: Pagination parameters.
+        :param filters: Optional filter schema.
+        :param sort_params: Optional sorting parameters.
+        :return: Paginated visit list.
+        """
+        ...
+
+    @abstractmethod
     async def get_all_paginated(
         self, pagination_params: Pagination, filters=None, sort_params: SortBase = None
     ) -> PaginationResult[Visit]:

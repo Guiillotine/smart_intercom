@@ -67,6 +67,8 @@ class IntercomUC(IIntercomUC):
         # 1. Get all unfinished visits
         # 2. Delete unfinished visits without data (no user messages) + s3
 
+        unfinished_visits = await self._visit_service.get_all()
+
         visit = await self._visit_service.create_visit()
 
         hello_bot_answer = self._dialogue_service.get_hello_bot_answer()

@@ -59,7 +59,6 @@ def setup_middleware():
         SessionMiddleware, # TODO: это что?
         secret_key=get_settings().project.SESSION_SECRET_KEY,
     )
-    #app.middleware("http")(get_jwt_context_middleware())
     app.middleware("http")(get_exception_middleware())
     app.middleware("http")(get_postgres_context_session_middleware())
 

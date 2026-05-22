@@ -9,8 +9,9 @@ from src.common.deps.oauth_scheme import oauth2_scheme
 from src.common.schemas import Msg
 from src.modules.users.constants.enums import LogoutType
 from src.modules.users.controllers.constants import UserCtrlEnums
-from src.modules.users.interfaces import IAuthCtrl
+from src.modules.users.interfaces import IAuthCtrl, IAuthUC
 from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate
+from src.modules.users.usecases.deps import get_auth_usecase
 
 
 class AuthCtrl(IAuthCtrl):
