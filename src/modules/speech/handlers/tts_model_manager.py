@@ -1,5 +1,6 @@
 from typing import ClassVar, TypeVar
 import torch
+from fastapi import Path
 
 from src.common.constants.enums import LanguageEnum
 from src.modules.speech.handlers.constants.consts import TTSModelManagerConsts
@@ -24,10 +25,11 @@ class TTSModelManager(ITTSModelManager[SileroTTSProtocol]):
               raise Exception
 
             model, _ = torch.hub.load(
-                repo_or_dir='snakers4/silero-models',
-                model='silero_tts',
+                repo_or_dir=str(self._consts.DirPath),
+                model="silero_tts",
                 language=lang.value,
                 speaker=params.model_id,
+                source="local",
             )
 
             self._models[lang] = model

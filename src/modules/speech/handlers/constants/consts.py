@@ -1,6 +1,12 @@
+import os
+from pathlib import Path
+
 from src.common.constants.enums import LanguageEnum
 from src.config.settings import Settings
 from src.modules.speech.schemas import TTSModelParams
+
+class RepoDirConsts:
+    PATH: Path = Path("").resolve() / "vendor" / "silero-models"
 
 
 class TTSModelManagerConsts:
@@ -15,3 +21,5 @@ class TTSModelManagerConsts:
                 speaker=settings.tts.TTS_SPEAKER_EN,
             ),
         }
+        self.DirPath = RepoDirConsts.PATH
+        print(222222222222222, self.DirPath)

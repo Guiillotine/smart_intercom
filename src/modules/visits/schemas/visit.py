@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import Field
 from datetime import datetime, UTC
 from uuid import UUID, uuid4
+
+from pydantic import Field
 
 from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
@@ -40,7 +41,7 @@ class VisitBase(CoreSchema):
 
 class VisitCreate(CoreSchema):
     status: VisitStatusEnum = VisitStatusEnum.IN_PROCESS
-    start_datetime: datetime = Field(default_factory=datetime.now(UTC))
+    start_datetime: datetime = Field(default_factory=lambda: datetime.now(UTC))
     dialogue_lang: LanguageEnum = LanguageEnum.RU
     photo: str | None = None
 
