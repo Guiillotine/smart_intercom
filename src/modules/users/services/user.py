@@ -1,4 +1,3 @@
-import hashlib
 import logging
 from uuid import UUID
 
@@ -6,10 +5,9 @@ from src.common.constants import ErrorCodesEnums
 from src.common.errors import BackendException
 from src.modules.users.interfaces import IUserPostgresRepo, IUserSrv
 from src.modules.users.schemas import (
-    UserCreate,
-    UserCreateDB,
     UserWithPassword,
     UserWithRole,
+    UserCreateInDB,
 )
 from src.modules.users.services.constants import UserSrvConsts, UserSrvEnums
 
@@ -39,18 +37,7 @@ class UserSrv(IUserSrv):
         user = await self._user_repo.get_by_email(email)
         return UserWithPassword.model_validate(user) if user else None
 
-    async def create(self, user_in: UserCreate) -> UserWithRole:
-        user = await self._user_repo.create(
-            obj_in=UserCreateDB(
-                first_name=user_in.first_name,
-                last_name=user_in.last_name,
-                middle_name=user_in.middle_name,
-                email=user_in.email,
-                password_hash=self.hash_password(user_in.password),
-            )
-        )
-        return UserWithRole.model_validate(user)
+    async def create(self, user_in: UserCreateInDB) -> UserWithRole:
+        user = await self._user_repo.create(obj_in=user_in)
 
-    @staticmethod
-    def hash_password(password: str) -> str:
-        return hashlib.sha256(password.encode("utf-8")).hexdigest()
+        return UserWithRole.model_validate(user)

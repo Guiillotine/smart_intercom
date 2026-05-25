@@ -5,8 +5,8 @@ from fastapi import Depends
 
 from src.common.constants import TokenEnums
 from src.common.constants.deps import get_token_enums
-from src.common.helpers import TokenHelper, CustomDateTime
-from src.common.interfaces import ICustomDateTime, ITokenHelper
+from src.common.helpers import TokenHelper, CustomDateTime, PasswordHelper
+from src.common.interfaces import ICustomDateTime, ITokenHelper, IPasswordHelper
 from src.common.logger.deps import get_base_logger
 from src.config.settings import Settings
 from src.config.settings.deps import get_settings
@@ -55,3 +55,16 @@ def get_token_helper(
         settings=settings,
         custom_datetime=custom_datetime,
     )
+
+
+def get_password_helper() -> IPasswordHelper:
+    """
+    Dependency provider for password hashing utility.
+
+    Returns an instance of PasswordHelper that implements the IPasswordHelper
+    interface, used for securely hashing and verifying passwords.
+
+    :return: Instance of PasswordHelper implementing IPasswordHelper.
+    """
+
+    return PasswordHelper()

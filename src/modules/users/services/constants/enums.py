@@ -1,2 +1,16 @@
+from src.common.constants import TokenEnums
+
+
 class UserSrvEnums:
-    pass
+    def __init__(
+        self,
+    ):
+        pass
+
+
+class AuthSrvEnums:
+    def __init__(
+        self,
+        token_enums: TokenEnums,
+    ):
+        self.TokenEnums = token_enums

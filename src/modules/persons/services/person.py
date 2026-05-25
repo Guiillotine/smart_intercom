@@ -86,7 +86,7 @@ class PersonSrv(IPersonSrv):
         person = await self._get_model_by_sid(sid)
 
         if not person:
-            raise BackendException(error=self._errors.Common.ENTITY_NOT_FOUND)
+            raise BackendException(error=self._errors.Person.PERSON_NOT_FOUND)
 
         await self._person_postgres_repo.update(
             db_obj=person,

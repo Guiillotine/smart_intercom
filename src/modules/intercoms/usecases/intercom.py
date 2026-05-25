@@ -67,6 +67,7 @@ class IntercomUC(IIntercomUC):
         # 1. Get all unfinished visits
         # 2. Delete unfinished visits without data (no user messages) + s3
 
+        # noinspection PyArgumentList
         unfinished_visits = await self._visit_service.get_all()
 
         visit = await self._visit_service.create_visit()
@@ -201,7 +202,7 @@ class IntercomUC(IIntercomUC):
         )
 
         if bot_answer.error: # TODO: to BotReplica !
-            return (bot_answer, True)
+            return bot_answer, True
 
         bot_replica = BotReplica(
             content="",
@@ -231,7 +232,10 @@ class IntercomUC(IIntercomUC):
             visit_sid,
             mode=self._enums.Dialogue.DialogueMode.DETECT_LANGUAGE,
             messages=[
-                ChatMessage(role=self._enums.Common.MessageAuthor.USER, content=message)
+                ChatMessage(
+                    role=self._enums.Common.MessageAuthorRole.USER,
+                    content=message,
+                )
             ],
         )
 
@@ -347,7 +351,9 @@ class IntercomUC(IIntercomUC):
         dialogue_lang: LanguageEnum,
     ) -> BotReplica:
         # TODO
-        messages = [ChatMessage(role=self._enums.Message.MessageAuthorRole.USER, content=message)]
+        messages = [
+            ChatMessage(role=self._enums.Common.MessageAuthorRole.USER, content=message)
+        ]
 
         bot_answer = await self._get_bot_answer(
             visit_sid,

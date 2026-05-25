@@ -7,7 +7,7 @@ from src.common.adapters.repositories.postgres import PostgresBaseRepo
 from src.common.constants import ErrorCodesEnums
 from src.modules.users.interfaces import IUserPostgresRepo
 from src.modules.users.models import UserModel
-from src.modules.users.schemas import UserCreateInDB, UserUpdate
+from src.modules.users.schemas import UserCreate, UserUpdate, UserCreateInDB
 from src.modules.users.adapters.repositories.postgres.constants import (
     UserRepoConsts,
     UserRepoEnums,

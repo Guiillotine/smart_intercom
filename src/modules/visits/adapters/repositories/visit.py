@@ -7,7 +7,10 @@ from src.common.constants import ErrorCodesEnums
 from src.modules.visits.interfaces import IVisitPersonPostgresRepo, IVisitPostgresRepo
 from src.modules.visits.models import VisitModel, VisitPersonModel
 from src.modules.visits.schemas import VisitCreate, VisitPersonCreate, VisitUpdate
-from src.modules.visits.adapters.repositories.constants import VisitRepoConsts, VisitRepoEnums
+from src.modules.visits.adapters.repositories.constants import (
+    VisitRepoConsts,
+    VisitRepoEnums,
+)
 
 
 class VisitPostgresRepo(

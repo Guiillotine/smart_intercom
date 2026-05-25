@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.common.interfaces import IPostgresBaseRepo, IBaseRedisRepo
 from src.modules.users.models import RoleModel, UserModel
-from src.modules.users.schemas import RoleCreate, RoleUpdate, UserCreateInDB, UserUpdate
+from src.modules.users.schemas import RoleCreate, RoleUpdate, UserUpdate, UserCreateInDB
 
 
 class IRolePostgresRepo(IPostgresBaseRepo[RoleModel, RoleCreate, RoleUpdate], ABC):
@@ -38,15 +38,4 @@ class IAuthRedisRepo(IBaseRedisRepo, ABC):
     Extends the base Redis repository with methods specific to storing
     and managing verification data used in the authentication process.
     """
-
-    @abstractmethod
-    async def delete_all_user_sessions_except(
-        self, user_sid: str, current_pair_id: str
-    ) -> None:
-        """
-        Deletes all user sessions except current.
-        :param user_sid: UUID of user.
-        :param current_pair_id: Pair ID of current user session.
-        :return: None
-        """
-        ...
+    pass

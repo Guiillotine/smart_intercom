@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.schemas import Msg
-from src.modules.users.constants.enums import LogoutType
 from src.modules.users.schemas import LoginToken, UserCreate, UserWithRole
 
 
@@ -85,12 +84,11 @@ class IAuthUC(ABC):
         ...
 
     @abstractmethod
-    async def delete_tokens(self, token: str, logout_type: LogoutType) -> Msg:
+    async def delete_token(self, token: str) -> Msg:
         """
-        Delete or invalidate user tokens.
+        Delete or invalidate user token.
 
         :param token: Current bearer token.
-        :param logout_type: Logout scope.
         :return: Operation result message.
         """
         ...

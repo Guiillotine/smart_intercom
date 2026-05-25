@@ -4,7 +4,10 @@ from enum import Enum
 class CommonErrorsEnum(Enum):
     # 400
     NOT_FOUND = ("not_found", 404, "Entry not found")
-    # --- 422 Unprocessable Entity ---
+    INCORRECT_SORT_FIELD = ("incorrect_sort_field", 400, "Incorrect sort field")
+    # 409 Conflict
+    NOT_UNIQUE = ("not_unique", 409, "Non-unique field(s) during creation")
+    # 422
     UNPROCESSABLE_ENTITY = ("unprocessable_entity", 422, "Unprocessable entity")
     NUMBER_OUT_OF_BOUNDS = (
         "number_out_of_bounds",
@@ -19,7 +22,11 @@ class AuthErrorsEnum(Enum):
     # 400
     INVALID_REFRESH_TOKEN = ("invalid_refresh_token", 401, "Invalid refresh token")
     INVALID_ACCESS_TOKEN = ("invalid_access_token", 401, "Invalid access token")
-    INCORRECT_CREDENTIALS = ("incorrect_credentials", 401, "Incorrect login/password")
+    INCORRECT_CREDENTIALS = (
+        "incorrect_credentials",
+        400,
+        "Incorrect login or password",
+    )
 
 
 class DialogueErrorsEnum(Enum):
@@ -42,9 +49,25 @@ class PersonErrorsEnum(Enum):
     PERSON_NOT_FOUND = ("person_not_found", 404, "Person not found")
 
 
+class UserError(Enum):
+    # 404
+    USER_NOT_FOUND = ("user_not_found", 404, "User not found")
+
+
+class TokenError(Enum):
+    # 401
+    INVALID_TOKEN = ("invalid_token", 400, "Invalid token")
+    INVALID_ACCESS_TOKEN = ("invalid_access_token", 400, "Invalid access token")
+    INVALID_REFRESH_TOKEN = ("invalid_refresh_token", 400, "Invalid refresh token")
+    # 404
+    TOKEN_NOT_FOUND = ("token_not_found", 404, "Token not found")
+
+
 class ErrorCodesEnums:
     def __init__(self):
         self.Auth = AuthErrorsEnum
+        self.User = UserError
+        self.Token = TokenError
         self.Common = CommonErrorsEnum
         self.Person = PersonErrorsEnum
         self.Dialogue = DialogueErrorsEnum

@@ -1,11 +1,11 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import numpy as np
 
 from src.modules.faces.schemas import FaceInfo
 
 
-class IFaceAnalyzerSrv:
+class IFaceAnalyzerSrv(ABC):
     """
     Interface for face analyzer service.
 
@@ -20,7 +20,7 @@ class IFaceAnalyzerSrv:
         image: np.ndarray,
     ) -> list[FaceInfo]:
         """
-        Analyse an image and return information about all detected faces.
+        Analyze an image and return information about all detected faces.
 
         The method detects faces in the provided image, normalizes detected face
         bounding boxes to image bounds, extracts face crops, normalizes face

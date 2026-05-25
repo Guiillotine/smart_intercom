@@ -1,4 +1,3 @@
-#ModelType
 import logging
 from contextlib import suppress
 from typing import TypeVar, Any, Sequence
@@ -11,7 +10,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.associationproxy import AssociationProxyInstance
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.orm.base import SQLORMOperations
 from sqlalchemy.sql.base import ExecutableOption
 
@@ -87,7 +85,7 @@ class PostgresBaseRepo(
         self,
         query: Select,
         pagination_params: Pagination,
-    ) -> (Sequence[ModelType], int):
+    ) -> tuple[Sequence[ModelType], int]:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self._get_single_result(query=count_query)
 
@@ -131,7 +129,7 @@ class PostgresBaseRepo(
         self,
         query: Select,
         sort_params: SortBase,
-    ) -> (Sequence[ModelType], int):
+    ) -> Select:
         if sort_params and sort_params.sort_field:
             try:
                 sort_field = await self._validate_sort_field(sort_params.sort_field)

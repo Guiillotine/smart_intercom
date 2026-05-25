@@ -1,1 +1,1 @@
-from .visit import VisitModel
+from .visit import VisitModel, VisitPersonModel

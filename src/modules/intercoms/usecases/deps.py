@@ -38,7 +38,7 @@ async def get_intercom_usecase(
     """
     Dependency provider for the intercom use case layer.
 
-    Initializes and returns a intercom use case instance with the required
+    Initializes and returns an intercom use case instance with the required
     enums, error codes, logger, and service layer dependency.
 
     :return: IIntercomUC: The initialized intercom use case.

@@ -8,6 +8,7 @@ from src.common.decorators import LoggingFunctionInfo
 from src.config.settings import Settings
 from src.modules.speech.interfaces import IASRSrv
 from src.modules.speech.schemas import SpeechInfo
+from src.modules.speech.services.constants import ASRServiceConsts
 
 
 class ASRSrv(IASRSrv):
@@ -41,7 +42,7 @@ class ASRSrv(IASRSrv):
             lang = (
                 dialogue_lang
                 if dialogue_lang is not None
-                else self._consts.Common.Language.DEFAULT_LANG
+                else self._consts.Common.DefaultLanguage
             )
         else:
             lang = LanguageEnum(info.language)

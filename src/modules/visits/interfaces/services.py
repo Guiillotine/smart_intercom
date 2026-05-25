@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
+from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.schemas import (
     Visit,
     VisitCallEmployee,
@@ -52,12 +53,13 @@ class IVisitSrv(ABC):
 
     @abstractmethod
     async def get_all(
-        self, pagination_params: Pagination, filters=VisitFilter, sort_params: SortBase = None
+        self,
+        filters: VisitFilter,
+        sort_params: SortBase = None
     ) -> ListResult[Visit]:
         """
-        Get paginated visits.
+        Get all visits.
 
-        :param pagination_params: Pagination parameters.
         :param filters: Optional filter schema.
         :param sort_params: Optional sorting parameters.
         :return: Paginated visit list.

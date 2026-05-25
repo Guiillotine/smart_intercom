@@ -1,4 +1,3 @@
-from enum import StrEnum, auto
 from typing import ClassVar
 
 from src.common.constants.consts import LanguageConsts

@@ -1,14 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Query
+from fastapi import APIRouter, Depends, Header
 from fastapi.security import OAuth2PasswordRequestForm
-from starlette import status
-from starlette.responses import JSONResponse
 
 from src.common.deps.oauth_scheme import oauth2_scheme
 from src.common.schemas import Msg
-from src.modules.users.constants.enums import LogoutType
-from src.modules.users.controllers.constants import UserCtrlEnums
+from src.modules.users.controllers.constants import AuthCtrlEnums
 from src.modules.users.interfaces import IAuthCtrl, IAuthUC
 from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate
 from src.modules.users.usecases.deps import get_auth_usecase
@@ -25,7 +22,7 @@ class AuthCtrl(IAuthCtrl):
 
     def __init__(
         self,
-        enums: UserCtrlEnums,
+        enums: AuthCtrlEnums,
     ):
         """
         Initializes the AuthRouters instance.
@@ -89,12 +86,12 @@ class AuthCtrl(IAuthCtrl):
         Authenticate user and return JWT token pair.
 
         ## Parameters:
-        - **email**: User's email identifier
-        - **password**: User's password (plaintext)
+        - email: User's email identifier
+        - password: User's password (plaintext)
 
         ## Returns:
-        - **accessToken**: JWT access token for API authorization
-        - **refreshToken**: JWT token for obtaining new access tokens
+        - accessToken: JWT access token for API authorization
+        - refreshToken: JWT token for obtaining new access tokens
 
         ## Notes:
         - Implements OAuth2 password grant flow
@@ -109,34 +106,20 @@ class AuthCtrl(IAuthCtrl):
     async def logout(
         token: Annotated[str, Depends(oauth2_scheme)],
         auth_usecase: Annotated[IAuthUC, Depends(get_auth_usecase)],
-        logout_type: LogoutType = Query(LogoutType.current, alias="logoutType"),
-    ) -> JSONResponse:
+    ) -> Msg:
         """
         Log out the user by invalidating their token(s).
 
         ## Parameters:
-        - **token**: Access or refresh token to be invalidated, extracted from the
+        - token: Access or refresh token to be invalidated, extracted from the
                 request.
-        - **auth_usecase**: Authentication use case instance with business logic.
-        - **logout_type**: Logout type.
+        - auth_usecase: Authentication use case instance with business logic.
 
         ## Returns:
-        - **JSONResponse**: Confirmation message indicating successful logout.
-
-        ## Notes:
-        - If `everywhere` is True, all user sessions are invalidated; otherwise, only
-                the current session is logged out.
+        - Confirmation message indicating successful logout.
         """
 
-        return JSONResponse(
-            content=(
-                await auth_usecase.delete_tokens(
-                    token=token,
-                    logout_type=logout_type,
-                )
-            ).model_dump(),
-            status_code=status.HTTP_200_OK,
-        )
+        return await auth_usecase.delete_token(token)
 
     @staticmethod
     async def update_access_token(
@@ -148,11 +131,11 @@ class AuthCtrl(IAuthCtrl):
         Refresh the access token using the provided refresh token.
 
         ## Parameters:
-        - **refreshToken**: The RefreshToken object containing the refresh token to be
+        - refreshToken: The RefreshToken object containing the refresh token to be
                 validated.
 
         ## Returns:
-        - **LoginToken**: New access and refresh token pair.
+        - LoginToken: New access and refresh token pair.
 
         ## Notes:
         - This endpoint validates the refresh token, deletes the old session, and issues
@@ -173,11 +156,11 @@ class AuthCtrl(IAuthCtrl):
         Register a new user.
 
         ## Parameters:
-        - **user_in**: UserCreate schema containing the data for the new user
+        - user_in: UserCreate schema containing the data for the new user
 
         ## Returns:
-        - **accessToken**: JWT access token for API authorization
-        - **refreshToken**: JWT token for obtaining new access tokens
+        - accessToken: JWT access token for API authorization
+        - refreshToken: JWT token for obtaining new access tokens
 
         ## Notes:
         - May trigger an error if a user with the same email already exists

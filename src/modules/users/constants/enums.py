@@ -9,18 +9,6 @@ class RoleEnum(IntEnum):
     SUPERUSER = 30
 
 
-class LogoutType(StrEnum):
-    """
-    Enumeration of user logout types.
-
-    current - logout current device.
-    everywhere - logout all user devices.
-    """
-
-    current = auto()
-    everywhere = auto()
-
-
 class UserEnums:
     """Container class for all user-related enumerations.
 
@@ -33,4 +21,3 @@ class UserEnums:
         """
         self.Role = RoleEnum
         self.Common = common_enums
-        self.LogoutType = LogoutType

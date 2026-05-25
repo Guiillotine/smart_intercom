@@ -43,6 +43,7 @@ class SQLFilterBase(Filter):
         return result
 
     @field_validator("*", mode="after")
+    @classmethod
     def timezone_validate(cls, v: Any) -> Any:
         if isinstance(v, datetime):
             if v.tzinfo is not None:

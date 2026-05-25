@@ -14,6 +14,7 @@ class CamelModel(BaseModel):
 
 class CoreSchema(CamelModel):
     @field_validator("*", mode="after")
+    @classmethod
     def timezone_validate(cls, v: Any) -> Any:
         if isinstance(v, datetime) and v.tzinfo is not None:
             v = v.replace(tzinfo=None)

@@ -1,1 +1,1 @@
-from .message import CameraS3Repo
+from .message import MessageS3Repo

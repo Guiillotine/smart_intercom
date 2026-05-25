@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, Query
 
 from src.common.deps import get_user_sid
 from src.modules.users.controllers.constants import UserCtrlEnums
-from src.modules.users.interfaces import IUserCtrl
-from src.modules.users.schemas import LoginToken, UserWithRole
+from src.modules.users.interfaces import IUserCtrl, IUserUC
+from src.modules.users.schemas import UserWithRole
+from src.modules.users.usecases.deps import get_user_usecase
 
 
 class UserCtrl(IUserCtrl):
@@ -78,9 +79,9 @@ class UserCtrl(IUserCtrl):
         user_usecase: Annotated[IUserUC, Depends(get_user_usecase)],
     ) -> UserWithRole:
         """
-        Get message history.
+        Get user by sid.
 
-        ## Notes:
-        - Is available for Administrator only.
+        ## Returns:
+        - User info with role.
         """
         return await user_usecase.get_by_sid(sid=sid, user_sid=user_sid)

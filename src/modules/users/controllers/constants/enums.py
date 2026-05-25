@@ -36,5 +36,20 @@ class UserCtrlEnums:
         """Initialize users controller enums container."""
 
         self.Common = common_enums
-        self.AuthCtrlPath = AuthCtrlPathEnum
         self.UserCtrlPath = UserCtrlPathEnum
+
+
+class AuthCtrlEnums:
+    """Container class for auth controller enumerations and constants.
+
+    Provides centralized access to controller-related enums.
+    """
+
+    def __init__(
+        self,
+        common_enums: CommonEnums,
+    ):
+        """Initialize users controller enums container."""
+
+        self.Common = common_enums
+        self.AuthCtrlPath = AuthCtrlPathEnum

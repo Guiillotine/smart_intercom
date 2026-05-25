@@ -67,3 +67,34 @@ class ICustomDateTime(ABC):
         :return: Aware datetime object localized to the configured timezone.
         """
         ...
+
+
+class IPasswordHelper(ABC):
+    """
+    Interface for password hashing and verification operations.
+
+    This abstraction allows different implementations of password handling logic
+    (e.g., using bcrypt, Argon2, etc.) while following the Dependency Inversion
+    Principle.
+    """
+
+    @abstractmethod
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """
+        Verify whether a plain password matches the hashed password.
+
+        :param plain_password: The raw password provided by the user.
+        :param hashed_password: The stored hashed password to compare against.
+        :return: True if the password matches, False otherwise.
+        """
+        ...
+
+    @abstractmethod
+    def get_password_hash(self, password: str | None) -> str | None:
+        """
+        Hash a plain password for secure storage.
+
+        :param password: The raw password to hash.
+        :return: A hashed representation of the password, or None if input is None.
+        """
+        ...

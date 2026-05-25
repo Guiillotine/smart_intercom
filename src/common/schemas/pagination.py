@@ -25,6 +25,7 @@ class Pagination(CoreSchema):
     offset: int = 0
 
     @field_validator("limit")
+    @classmethod
     def validate_limit(cls, v: int | None) -> int | None:
         """
         Validate that the limit value is non-negative.
@@ -45,6 +46,7 @@ class Pagination(CoreSchema):
         return v
 
     @field_validator("offset")
+    @classmethod
     def validate_offset(cls, v: int | None) -> int | None:
         """
         Validate that the offset value is non-negative.

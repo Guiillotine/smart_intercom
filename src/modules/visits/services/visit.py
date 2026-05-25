@@ -1,11 +1,13 @@
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from uuid import UUID
 
 from src.common.constants import ErrorCodesEnums
+from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.modules.visits.constants.enums import VisitStatusEnum
+from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv
 from src.modules.visits.services.constants import VisitSrvConsts, VisitSrvEnums
 from src.modules.visits.schemas import (
@@ -44,6 +46,18 @@ class VisitSrv(IVisitSrv):
 
     async def get_full_by_sid(self, sid: UUID) -> VisitFull:
         return VisitFull.model_validate(await self._get_model_by_sid(sid))
+
+    @LoggingFunctionInfo(description="Get all visits.")
+    async def get_all(
+        self,
+        filters: VisitFilter,
+        sort_params: SortBase = None,
+    ) -> ListResult[Visit]:
+        visits = await self._visit_repo.get_all(
+            filters=filters,
+            sort_params=sort_params,
+        )
+        return ListResult[Visit](items=visits)
 
     async def get_all_paginated(
         self,
@@ -104,7 +118,7 @@ class VisitSrv(IVisitSrv):
             sid=sid,
             visit_in=VisitUpdate(
                 status=VisitStatusEnum.OVER,
-                finish_datetime=datetime.utcnow(),
+                finish_datetime=datetime.now(UTC),
                 visitor_goal=params.visitor_goal,
                 bot_granted_access=params.bot_granted_access,
             ),
@@ -119,7 +133,7 @@ class VisitSrv(IVisitSrv):
                 granted_access=door_open,
                 decision_by_user_sid=user_sid,
                 status=VisitStatusEnum.OVER,
-                finish_datetime=datetime.utcnow(),
+                finish_datetime=datetime.now(UTC),
             ),
         )
         return Msg()

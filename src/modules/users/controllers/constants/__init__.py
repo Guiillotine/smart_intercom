@@ -1,1 +1,1 @@
-from .enums import UserCtrlEnums
+from .enums import UserCtrlEnums, AuthCtrlEnums

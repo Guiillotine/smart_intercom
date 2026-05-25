@@ -1,7 +1,7 @@
 from enum import auto, StrEnum
 
 
-class AuthPayloadFields(StrEnum):
+class AuthPayloadFieldsEnum(StrEnum):
     """
     Enum representing the standard fields used in authentication token payloads.
     """
@@ -11,6 +11,14 @@ class AuthPayloadFields(StrEnum):
     EXP = "exp"
     JTI = "jti"
     PAIR_ID = "pair_id"
+
+
+class TokenPayloadFieldsEnum(StrEnum):
+    EXP = "exp"
+    JTI = "jti"
+    PAIR_ID = "pair_id"
+    DEVICE = "device"
+    IAT = "iat"
 
 
 class TokenType(StrEnum):
@@ -27,5 +35,6 @@ class TokenType(StrEnum):
 
 class TokenEnums:
     def __init__(self):
-        self.AuthPayloadFields = AuthPayloadFields
+        self.AuthPayloadFields = AuthPayloadFieldsEnum
+        self.TokenPayloadFields = TokenPayloadFieldsEnum
         self.TokenType = TokenType

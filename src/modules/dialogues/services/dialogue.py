@@ -112,7 +112,10 @@ class DialogueSrv(IDialogueSrv):
 
         raise BackendException(error=self._errors.Dialogue.INVALID_LLM_RESPONSE)
 
-    def get_hello_bot_answer(self) -> BotReplica:
+    def get_hello_bot_answer(
+        self,
+        lang: LanguageEnum = LanguageConsts.DEFAULT_LANG,
+    ) -> BotReplica:
         lang = LanguageConsts.DEFAULT_LANG
         return BotReplica(
             content=self._consts.Message.get(self._enums.BotMessage.HELLO, lang),

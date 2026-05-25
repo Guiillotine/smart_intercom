@@ -7,7 +7,6 @@ from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
-from src.modules.users.constants.enums import LogoutType
 from src.modules.users.interfaces.usecases import IAuthUC, IUserUC
 from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate, UserWithRole
 
@@ -51,14 +50,12 @@ class IAuthCtrl(ABC):
     async def logout(
         token: str,
         auth_usecase: IAuthUC,
-        logout_type: LogoutType,
     ) -> JSONResponse:
         """
         Log out user by invalidating token data.
 
         :param token: Current bearer token.
         :param auth_usecase: Auth use case dependency.
-        :param logout_type: Logout scope.
         :return: JSON response with operation result.
         """
         ...

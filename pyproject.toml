@@ -33,6 +33,7 @@ dependencies = [
     "faster-whisper (>=1.2.1,<2.0.0)",
     "soundfile (>=0.13.1,<0.14.0)",
     "openai (>=2.38.0,<3.0.0)",
+    "passlib (>=1.7.4,<2.0.0)",
 ]
 
 

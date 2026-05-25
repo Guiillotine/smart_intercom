@@ -55,6 +55,7 @@ class UserWithSid(UserBase):
 
 class UserCreate(UserBase):
     password: str
+    role_id: int | None = None
 
     @field_validator("password")
     @classmethod
@@ -81,9 +82,10 @@ class UserCreate(UserBase):
             )
         return v
 
+
 class UserCreateInDB(UserBase):
     password_hash: str
-    role_id: int = RoleEnum.USER
+    role_id: int
 
 
 class UserUpdate(CoreSchema):
@@ -99,6 +101,7 @@ class UserUpdate(CoreSchema):
 class User(UserBase):
     sid: UUID
     is_active: bool
+    role_id: RoleBase
 
 
 class CreatedUser(User):

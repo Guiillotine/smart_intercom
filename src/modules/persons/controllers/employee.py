@@ -8,8 +8,11 @@ from src.common.schemas import Msg, Pagination, PaginationResult
 from src.modules.persons.controllers.constants import EmployeeCtrlEnums
 from src.modules.persons.interfaces import IEmployeeCtrl
 from src.modules.persons.interfaces.usecases import IEmployeeUC
-from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate, \
-    EmployeeCreate
+from src.modules.persons.schemas import (
+    Employee,
+    EmployeeUpdate,
+    EmployeeCreate,
+)
 from src.modules.persons.usecases.deps import get_employee_usecase
 
 
