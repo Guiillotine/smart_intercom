@@ -1,11 +1,13 @@
+import sys
 from contextlib import asynccontextmanager
+from pathlib import Path
+from pkgutil import extend_path
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from faster_whisper import WhisperModel
 from openai import OpenAI
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 
 from src.common.errors import BackendException
 from src.config.docs.deps import get_tags_metadata
@@ -27,6 +29,7 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    initialize_silero_submodule()
     initialize_state()
     yield
     clean_state()
@@ -95,6 +98,18 @@ def initialize_state():
         max_retries=settings.bot.LLM_HTTP_RETRIES,
         timeout=settings.bot.LLM_RESPONSE_TIMEOUT_SEC,
     )
+
+
+def initialize_silero_submodule():
+    repo = (Path(__file__).resolve().parents[3] / "vendor" / "silero-models").resolve()
+    repo_str = str(repo)
+
+    if repo_str not in sys.path:
+        sys.path.append(repo_str)
+
+    # Extend src __path__ with silero src directory
+    import src as project_src
+    project_src.__path__ = extend_path(project_src.__path__, project_src.__name__)
 
 
 def clean_state():

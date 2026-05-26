@@ -61,7 +61,7 @@ class TokenProviderSrv(ITokenProviderSrv):
             data=payload,
             pair_id=pair_id,
             expires_delta=timedelta(
-                seconds=self._settings.project.ACCESS_TOKEN_EXPIRE_SECONDS,
+                seconds=self._settings.auth.ACCESS_TOKEN_EXPIRE_SECONDS,
             ),
             refresh=False,
         )
@@ -70,7 +70,7 @@ class TokenProviderSrv(ITokenProviderSrv):
             data=payload,
             pair_id=pair_id,
             expires_delta=timedelta(
-                seconds=self._settings.project.REFRESH_TOKEN_EXPIRE_SECONDS,
+                seconds=self._settings.auth.REFRESH_TOKEN_EXPIRE_SECONDS,
             ),
             refresh=True,
         )
@@ -79,14 +79,14 @@ class TokenProviderSrv(ITokenProviderSrv):
             key=f"{payload.get(self._enums.TokenEnums.AuthPayloadFields.SUB)}:"
             f"{pair_id}:"
             f"{access_jti}",
-            ttl=self._settings.project.ACCESS_TOKEN_EXPIRE_SECONDS,
+            ttl=self._settings.auth.ACCESS_TOKEN_EXPIRE_SECONDS,
             value=access_token,
         )
         await self._auth_redis_repository.set_with_ttl(
             key=f"{payload.get(self._enums.TokenEnums.AuthPayloadFields.SUB)}:"
             f"{pair_id}:"
             f"{refresh_jti}",
-            ttl=self._settings.project.REFRESH_TOKEN_EXPIRE_SECONDS,
+            ttl=self._settings.auth.REFRESH_TOKEN_EXPIRE_SECONDS,
             value=refresh_token,
         )
 
@@ -111,7 +111,7 @@ class TokenProviderSrv(ITokenProviderSrv):
             data=payload,
             pair_id=pair_id,
             expires_delta=timedelta(
-                seconds=self._settings.project.ACCESS_TOKEN_EXPIRE_SECONDS,
+                seconds=self._settings.auth.ACCESS_TOKEN_EXPIRE_SECONDS,
             ),
             refresh=False,
         )
@@ -119,7 +119,7 @@ class TokenProviderSrv(ITokenProviderSrv):
         key = self.prepare_token_key(entity_sid, pair_id, access_jti)
         await self._auth_redis_repository.set_with_ttl(
             key=key,
-            ttl=self._settings.project.ACCESS_TOKEN_EXPIRE_SECONDS,
+            ttl=self._settings.auth.ACCESS_TOKEN_EXPIRE_SECONDS,
             value=access_token,
         )
 

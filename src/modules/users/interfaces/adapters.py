@@ -12,6 +12,11 @@ class IRolePostgresRepo(IPostgresBaseRepo[RoleModel, RoleCreate, RoleUpdate], AB
     Extends base PostgreSQL repository with the role model contract.
     """
 
+    @abstractmethod
+    async def get_by_id(self, id: int) -> RoleModel | None:
+        """Get role database model by id."""
+        ...
+
 
 class IUserPostgresRepo(IPostgresBaseRepo[UserModel, UserCreateInDB, UserUpdate], ABC):
     """

@@ -15,7 +15,7 @@ class Settings:
     project = ProjectSettings()
     runtime = RuntimeSettings()
     redis = RedisSettings()
-    token = AuthSettings()
+    auth = AuthSettings()
     face = FaceSettings()
     tts = TTSSettings()
     asr = ASRSettings()

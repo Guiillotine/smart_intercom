@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.client.storages.postgres.init.constants import PostgresInitEnums
 from src.config.settings import Settings
 from src.modules.users.interfaces import IRolePostgresRepo
+from src.modules.users.schemas import RoleCreate
 
 
 class PostgresInitializer:
@@ -34,6 +35,19 @@ class PostgresInitializer:
         self._logger.info("Starting user roles initialization")
 
         # TODO: add user roles initialization
+
+        for id_, name in self._enums.User.Role.get_all_roles():
+            role = await self._role_postgres_repo.get_by_id(id=id_)
+            if role is not None:
+                self._logger.info("User role %d already exist.", id_)
+            else:
+                await self._role_postgres_repo.create(
+                    obj_in=RoleCreate(
+                        id=id_,
+                        name=name,
+                    )
+                )
+                self._logger.info("User role created: %d", id_)
 
         self._logger.info("Completed user roles initialization")
 

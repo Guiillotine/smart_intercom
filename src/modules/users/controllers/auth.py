@@ -80,7 +80,6 @@ class AuthCtrl(IAuthCtrl):
     async def login(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         auth_usecase: Annotated[IAuthUC, Depends(get_auth_usecase)],
-        user_agent: Annotated[str | None, Header(alias="User-Agent")] = None,
     ) -> LoginToken:
         """
         Authenticate user and return JWT token pair.
@@ -98,9 +97,7 @@ class AuthCtrl(IAuthCtrl):
         - Tokens should be used with 'Authorization: Bearer <token>' header
         """
 
-        return await auth_usecase.get_token_pair(
-            form_data=form_data, user_agent=user_agent
-        )
+        return await auth_usecase.get_token_pair(form_data=form_data)
 
     @staticmethod
     async def logout(
@@ -125,7 +122,6 @@ class AuthCtrl(IAuthCtrl):
     async def update_access_token(
         auth_usecase: Annotated[IAuthUC, Depends(get_auth_usecase)],
         body: RefreshToken,
-        user_agent: Annotated[str | None, Header(alias="User-Agent")] = None,
     ) -> LoginToken:
         """
         Refresh the access token using the provided refresh token.
@@ -142,15 +138,12 @@ class AuthCtrl(IAuthCtrl):
                 new tokens.
         """
 
-        return await auth_usecase.update_access_token(
-            refresh_token=body.refresh_token, user_agent=user_agent
-        )
+        return await auth_usecase.update_access_token(refresh_token=body.refresh_token)
 
     @staticmethod
     async def register(
         user_in: UserCreate,
         auth_usecase: Annotated[IAuthUC, Depends(get_auth_usecase)],
-        user_agent: Annotated[str | None, Header(alias="User-Agent")] = None,
     ) -> LoginToken:
         """
         Register a new user.
@@ -166,4 +159,4 @@ class AuthCtrl(IAuthCtrl):
         - May trigger an error if a user with the same email already exists
         """
 
-        return await auth_usecase.register(user_in=user_in, user_agent=user_agent)
+        return await auth_usecase.register(user_in=user_in)

@@ -70,8 +70,8 @@ class TokenHelper(ITokenHelper):
 
         encoded_jwt = jwt.encode(
             to_encode,
-            self._settings.token.TOKEN_SECRET_KEY,
-            algorithm=self._settings.token.ALGORITHM,
+            self._settings.auth.TOKEN_SECRET_KEY,
+            algorithm=self._settings.auth.ALGORITHM,
         )
 
         self._logger.debug("Token created successfully. Payload: %s", to_encode)

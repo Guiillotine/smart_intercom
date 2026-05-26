@@ -53,7 +53,6 @@ class AuthUC(IAuthUC):
     async def get_token_pair(
         self,
         form_data: OAuth2PasswordRequestForm,
-        user_agent: str,
     ) -> LoginToken:
         user = await self._auth_service.authenticate(form_data)
 
@@ -71,7 +70,6 @@ class AuthUC(IAuthUC):
     async def update_access_token(
         self,
         refresh_token: str,
-        user_agent: str,
     ) -> LoginToken:
         try:
             payload = await self._token_provider_service.validate_token(refresh_token)
@@ -127,7 +125,7 @@ class AuthUC(IAuthUC):
     @LoggingFunctionInfo(
         description="Register a new user after verifying email status."
     )
-    async def register(self, user_in: UserCreate, user_agent: str) -> LoginToken:
+    async def register(self, user_in: UserCreate) -> LoginToken:
         self._logger.debug("Creating new user with email: %s", user_in.email)
 
         user = await self._user_service.create(

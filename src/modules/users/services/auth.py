@@ -55,6 +55,9 @@ class AuthSrv(IAuthSrv):
 
         user = await self._user_service.get_by_email(email=credentials.username)
 
+        if not user:
+            raise BackendException(self._errors.Auth.INCORRECT_CREDENTIALS)
+
         if not self._password_helper.verify_password(
             credentials.password,
             user.password_hash,

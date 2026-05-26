@@ -1,7 +1,7 @@
 import re
 from uuid import UUID
 
-from pydantic import EmailStr, Field, field_validator
+from pydantic import EmailStr, field_validator
 
 from src.common.constants import ErrorCodesEnums
 from src.common.errors import BackendException
@@ -55,7 +55,7 @@ class UserWithSid(UserBase):
 
 class UserCreate(UserBase):
     password: str
-    role_id: int | None = None
+    role_id: RoleEnum | None = None
 
     @field_validator("password")
     @classmethod
@@ -85,7 +85,7 @@ class UserCreate(UserBase):
 
 class UserCreateInDB(UserBase):
     password_hash: str
-    role_id: int
+    role_id: RoleEnum
 
 
 class UserUpdate(CoreSchema):
@@ -94,14 +94,14 @@ class UserUpdate(CoreSchema):
     middle_name: str | None = None
     email: EmailStr | None = None
     password_hash: str | None = None
-    role_id: int | None = None
+    role_id: RoleEnum | None = None
     is_active: bool | None = None
 
 
 class User(UserBase):
     sid: UUID
     is_active: bool
-    role_id: RoleBase
+    role_id: RoleEnum
 
 
 class CreatedUser(User):

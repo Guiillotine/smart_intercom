@@ -33,14 +33,12 @@ class IAuthCtrl(ABC):
     async def login(
         form_data: OAuth2PasswordRequestForm,
         auth_usecase: IAuthUC,
-        user_agent: str | None = None,
     ) -> LoginToken:
         """
         Authenticate user and return token pair.
 
         :param form_data: OAuth2 password form data.
         :param auth_usecase: Auth use case dependency.
-        :param user_agent: Optional User-Agent request header.
         :return: Access and refresh token pair.
         """
         ...
@@ -65,14 +63,12 @@ class IAuthCtrl(ABC):
     async def update_access_token(
         auth_usecase: IAuthUC,
         body: RefreshToken,
-        user_agent: str | None = None,
     ) -> LoginToken:
         """
         Refresh access token.
 
         :param auth_usecase: Auth use case dependency.
         :param body: Refresh token request body.
-        :param user_agent: Optional User-Agent request header.
         :return: New access and refresh token pair.
         """
         ...
@@ -82,14 +78,12 @@ class IAuthCtrl(ABC):
     async def register(
         user_in: UserCreate,
         auth_usecase: IAuthUC,
-        user_agent: str | None = None,
     ) -> LoginToken:
         """
         Register a user and return token pair.
 
         :param user_in: User registration schema.
         :param auth_usecase: Auth use case dependency.
-        :param user_agent: Optional User-Agent request header.
         :return: Access and refresh token pair.
         """
         ...

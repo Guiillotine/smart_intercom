@@ -45,40 +45,37 @@ class IAuthUC(ABC):
 
     @abstractmethod
     async def get_token_pair(
-        self, form_data: OAuth2PasswordRequestForm, user_agent: str | None = None
+        self, form_data: OAuth2PasswordRequestForm,
     ) -> LoginToken:
         """
         Generates a pair of access and refresh tokens for the user based on provided
         credentials.
 
         :param form_data: The form data containing the username and password.
-        :param user_agent: The User-Agent string from the client request.
         :return: A LoginToken instance containing the generated tokens.
         """
         ...
 
     @abstractmethod
     async def register(
-        self, user_in: UserCreate, user_agent: str | None = None
+        self, user_in: UserCreate,
     ) -> LoginToken:
         """
         Register a user and create token pair.
 
         :param user_in: User registration schema.
-        :param user_agent: Optional User-Agent request header.
         :return: Access and refresh token pair.
         """
         ...
 
     @abstractmethod
     async def update_access_token(
-        self, refresh_token: str, user_agent: str | None = None
+        self, refresh_token: str,
     ) -> LoginToken:
         """
         Refresh access token using refresh token.
 
         :param refresh_token: Refresh token string.
-        :param user_agent: Optional User-Agent request header.
         :return: New access and refresh token pair.
         """
         ...

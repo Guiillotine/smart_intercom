@@ -210,6 +210,7 @@ class PostgresBaseRepo(
             await self._commit_and_refresh(db_obj, with_commit)
 
         except IntegrityError as e:
+            print(1111111111, e)
             self._logger.debug(
                 "Failed to create %s due to IntegrityError", self._model.__name__
             )

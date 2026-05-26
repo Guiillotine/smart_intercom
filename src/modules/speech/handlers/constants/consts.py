@@ -22,4 +22,3 @@ class TTSModelManagerConsts:
             ),
         }
         self.DirPath = RepoDirConsts.PATH
-        print(222222222222222, self.DirPath)

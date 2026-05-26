@@ -11,3 +11,6 @@ class AuthSettings(BaseSettings):
 
     TOKEN_SECRET_KEY: str = Field(default="secret_key", alias="TOKEN_SECRET_KEY")
     ALGORITHM: str = Field(default="HS256", alias="ALGORITHM")
+
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = 60 * 60
+    REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30

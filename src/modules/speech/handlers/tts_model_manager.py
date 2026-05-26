@@ -1,3 +1,4 @@
+import sys
 from typing import ClassVar, TypeVar
 import torch
 from fastapi import Path
@@ -17,6 +18,8 @@ class TTSModelManager(ITTSModelManager[SileroTTSProtocol]):
         self._models = {}
         self._consts = consts
 
+        repo_dir = str(self._consts.DirPath)
+
         for lang in LanguageEnum:
             params = self._consts.LangTTSModelMap[lang]
 
@@ -25,7 +28,7 @@ class TTSModelManager(ITTSModelManager[SileroTTSProtocol]):
               raise Exception
 
             model, _ = torch.hub.load(
-                repo_or_dir=str(self._consts.DirPath),
+                repo_or_dir=repo_dir,
                 model="silero_tts",
                 language=lang.value,
                 speaker=params.model_id,

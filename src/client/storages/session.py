@@ -80,8 +80,8 @@ class RedisSessionProvider(IRedisSessionProvider):
 
         self._settings = settings
         self._client = AIORedis(
-            host=self._settings.redis.REDIS_HOST,
-            port=self._settings.redis.REDIS_PORT,
+            host=self._settings.redis.HOST,
+            port=self._settings.redis.PORT,
             decode_responses=True,
         )
 
