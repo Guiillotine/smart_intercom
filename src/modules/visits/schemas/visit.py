@@ -8,6 +8,7 @@ from pydantic import Field
 from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.common.constants.enums import GenderEnum, LanguageEnum
+from src.modules.messages.schemas import Message
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum
 
 
@@ -40,9 +41,9 @@ class VisitBase(CoreSchema):
 
 
 class VisitCreate(CoreSchema):
-    status: VisitStatusEnum = VisitStatusEnum.IN_PROCESS
-    start_datetime: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    dialogue_lang: LanguageEnum = LanguageEnum.RU
+    status: VisitStatusEnum
+    start_datetime: datetime
+    dialogue_lang: LanguageEnum
     photo: str | None = None
 
 
@@ -51,6 +52,7 @@ class VisitUpdateShort(CoreSchema):
     dialogue_lang: LanguageEnum
 
 
+@partial_schema
 class VisitUpdate(VisitUpdateShort):
     status: VisitStatusEnum
     visitor_goal: str
@@ -84,9 +86,12 @@ class Visit(CoreSchema):
     dialogue_lang: LanguageEnum
 
 
-class VisitFull(Visit):
-    visitors: list[VisitPerson] = Field(default_factory=list)
-    messages: list = Field(default_factory=list)
+class VisitWithMessages(Visit):
+    messages: list[Message]
+
+
+class VisitFull(VisitWithMessages):
+    visitors: list[VisitPerson]
 
 
 class VisitReport(VisitFull):

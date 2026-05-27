@@ -7,6 +7,7 @@ from src.common.constants import ErrorCodesEnums
 from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
+from src.common.interfaces import ICustomDateTime
 from src.common.schemas import Msg
 from src.config.settings import Settings
 from src.modules.dialogues.constants.enums import DialogueModeEnum
@@ -24,9 +25,10 @@ from src.modules.messages.interfaces import IMessageSrv
 from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate
 from src.modules.speech.interfaces import ITTSSrv, IASRSrv
 from src.modules.visits.constants.enums import VisitStatusEnum
+from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitSrv
 from src.modules.visits.schemas import Visit, VisitCallEmployee, VisitFinish, \
-    VisitUpdateShort, VisitUpdate
+    VisitUpdateShort, VisitUpdate, VisitCreate
 
 
 class IntercomUC(IIntercomUC):
@@ -46,6 +48,7 @@ class IntercomUC(IIntercomUC):
         tts_service: ITTSSrv,
         visit_service: IVisitSrv,
         message_service: IMessageSrv,
+        custom_datetime: ICustomDateTime,
         dialogue_service: IDialogueSrv,
     ):
         """
@@ -60,17 +63,33 @@ class IntercomUC(IIntercomUC):
         self._tts_service = tts_service
         self._visit_service = visit_service
         self._message_service = message_service
+        self._custom_datetime = custom_datetime
         self._dialogue_service = dialogue_service
 
     async def start_visit(self) -> IntercomStartedVisit:
-        # TODO:
-        # 1. Get all unfinished visits
-        # 2. Delete unfinished visits without data (no user messages) + s3
+        unfinished_visits = await self._visit_service.get_all(
+            filters=VisitFilter(status=self._enums.Visit.VisitStatus.IN_PROCESS),
+            requirement=self._enums.SrvReqCommon.VisitRequirements.WITH_MESSAGES,
+        )
 
-        # noinspection PyArgumentList
-        unfinished_visits = await self._visit_service.get_all()
+        for visit in unfinished_visits.items:
+            if visit.messages:
+                await self._visit_service.finish_visit(
+                    sid=visit.sid,
+                    visit_finish_params=VisitFinish(
+                        finish_reason=self._enums.Visit.VisitFinishReason.CANCELLED_BY_VISITOR
+                    )
+                )
+            else:
+                await self._visit_service.delete_visit(sid=visit.sid)
 
-        visit = await self._visit_service.create_visit()
+        visit = await self._visit_service.create_visit(
+            visit_in=VisitCreate(
+                status=self._enums.Visit.VisitStatus.IN_PROCESS,
+                start_datetime=self._custom_datetime.get_utc_datetime(),
+                dialogue_lang=self._consts.Common.DefaultLanguage,
+            )
+        )
 
         hello_bot_answer = self._dialogue_service.get_hello_bot_answer()
 

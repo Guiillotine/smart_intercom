@@ -40,7 +40,7 @@ class IPostgresBaseRepo[ModelType, CreateSchemaType, UpdateSchemaType](ABC):
         filters: SQLFilterBase = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> Sequence[ModelType]:
+    ) -> list[ModelType]:
         """
         Retrieve all records for the model.
 
@@ -58,7 +58,7 @@ class IPostgresBaseRepo[ModelType, CreateSchemaType, UpdateSchemaType](ABC):
         filters: SQLFilterBase = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[ModelType], int]:
+    ) -> tuple[list[ModelType], int]:
         """
         Get paginated items with filters.
         """

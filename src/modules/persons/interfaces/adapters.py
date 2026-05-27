@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 
 from sqlalchemy.sql.base import ExecutableOption
 
@@ -27,7 +26,7 @@ class IPersonPostgresRepo(
         filters: PersonFilter = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[PersonModel], int]:
+    ) -> tuple[list[PersonModel], int]:
         """
         Retrieve a paginated list of persons.
 

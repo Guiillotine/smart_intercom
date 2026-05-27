@@ -3,6 +3,7 @@ from datetime import datetime, UTC
 from uuid import UUID
 
 from src.common.constants import ErrorCodesEnums
+from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
@@ -19,6 +20,7 @@ from src.modules.visits.schemas import (
     VisitReport,
     VisitUpdate,
 )
+from src.modules.visits.services.constants.consts import VisitRespSchemas
 
 
 class VisitSrv(IVisitSrv):
@@ -36,13 +38,18 @@ class VisitSrv(IVisitSrv):
         self._logger = logger
         self._visit_repo = visit_repo
 
-    async def create_visit(self, visit_in: VisitCreate | None = None) -> Visit:
+    async def create_visit(self, visit_in: VisitCreate) -> Visit:
         return Visit.model_validate(
-            await self._visit_repo.create(obj_in=visit_in or VisitCreate())
+            await self._visit_repo.create(obj_in=visit_in)
         )
 
-    async def get_by_sid(self, sid: UUID) -> Visit:
-        return Visit.model_validate(await self._get_model_by_sid(sid))
+    async def get_by_sid(
+        self,
+        sid: UUID,
+    ) -> Visit:
+        return Visit.model_validate(
+            await self._get_model_by_sid(sid),
+        )
 
     async def get_full_by_sid(self, sid: UUID) -> VisitFull:
         return VisitFull.model_validate(await self._get_model_by_sid(sid))
@@ -50,14 +57,28 @@ class VisitSrv(IVisitSrv):
     @LoggingFunctionInfo(description="Get all visits.")
     async def get_all(
         self,
-        filters: VisitFilter,
-        sort_params: SortBase = None,
-    ) -> ListResult[Visit]:
+        filters: VisitFilter | None = None,
+        sort_params: SortBase | None = None,
+        requirement: VisitRequirementsEnum | None = None,
+    ) -> ListResult[VisitRespSchemas.GET_ALL]:
+        if not requirement:
+            requirement = self._enums.SrvReqCommon.VisitRequirements.EMPTY
+
+        custom_options = self._consts.Requirements.GET_ALL.get(requirement).get(
+            self._enums.SrvReqCommon.RequirementFieldName.OPTIONS
+        )()
+
         visits = await self._visit_repo.get_all(
             filters=filters,
             sort_params=sort_params,
+            custom_options=custom_options,
         )
-        return ListResult[Visit](items=visits)
+
+        response_schema = self._consts.Requirements.GET_ALL.get(requirement).get(
+            self._enums.SrvReqCommon.RequirementFieldName.RESPONSE_SCHEMA
+        )
+
+        return ListResult[response_schema](items=visits)
 
     async def get_all_paginated(
         self,
@@ -113,7 +134,7 @@ class VisitSrv(IVisitSrv):
         sid: UUID,
         visit_finish_params: VisitFinish | None = None,
     ) -> Visit:
-        params = visit_finish_params or VisitFinish()
+        params = visit_finish_params or VisitFinish() # TODO: default
         return await self.update_visit(
             sid=sid,
             visit_in=VisitUpdate(
@@ -138,8 +159,14 @@ class VisitSrv(IVisitSrv):
         )
         return Msg()
 
+    @LoggingFunctionInfo(description="Delete visit by identifier.")
+    async def delete_visit(self, sid) -> Msg:
+        await self._visit_repo.delete(sid=sid)
+        return Msg()
+
+
     async def _get_model_by_sid(self, sid: UUID):
         visit = await self._visit_repo.get_by_sid(sid)
         if not visit:
-            raise BackendException(error=self._errors.Common.NOT_FOUND)
+            raise BackendException(error=self._errors.Visit.VISIT_NOT_FOUND)
         return visit

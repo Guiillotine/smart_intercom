@@ -1,13 +1,14 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, Path
 
 from src.common.deps import get_user_sid
 from src.common.schemas import ListResult, PaginationResult, Msg, Pagination, SortBase
 from src.modules.visits.constants.enums import VisitSortFieldsEnum
 from src.modules.visits.controllers.constants import VisitCtrlEnums
-from src.modules.visits.interfaces import IVisitController, IVisitUC
+from src.modules.visits.interfaces import IVisitController
+from src.modules.visits.interfaces.usecases import IVisitUC
 from src.modules.visits.schemas import VisitReport, VisitFull, Visit
 from src.modules.visits.usecases.deps import get_visit_usecase
 
@@ -41,13 +42,6 @@ class VisitController(IVisitController):
     def _add_controllers(self) -> None:
         """Register all common visits endpoints to the router."""
         self._controller.add_api_route(
-            path=self._enums.VisitCtrlPath.get_visit,
-            endpoint=self.get_visit,
-            methods=[self._enums.Common.RequestType.GET],
-            response_model=VisitFull,
-        )
-
-        self._controller.add_api_route(
             path=self._enums.VisitCtrlPath.get_all_visits,
             endpoint=self.get_all_visits,
             methods=[self._enums.Common.RequestType.GET],
@@ -62,6 +56,13 @@ class VisitController(IVisitController):
         )
 
         self._controller.add_api_route(
+            path=self._enums.VisitCtrlPath.get_visit,
+            endpoint=self.get_visit,
+            methods=[self._enums.Common.RequestType.GET],
+            response_model=VisitFull,
+        )
+
+        self._controller.add_api_route(
             path=self._enums.VisitCtrlPath.make_door_open_decision,
             endpoint=self.make_door_open_decision,
             methods=[self._enums.Common.RequestType.POST],
@@ -70,7 +71,7 @@ class VisitController(IVisitController):
 
     @staticmethod
     async def get_visit(
-        sid: UUID,
+        sid: Annotated[UUID, Path()],
         user_sid: Annotated[UUID, Depends(get_user_sid)],
         visit_usecase: Annotated[IVisitUC, Depends(get_visit_usecase)],
     ) -> VisitFull:
@@ -85,9 +86,11 @@ class VisitController(IVisitController):
     @staticmethod
     async def get_all_visits(
         user_sid: Annotated[UUID, Depends(get_user_sid)],
+        sort_schema: Annotated[
+            SortBase, Depends(SortBase[VisitSortFieldsEnum])
+        ],
         pagination_params: Annotated[Pagination, Depends(Pagination)],
         visit_usecase: Annotated[IVisitUC, Depends(get_visit_usecase)],
-        sort_schema: SortBase[VisitSortFieldsEnum] | None = None,
     ) -> PaginationResult[Visit]:
         """
         Get paginated visits list with optional filters and sorts.
@@ -106,6 +109,7 @@ class VisitController(IVisitController):
 
     @staticmethod
     async def get_waiting_decision_visits(
+        user_sid: Annotated[UUID, Depends(get_user_sid)],
         visit_usecase: Annotated[IVisitUC, Depends(get_visit_usecase)],
     ) -> ListResult[VisitReport]:
         """
@@ -122,7 +126,7 @@ class VisitController(IVisitController):
 
     @staticmethod
     async def make_door_open_decision(
-        sid: UUID,
+        sid: Annotated[UUID, Path()],
         user_sid: Annotated[UUID, Depends(get_user_sid)],
         door_open: Annotated[
             bool, Body(alias="doorOpen", validation_alias="doorOpen", embed=True)

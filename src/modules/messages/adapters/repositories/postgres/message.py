@@ -1,13 +1,9 @@
 import logging
-from collections.abc import Sequence
-from uuid import UUID
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.common.adapters.repositories.postgres import PostgresBaseRepo
 from src.common.constants import ErrorCodesEnums
-from src.common.schemas import Pagination
 from src.modules.messages.interfaces import IMessagePostgresRepo
 from src.modules.messages.models import MessageModel
 from src.modules.messages.schemas import MessageCreate, MessageUpdate

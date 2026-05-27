@@ -1,6 +1,6 @@
 import logging
 from contextlib import suppress
-from typing import TypeVar, Any, Sequence
+from typing import TypeVar, Any
 from uuid import UUID
 
 from fastapi_filter.contrib.sqlalchemy import Filter
@@ -68,9 +68,9 @@ class PostgresBaseRepo(
         result = await self._db.execute(query)
         return result.scalars().first()
 
-    async def _get_all_results(self, query: Select) -> Sequence[ModelType]:
+    async def _get_all_results(self, query: Select) -> list[ModelType]:
         result = await self._db.execute(query)
-        return result.unique().scalars().all()
+        return list(result.unique().scalars().all())
 
     async def _commit_and_refresh(self, db_obj: ModelType, with_commit: bool) -> None:
         if with_commit:
@@ -85,7 +85,7 @@ class PostgresBaseRepo(
         self,
         query: Select,
         pagination_params: Pagination,
-    ) -> tuple[Sequence[ModelType], int]:
+    ) -> tuple[list[ModelType], int]:
         count_query = select(func.count()).select_from(query.subquery())
         total = await self._get_single_result(query=count_query)
 
@@ -94,7 +94,7 @@ class PostgresBaseRepo(
         )
         items = await self._get_all_results(query=paginated_query)
 
-        return items, total
+        return list(items), total
 
     async def _validate_sort_field(self, field_name: str) -> Column | SQLORMOperations:
         invalid_field_msg = "Invalid sort field: {field_name}"
@@ -172,13 +172,13 @@ class PostgresBaseRepo(
         filters: SQLFilterBase = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> Sequence[ModelType]:
+    ) -> list[ModelType]:
         query = await self._apply_options(
             query=select(self._model), filters=filters, options=custom_options
         )
 
         self._logger.debug("Fetching all %s records", self._model.__name__)
-        return await self._get_all_results(query)
+        return list(await self._get_all_results(query))
 
     @LoggingFunctionInfo(
         description="Retrieve all records of the model with pagination"
@@ -189,7 +189,7 @@ class PostgresBaseRepo(
         filters: SQLFilterBase = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[ModelType], int]:
+    ) -> tuple[list[ModelType], int]:
         query = await self._apply_options(
             query=select(self._model), filters=filters, options=custom_options
         )

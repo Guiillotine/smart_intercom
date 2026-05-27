@@ -8,8 +8,11 @@ from src.common.schemas import Msg
 from src.modules.intercoms.controllers.constants import IntercomCtrlEnums
 from src.modules.intercoms.interfaces import IIntercomController
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
-from src.modules.intercoms.schemas.intercom import IntercomAnswer, Decision, \
-    IntercomStartedVisit
+from src.modules.intercoms.schemas.intercom import (
+    Decision,
+    IntercomAnswer,
+    IntercomStartedVisit,
+)
 from src.modules.intercoms.usecases.deps import get_intercom_usecase
 
 

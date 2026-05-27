@@ -47,9 +47,9 @@ class IVisitController(ABC):
     @abstractmethod
     async def get_all_visits(
         user_sid: UUID,
+        sort_schema: SortBase[VisitSortFieldsEnum],
         pagination_params: Pagination,
         visit_usecase: IVisitUC,
-        sort_schema: SortBase[VisitSortFieldsEnum] | None = None,
     ) -> PaginationResult[Visit]:
         """
         Get paginated visits list.
@@ -65,11 +65,13 @@ class IVisitController(ABC):
     @staticmethod
     @abstractmethod
     async def get_waiting_decision_visits(
+        user_sid: UUID,
         visit_usecase: IVisitUC,
     ) -> ListResult[VisitReport]:
         """
         Get visits waiting for user decision.
 
+        :param user_sid: Current authorized user SID.
         :param visit_usecase: Visit use case dependency.
         :return: List of visits waiting for decision.
         """

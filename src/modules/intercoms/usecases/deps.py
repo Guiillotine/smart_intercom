@@ -5,6 +5,8 @@ from fastapi import Depends
 
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.deps import get_error_codes_enums
+from src.common.helpers.deps import get_custom_datetime
+from src.common.interfaces import ICustomDateTime
 from src.common.logger.deps import get_intercom_logger
 from src.config.settings import Settings
 from src.config.settings.deps import get_settings
@@ -33,6 +35,7 @@ async def get_intercom_usecase(
     tts_service: Annotated[ITTSSrv, Depends(get_tts_service)],
     visit_service: Annotated[IVisitSrv, Depends(get_visit_service)],
     message_service: Annotated[IMessageSrv, Depends(get_message_service)],
+    custom_datetime: Annotated[ICustomDateTime, Depends(get_custom_datetime)],
     dialogue_service: Annotated[IDialogueSrv, Depends(get_dialogue_service)],
 ) -> IIntercomUC:
     """
@@ -54,5 +57,6 @@ async def get_intercom_usecase(
         tts_service=tts_service,
         visit_service=visit_service,
         message_service=message_service,
+        custom_datetime=custom_datetime,
         dialogue_service=dialogue_service,
     )

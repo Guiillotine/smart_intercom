@@ -29,6 +29,11 @@ class AuthErrorsEnum(Enum):
     )
 
 
+class VisitErrorsEnum(Enum):
+    # 404
+    VISIT_NOT_FOUND = ("visit_not_found", 404, "Visit not found")
+
+
 class DialogueErrorsEnum(Enum):
     # 400
     BAD_REQUEST = ("bad_request", 400, "Bad request to LLM provider")
@@ -49,12 +54,12 @@ class PersonErrorsEnum(Enum):
     PERSON_NOT_FOUND = ("person_not_found", 404, "Person not found")
 
 
-class UserError(Enum):
+class UserErrorsEnum(Enum):
     # 404
     USER_NOT_FOUND = ("user_not_found", 404, "User not found")
 
 
-class TokenError(Enum):
+class TokenErrorsEnum(Enum):
     # 401
     INVALID_TOKEN = ("invalid_token", 400, "Invalid token")
     INVALID_ACCESS_TOKEN = ("invalid_access_token", 400, "Invalid access token")
@@ -66,8 +71,9 @@ class TokenError(Enum):
 class ErrorCodesEnums:
     def __init__(self):
         self.Auth = AuthErrorsEnum
-        self.User = UserError
-        self.Token = TokenError
+        self.User = UserErrorsEnum
+        self.Token = TokenErrorsEnum
+        self.Visit = VisitErrorsEnum
         self.Common = CommonErrorsEnum
         self.Person = PersonErrorsEnum
         self.Dialogue = DialogueErrorsEnum

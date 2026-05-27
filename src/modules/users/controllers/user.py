@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, Query
 
 from src.common.deps import get_user_sid
 from src.modules.users.controllers.constants import UserCtrlEnums
-from src.modules.users.interfaces import IUserCtrl, IUserUC
+from src.modules.users.interfaces import IUserCtrl
+from src.modules.users.interfaces.usecases import IUserUC
 from src.modules.users.schemas import UserWithRole
 from src.modules.users.usecases.deps import get_user_usecase
 

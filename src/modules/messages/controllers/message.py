@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, Query
 from src.common.deps import get_user_sid
 from src.common.schemas import PaginationResult, Pagination
 from src.modules.messages.controllers.constants import MessageCtrlEnums
-from src.modules.messages.interfaces import IMessageCtrl, IMessageUC
+from src.modules.messages.interfaces import IMessageCtrl
+from src.modules.messages.interfaces.usecases import IMessageUC
 from src.modules.messages.schemas import MessageInHistory
 from src.modules.messages.usecases.deps import get_message_usecase
 

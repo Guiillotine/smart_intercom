@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.schemas import (
@@ -12,6 +13,7 @@ from src.modules.visits.schemas import (
     VisitReport,
     VisitUpdate,
 )
+from src.modules.visits.services.constants.consts import VisitRespSchemas
 
 
 class IVisitSrv(ABC):
@@ -22,11 +24,11 @@ class IVisitSrv(ABC):
     """
 
     @abstractmethod
-    async def create_visit(self, visit_in: VisitCreate | None = None) -> Visit:
+    async def create_visit(self, visit_in: VisitCreate) -> Visit:
         """
         Create a visit.
 
-        :param visit_in: Optional visit creation schema.
+        :param visit_in: Visit creation schema.
         :return: Created visit.
         """
         ...
@@ -54,14 +56,16 @@ class IVisitSrv(ABC):
     @abstractmethod
     async def get_all(
         self,
-        filters: VisitFilter,
-        sort_params: SortBase = None
-    ) -> ListResult[Visit]:
+        filters: VisitFilter | None = None,
+        sort_params: SortBase | None = None,
+        requirement: VisitRequirementsEnum | None = None,
+    ) -> ListResult[VisitRespSchemas.GET_ALL]:
         """
         Get all visits.
 
         :param filters: Optional filter schema.
         :param sort_params: Optional sorting parameters.
+        :param requirement: Requirements for response schema.
         :return: Paginated visit list.
         """
         ...
@@ -136,6 +140,16 @@ class IVisitSrv(ABC):
         :param sid: Visit identifier.
         :param user_sid: User who made the decision.
         :param door_open: Whether the door should be opened.
+        :return: Operation result message.
+        """
+        ...
+
+    @abstractmethod
+    async def delete_visit(self, sid) -> Msg:
+        """
+        Delete visit by identifier.
+
+        :param sid: Visit identifier.
         :return: Operation result message.
         """
         ...

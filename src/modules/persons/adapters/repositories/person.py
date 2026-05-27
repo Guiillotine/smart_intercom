@@ -1,7 +1,5 @@
 import logging
-from collections.abc import Sequence
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.base import ExecutableOption
 
@@ -37,7 +35,7 @@ class PersonPostgresRepo(
         filters: PersonFilter = None,
         sort_params: SortBase = None,
         custom_options: tuple[ExecutableOption, ...] = None,
-    ) -> tuple[Sequence[PersonModel], int]:
+    ) -> tuple[list[PersonModel], int]:
         if self._person_type is not None:
             filters = filters or PersonFilter()
             filters.person_type = self._person_type

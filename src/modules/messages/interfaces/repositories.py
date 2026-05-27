@@ -1,9 +1,5 @@
-from abc import ABC, abstractmethod
-from collections.abc import Sequence
-from uuid import UUID
-
+from abc import ABC
 from src.common.interfaces import IPostgresBaseRepo, IS3BaseRepo
-from src.common.schemas import Pagination
 from src.modules.messages.models import MessageModel
 from src.modules.messages.schemas import MessageCreate, MessageUpdate
 

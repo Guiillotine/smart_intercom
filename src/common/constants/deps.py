@@ -1,4 +1,5 @@
-from src.common.constants import CommonEnums, ErrorCodesEnums, TokenEnums
+from src.common.constants import CommonEnums, ErrorCodesEnums, TokenEnums, \
+    SrvReqCommonEnums
 from src.common.constants.consts import CommonConsts
 
 
@@ -20,3 +21,8 @@ def get_error_codes_enums():
 def get_common_consts():
     """Dependency provider for common consts."""
     return CommonConsts()
+
+
+def get_srv_req_common_enums() -> SrvReqCommonEnums:
+    """Dependency provider for output service requirement enums."""
+    return SrvReqCommonEnums()

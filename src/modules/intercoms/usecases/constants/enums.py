@@ -1,4 +1,4 @@
-from src.common.constants import CommonEnums
+from src.common.constants import CommonEnums, SrvReqCommonEnums
 from src.modules.dialogues.constants import DialogueEnums
 from src.modules.messages.constants import MessageEnums
 from src.modules.visits.constants import VisitEnums
@@ -11,8 +11,10 @@ class IntercomUCEnums:
         visit_common_enums: VisitEnums,
         message_common_enums: MessageEnums,
         dialogue_common_enums: DialogueEnums,
+        srv_req_common_enums: SrvReqCommonEnums,
     ):
         self.Common = common_enums
         self.Visit = visit_common_enums
         self.Message = message_common_enums
         self.Dialogue = dialogue_common_enums
+        self.SrvReqCommon = srv_req_common_enums
