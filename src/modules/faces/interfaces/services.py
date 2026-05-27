@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 
 import numpy as np
+from fastapi import UploadFile
 
 from src.modules.faces.schemas import FaceInfo
 
@@ -17,7 +18,7 @@ class IFaceAnalyzerSrv(ABC):
     @abstractmethod
     def analyse_photo(
         self,
-        image: np.ndarray,
+        image: np.ndarray | UploadFile,
     ) -> list[FaceInfo]:
         """
         Analyze an image and return information about all detected faces.

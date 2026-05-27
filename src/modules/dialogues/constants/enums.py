@@ -14,6 +14,7 @@ class DialogueModeEnum(IntEnum):
 class BotMessageEnum(StrEnum):
   HELLO = auto()
   ERROR = auto()
+  RECOGNIZED = auto()
   ACCESS_GRANTED = auto()
   ACCESS_NOT_GRANTED = auto()
   WANT_TO_ENTER_QUESTION = auto()

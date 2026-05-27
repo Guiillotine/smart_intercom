@@ -16,7 +16,6 @@ class BotReplica(ChatBotAnswerBase):
     """What will be announced to the visitor"""
     content: str
     lang: LanguageEnum
-    error: bool = False
 
 
 class DetectLanguageBotAnswer(ChatBotAnswerBase):
@@ -41,7 +40,7 @@ class WantToEnterBotAnswer(ChatBotAnswerBase):
     want_to_enter: bool
 
 
-ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogueBotAnswer | GoalDialogueBotAnswer | BotReplica | WantToEnterBotAnswer
+ChatBotAnswer = DetectLanguageBotAnswer | VisitorCallEmployeeBotAnswer | GrantAccessDialogueBotAnswer | GoalDialogueBotAnswer | WantToEnterBotAnswer
 
 
 class DialogueConfig(CoreSchema):

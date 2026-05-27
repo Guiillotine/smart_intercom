@@ -1,4 +1,4 @@
-from enum import StrEnum, auto
+from enum import StrEnum, auto, IntEnum
 
 
 class VisitStatusEnum(StrEnum):
@@ -8,11 +8,19 @@ class VisitStatusEnum(StrEnum):
     OVER = auto()
 
 
-class VisitFinishReasonEnum(StrEnum):
-    EMPLOYEE_DECISION = auto()
-    CANCELLED_BY_VISITOR = auto()
-    BOT_ERROR = auto()
-    TIMEOUT = auto()
+class VisitFinishReasonEnum(IntEnum):
+    """Why visit was finished"""
+    EMPLOYEE_DECISION = 1
+    CANCELLED_BY_VISITOR = 2
+    TIMEOUT = 3
+
+
+class VisitHandoffReasonEnum(IntEnum):
+    """Why employee was called"""
+    READY_FOR_EMPLOYEE_DECISION = 1
+    EMPLOYEE_RECOGNIZED = 2
+    VISITOR_REQUESTED_EMPLOYEE = 3
+    BOT_ERROR = 4
 
 
 class VisitSortFieldsEnum(StrEnum):
@@ -22,6 +30,7 @@ class VisitSortFieldsEnum(StrEnum):
 
 class VisitEnums:
     def __init__(self):
-        self.VisitStatus = VisitStatusEnum
-        self.VisitSortFields = VisitSortFieldsEnum
-        self.VisitFinishReason = VisitFinishReasonEnum
+        self.Status = VisitStatusEnum
+        self.SortFields = VisitSortFieldsEnum
+        self.FinishReason = VisitFinishReasonEnum
+        self.HandoffReason = VisitHandoffReasonEnum

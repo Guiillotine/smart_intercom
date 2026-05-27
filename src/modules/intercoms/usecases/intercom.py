@@ -17,18 +17,20 @@ from src.modules.dialogues.schemas.dialogue import (
     ChatBotAnswer,
     BotReplica,
 )
+from src.modules.faces.interfaces import IFaceAnalyzerSrv
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
 from src.modules.intercoms.schemas.intercom import IntercomStartedVisit, IntercomAnswer, \
-    Decision
+    Decision, PhotoProcessingResult
 from src.modules.intercoms.usecases.constants import IntercomUCEnums, IntercomUCConsts
 from src.modules.messages.interfaces import IMessageSrv
-from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate
+from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate, Message
+from src.modules.persons.interfaces import IPersonSrv
 from src.modules.speech.interfaces import ITTSSrv, IASRSrv
 from src.modules.visits.constants.enums import VisitStatusEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitSrv
-from src.modules.visits.schemas import Visit, VisitCallEmployee, VisitFinish, \
-    VisitUpdateShort, VisitUpdate, VisitCreate
+from src.modules.visits.schemas import Visit, VisitFinish, \
+    VisitUpdateShort, VisitUpdate, VisitCreate, VisitPersonCreate
 
 
 class IntercomUC(IIntercomUC):
@@ -47,9 +49,11 @@ class IntercomUC(IIntercomUC):
         asr_service: IASRSrv,
         tts_service: ITTSSrv,
         visit_service: IVisitSrv,
+        person_service: IPersonSrv,
         message_service: IMessageSrv,
         custom_datetime: ICustomDateTime,
         dialogue_service: IDialogueSrv,
+        face_analyzer_service: IFaceAnalyzerSrv,
     ):
         """
         Initialize the IntercomUC.
@@ -62,13 +66,15 @@ class IntercomUC(IIntercomUC):
         self._asr_service = asr_service
         self._tts_service = tts_service
         self._visit_service = visit_service
+        self._person_service = person_service
         self._message_service = message_service
         self._custom_datetime = custom_datetime
         self._dialogue_service = dialogue_service
+        self._face_analyzer_service = face_analyzer_service
 
     async def start_visit(self) -> IntercomStartedVisit:
         unfinished_visits = await self._visit_service.get_all(
-            filters=VisitFilter(status=self._enums.Visit.VisitStatus.IN_PROCESS),
+            filters=VisitFilter(status=self._enums.Visit.Status.IN_PROCESS),
             requirement=self._enums.SrvReqCommon.VisitRequirements.WITH_MESSAGES,
         )
 
@@ -77,7 +83,8 @@ class IntercomUC(IIntercomUC):
                 await self._visit_service.finish_visit(
                     sid=visit.sid,
                     visit_finish_params=VisitFinish(
-                        finish_reason=self._enums.Visit.VisitFinishReason.CANCELLED_BY_VISITOR
+                        finish_reason
+                        =self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR
                     )
                 )
             else:
@@ -85,7 +92,7 @@ class IntercomUC(IIntercomUC):
 
         visit = await self._visit_service.create_visit(
             visit_in=VisitCreate(
-                status=self._enums.Visit.VisitStatus.IN_PROCESS,
+                status=self._enums.Visit.Status.IN_PROCESS,
                 start_datetime=self._custom_datetime.get_utc_datetime(),
                 dialogue_lang=self._consts.Common.DefaultLanguage,
             )
@@ -100,17 +107,50 @@ class IntercomUC(IIntercomUC):
         )
 
         return IntercomStartedVisit(
-            visit_sid = visit.sid,
-            hello_message_audio_path = intercom_answer.answer_message_audio_path,
+            visit_sid=visit.sid,
+            hello_message_audio_path=intercom_answer.answer_message_audio_path,
         )
 
     @LoggingFunctionInfo(description="Process visit photo.")
-    async def process_visit_photo(self, visit_sid: UUID, photo: UploadFile) -> Msg:
-        # TODO:
-        # 1. Process photo
-        # 2. Identification by embedding (Person table)
-        # 3. Call user if employee was detected
-        ...
+    async def process_visit_photo(
+        self,
+        visit_sid: UUID,
+        photo: UploadFile,
+    ) -> PhotoProcessingResult:
+        photo_processing_result = PhotoProcessingResult()
+
+        faces_info = self._face_analyzer_service.analyse_photo(photo)
+
+        for face in faces_info:
+            visit_person_in = VisitPersonCreate(
+                visit_sid=visit_sid,
+                detected_age=face.detected_age,
+                detected_sex=face.detected_sex,
+                crop_coords=face.crop_coords,
+            )
+
+            person_sid = await self._person_service.search_by_face_embedding(
+                embedding=face.face_embedding
+            )
+            if person_sid is not None:
+                visit_person_in.person_sid = person_sid
+                photo_processing_result.detected_employee = True
+
+            await self._visit_service.create_visitor(visit_person_in)
+
+        if photo_processing_result.detected_employee:
+            created_message = await self._create_intercom_audio_and_text_message(
+                visit_sid=visit_sid,
+                bot_replica=self._dialogue_service.get_recognized_bot_answer(),
+            )
+            photo_processing_result.message_audio_path = created_message.audio_s3_path
+
+            await self._visit_service.call_employee(
+                sid=visit_sid,
+                reason=self._enums.Visit.HandoffReason.EMPLOYEE_RECOGNIZED,
+            )
+
+        return photo_processing_result
 
     async def get_answer(
         self,
@@ -135,7 +175,7 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         dialogue_lang: LanguageEnum | None = None,
     ) -> IntercomAnswer:
-        detect_language = dialogue_lang is not None
+        detect_language = dialogue_lang is None
 
         visit = await self._visit_service.get_by_sid(visit_sid)
 
@@ -148,10 +188,8 @@ class IntercomUC(IIntercomUC):
             ),
         )
 
-        bot_replica: BotReplica | None = None
-
         match visit.status:
-            case self._enums.Visit.VisitStatus.IN_PROCESS:
+            case self._enums.Visit.Status.IN_PROCESS:
                 # State 0: Detect language
                 if detect_language:
                     dialogue_lang = await self._detect_dialogue_lang_by_visitor_message(
@@ -178,7 +216,7 @@ class IntercomUC(IIntercomUC):
                         visit_sid, dialogue_lang
                     )
 
-            case self._enums.Visit.VisitStatus.ASKED_WANT_TO_ENTER:
+            case self._enums.Visit.Status.ASKED_WANT_TO_ENTER:
                 # State 3: Getting the visitor's answer to a 'want to enter' question
                 bot_replica = await self._process_want_to_enter_visitor_answer(
                     visit_sid=visit_sid,
@@ -202,8 +240,8 @@ class IntercomUC(IIntercomUC):
 
     def _validate_get_answer(self, visit: Visit) -> None:
         if visit.status in (
-            self._enums.Visit.VisitStatus.OVER,
-            self._enums.Visit.VisitStatus.WAITING_DECISION
+            self._enums.Visit.Status.OVER,
+            self._enums.Visit.Status.WAITING_DECISION
         ):
             raise BackendException(error=self._errors.Intercom.DIALOGUE_IS_OVER)
 
@@ -216,12 +254,14 @@ class IntercomUC(IIntercomUC):
         bot_answer = await self._get_bot_answer(
             visit_sid,
             mode=self._enums.Dialogue.DialogueMode.VISITOR_CALL_EMPLOYEE,
-            messages=[ChatMessage(role=self._enums.Common.MessageAuthorRole.USER, content=message)],
+            messages=[
+                ChatMessage(
+                    role=self._enums.Common.MessageAuthorRole.USER,
+                    content=message,
+                )
+            ],
             dialogue_lang=dialogue_lang,
         )
-
-        if bot_answer.error: # TODO: to BotReplica !
-            return bot_answer, True
 
         bot_replica = BotReplica(
             content="",
@@ -229,12 +269,15 @@ class IntercomUC(IIntercomUC):
         )
 
         if bot_answer.call_employee:
-            bot_replica.content = await (
-                self._dialogue_service.get_call_employee_bot_answer(lang=dialogue_lang)
+            bot_replica.content = self._dialogue_service.get_call_employee_bot_answer(
+                lang=dialogue_lang
             ).content
 
             # Transition from state 1 to state 5
-            await self._visit_service.call_employee(sid=visit_sid)
+            await self._visit_service.call_employee(
+                sid=visit_sid,
+                reason=self._enums.Visit.HandoffReason.VISITOR_REQUESTED_EMPLOYEE,
+            )
 
         return bot_replica, bot_answer.call_employee
 
@@ -258,23 +301,19 @@ class IntercomUC(IIntercomUC):
             ],
         )
 
-        if bot_answer.error:  # TODO: to BotReplica !
-            print("Can't detect message language")
-            return self._enums.Common.Language.RU
+        detected_lang = bot_answer.lang
 
-        delected_lang = bot_answer.lang
-
-        if visit_dialogue_lang != delected_lang:
+        if visit_dialogue_lang != detected_lang:
             await self._visit_service.update_visit(
                 sid=visit_sid,
                 visit_in=VisitUpdate.model_validate(
-                    VisitUpdateShort(dialogue_lang=delected_lang)
+                    VisitUpdateShort(dialogue_lang=detected_lang)
                 ),
             )
 
-        return delected_lang
+        return detected_lang
 
-    async def _set_visit_dialogue_lang (
+    async def _set_visit_dialogue_lang(
         self,
         message: str,
         visit_sid: UUID,
@@ -322,13 +361,14 @@ class IntercomUC(IIntercomUC):
             dialogue_lang=dialogue_lang,
         )
 
-        if bot_goal_answer.error:  # TODO: to BotReplica !
-            return bot_goal_answer
-
         bot_replica_content = bot_goal_answer.content
 
         if bot_goal_answer.goal_identified:
-            want_to_enter_question = self._dialogue_service.get_want_to_enter_question_bot_answer(dialogue_lang).content
+            want_to_enter_question = (
+                self._dialogue_service.get_want_to_enter_question_bot_answer(
+                    dialogue_lang
+                ).content
+            )
 
             bot_replica_content = f"{bot_goal_answer.content} {want_to_enter_question}"
 
@@ -344,17 +384,19 @@ class IntercomUC(IIntercomUC):
                 ],
             )
 
-            if bot_goal_relevant_answer.error:  # TODO: to BotReplica !
-                return bot_goal_relevant_answer
-
             grant_access = bot_goal_relevant_answer.goal_relevant_to_company
 
-            # Transition from state 3 to state 4
-            await self._visit_service.ask_want_to_enter(
+            # Save goal info to visit for report
+            await self._visit_service.update_visit(
                 sid=visit_sid,
-                visitor_goal=bot_goal_answer.visitor_goal,
-                bot_granted_access=grant_access,
+                visit_in=VisitUpdate(
+                    visitor_goal=bot_goal_answer.visitor_goal,
+                    bot_granted_access=grant_access,
+                )
             )
+
+            # Transition from state 3 to state 4
+            await self._visit_service.ask_want_to_enter(visit_sid)
 
         return BotReplica(
             content=bot_replica_content,
@@ -378,31 +420,27 @@ class IntercomUC(IIntercomUC):
             visit_sid,
             mode=self._enums.Dialogue.DialogueMode.WANT_TO_ENTER,
             messages=messages,
-            visitor_goal=visitor_goal,
-            bot_granted_access=bot_granted_access,
         )
 
-        if bot_answer.error:  # TODO: to BotReplica !
-            return bot_answer
-
         if bot_answer.want_to_enter:
-            bot_replica = self._dialogue_service.get_call_employee_bot_answer(lang=dialogue_lang)
+            bot_replica = self._dialogue_service.get_call_employee_bot_answer(
+                lang=dialogue_lang
+            )
 
             await self._visit_service.call_employee(
               visit_sid,
-              visit_call_employee_params=VisitCallEmployee(
-                  visitor_goal=visitor_goal,
-                  bot_granted_access=bot_granted_access,
-              ),
+              reason=self._enums.Visit.HandoffReason.READY_FOR_EMPLOYEE_DECISION,
           )
 
         else:
-            bot_replica = self._dialogue_service.get_goodbye_bot_answer(lang=dialogue_lang)
+            bot_replica = self._dialogue_service.get_goodbye_bot_answer(
+                lang=dialogue_lang
+            )
 
             await self._visit_service.finish_visit(
                 visit_sid,
                 visit_finish_params=VisitFinish(
-                    finish_reason=self._enums.Visit.VisitFinishReason.CANCELLED_BY_VISITOR,
+                    finish_reason=self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR,
                     visitor_goal=visitor_goal,
                     bot_granted_access=bot_granted_access,
                 ),
@@ -414,9 +452,7 @@ class IntercomUC(IIntercomUC):
         self,
         visit_sid: UUID,
         mode: DialogueModeEnum,
-        messages: list[ChatMessage] = None,
-        visitor_goal: str | None = None,
-        bot_granted_access: bool | None = None,
+        messages: list[ChatMessage] | None = None,
         dialogue_lang: LanguageEnum | None = None,
     ) -> ChatBotAnswer:
         if messages is None:
@@ -431,23 +467,21 @@ class IntercomUC(IIntercomUC):
             self._logger.debug(f"Bot answer: {bot_answer.content}")
 
         except Exception:
-            visit_call_employee_params=VisitCallEmployee(
-                finish_reason=self._enums.Visit.VisitFinishReason.BOT_ERROR,
-            )
-
-            if visitor_goal is not None:
-                visit_call_employee_params.visitor_goal=visitor_goal
-
-            if bot_granted_access is not None:
-                visit_call_employee_params.bot_granted_access=bot_granted_access
-
             await self._visit_service.call_employee(
                 sid=visit_sid,
-                visit_call_employee_params=visit_call_employee_params,
+                reason=self._enums.Visit.HandoffReason.BOT_ERROR,
             )
 
-            return self._dialogue_service.get_error_bot_answer(
-                lang=dialogue_lang or self._consts.Common.DefaultLanguage
+            # Save bot error message
+            message = await self._create_intercom_audio_and_text_message(
+                visit_sid=visit_sid,
+                bot_replica=self._dialogue_service.get_error_bot_answer(
+                    lang=dialogue_lang or self._consts.Common.DefaultLanguage
+                )
+            )
+            # TODO: try, catch
+            raise BotDialogueError(
+                message_audio_path=message.audio_s3_path
             )
 
         return bot_answer
@@ -459,20 +493,12 @@ class IntercomUC(IIntercomUC):
         bot_replica: BotReplica,
     ) -> IntercomAnswer:
         try:
-            audio_data = await self._tts_service.synthesize(
-                text=bot_replica.content, lang=bot_replica.lang,
-            )
-
-            created_message = await self._message_service.create_bot_message(
-                message_in=MessageBotCreate(
-                    audio=audio_data.audio,
-                    content=bot_replica.content,
-                    visit_sid=visit_sid,
-                )
+            created_message = await self._create_intercom_audio_and_text_message(
+                visit_sid, bot_replica,
             )
 
             dialogue_finished = (
-                visit_status == self._enums.Visit.VisitStatus.WAITING_DECISION
+                visit_status == self._enums.Visit.Status.WAITING_DECISION
             )
 
             return IntercomAnswer(
@@ -493,16 +519,8 @@ class IntercomUC(IIntercomUC):
 
         bot_replica = self._dialogue_service.get_error_bot_answer()
 
-        audio_data = await self._tts_service.synthesize(
-            text=bot_replica.content, lang=bot_replica.lang,
-        )
-
-        created_message = await self._message_service.create_bot_message(
-            message_in=MessageBotCreate(
-                audio=audio_data.audio,
-                content=bot_replica.content,
-                visit_sid=visit_sid,
-            )
+        created_message = await self._create_intercom_audio_and_text_message(
+            visit_sid, bot_replica,
         )
 
         return IntercomAnswer(
@@ -511,4 +529,22 @@ class IntercomUC(IIntercomUC):
 
     @LoggingFunctionInfo(description="Get user door opening decision for visit.")
     async def get_user_decision(self, visit_sid: UUID) -> Decision:
-        ...
+        # TODO: get user decision
+        pass
+
+    async def _create_intercom_audio_and_text_message(
+        self,
+        visit_sid: UUID,
+        bot_replica: BotReplica,
+    ) -> Message:
+        audio_data = self._tts_service.synthesize(
+            text=bot_replica.content, lang=bot_replica.lang,
+        )
+
+        return await self._message_service.create_bot_message(
+            message_in=MessageBotCreate(
+                audio=audio_data.audio,
+                content=bot_replica.content,
+                visit_sid=visit_sid,
+            )
+        )

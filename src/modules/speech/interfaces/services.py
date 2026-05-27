@@ -16,7 +16,7 @@ class ITTSSrv(ABC):
     """
 
     @abstractmethod
-    async def synthesize(self, text: str, lang: LanguageEnum):
+    def synthesize(self, text: str, lang: LanguageEnum):
         """
         Synthesize speech from text.
 

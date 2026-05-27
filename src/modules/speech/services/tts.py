@@ -23,9 +23,8 @@ class TTSSrv(ITTSSrv):
         self._tts_model_manager = tts_model_manager
 
     @LoggingFunctionInfo("Synthesize speech from text.")
-    async def synthesize(self, text: str, lang: LanguageEnum=LanguageEnum.RU) -> AudioData:
+    def synthesize(self, text: str, lang: LanguageEnum=LanguageEnum.RU) -> AudioData:
         model, params = self._tts_model_manager.get_model(lang=lang)
-        print(type(model), type(params))
 
         audio = model.apply_tts(
             text=text,

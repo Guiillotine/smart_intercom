@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from pydantic import Field
+
 from src.common.schemas import CoreSchema
 
 
@@ -15,3 +17,10 @@ class IntercomAnswer(CoreSchema):
 
 class Decision(CoreSchema):
     open: bool
+
+
+class PhotoProcessingResult(CoreSchema):
+    detected_employee: bool = False
+    message_audio_path: str | None = Field(
+        None, description="Sets if person was identified"
+    )

@@ -1,9 +1,12 @@
 import logging
 
+import cv2
 import numpy as np
+from fastapi import UploadFile
 from insightface.app.common import Face
 
 from src.common.constants import ErrorCodesEnums
+from src.common.decorators import LoggingFunctionInfo
 from src.modules.faces.interfaces import IFaceAnalyzerSrv, IFaceAnalysisModelManager
 from src.modules.faces.schemas import FaceInfo
 from src.modules.faces.services.constants import FaceAnalyzerSrvEnums
@@ -28,10 +31,16 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
         self._errors = errors
         self._app = face_analysis_model_manager.app
 
+    @LoggingFunctionInfo(
+        description="Analyze an image and return information about all detected faces."
+    )
     def analyse_photo(
         self,
-        image: np.ndarray,
+        image: np.ndarray | UploadFile,
     ) -> list[FaceInfo]:
+        if type(image) == UploadFile:
+            image = self._upload_file_to_ndarray(image)
+
         faces = self._app.get(image)
 
         h, w = image.shape[:2]
@@ -40,17 +49,15 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
 
         faces_info: list[FaceInfo] = []
         for face in faces:
-            x1, y1, x2, y2 = face.bbox
-
             face_embedding = self._l2_norm_embedding(embedding=face.embedding)
+            x1, y1, x2, y2 = face.bbox
 
             faces_info.append(
                 FaceInfo(
                     detected_age=face.age,
                     detected_sex=self._enums.Common.Gender(face.gender),
-                    photo="crop/path_to_s3",
                     face_embedding=face_embedding,
-                    crop=image[y1:y2, x1:x2],
+                    crop_coords=[y1, y2, x1, x2],
                 )
             )
 
@@ -85,3 +92,14 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
     @staticmethod
     def _get_vector_len(v: list[float]) -> float:
         return sum(x * x for x in v)**0.5
+
+    @staticmethod
+    async def _upload_file_to_ndarray(image: UploadFile) -> np.ndarray:
+        content = await image.read()
+        image_array = np.frombuffer(content, dtype=np.uint8)
+        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        if image is None:
+            raise ValueError("Can't decode image")
+
+        return image

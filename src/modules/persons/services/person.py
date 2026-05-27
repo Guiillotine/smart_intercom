@@ -46,6 +46,11 @@ class PersonSrv(IPersonSrv):
             await self._person_postgres_repo.get_by_sid(sid)
         )
 
+    @LoggingFunctionInfo(description="Search person by face embedding.")
+    async def search_by_face_embedding(self, embedding: list[float]) -> UUID | None:
+        # TODO: search by embedding
+        pass
+
     @LoggingFunctionInfo(description="Create person.")
     async def create(self, person_in: PersonCreate) -> Person:
         return Person.model_validate(

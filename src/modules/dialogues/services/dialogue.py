@@ -122,7 +122,19 @@ class DialogueSrv(IDialogueSrv):
             lang=lang,
         )
 
-    def get_error_bot_answer(self, lang: LanguageEnum = LanguageConsts.DEFAULT_LANG) -> BotReplica:
+    def get_recognized_bot_answer(
+        self,
+        lang: LanguageEnum = LanguageConsts.DEFAULT_LANG,
+    ) -> BotReplica:
+        return BotReplica(
+            content=self._consts.Message.get(self._enums.BotMessage.RECOGNIZED, lang),
+            lang=lang,
+        )
+
+    def get_error_bot_answer(
+        self,
+        lang: LanguageEnum = LanguageConsts.DEFAULT_LANG,
+    ) -> BotReplica:
         return BotReplica(
             content=self._consts.Message.get(self._enums.BotMessage.ERROR, lang),
             lang=lang,

@@ -45,6 +45,16 @@ class VisitModel(CoreModel):
         comment="S3 path to photo of the visit",
     )
 
+    finish_reason: Mapped[int | None] = mapped_column(
+        comment="Why visit was finished",
+        nullable=True,
+    )
+
+    handoff_reason: Mapped[int | None] = mapped_column(
+        comment="Why employee was called",
+        nullable=True,
+    )
+
     decision_by_user_sid: Mapped[UUID | None] = mapped_column(
         ForeignKey(f"{SchemaNamesEnum.USERS.value}.user.sid"),
         nullable=True,

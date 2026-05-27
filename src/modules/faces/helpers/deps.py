@@ -9,6 +9,6 @@ from src.modules.faces.interfaces import IFaceAnalysisModelManager
 
 
 def get_face_analysis_model_manager(
-    settings: Annotated[Settings, Depends(get_settings())]
+    settings: Annotated[Settings, Depends(get_settings)]
 ) -> IFaceAnalysisModelManager:
     return FaceAnalysisModelManager(settings=settings)

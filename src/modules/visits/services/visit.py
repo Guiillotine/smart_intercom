@@ -7,18 +7,18 @@ from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
-from src.modules.visits.constants.enums import VisitStatusEnum
+from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
-from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv
+from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
+    IVisitPersonPostgresRepo
 from src.modules.visits.services.constants import VisitSrvConsts, VisitSrvEnums
 from src.modules.visits.schemas import (
     Visit,
-    VisitCallEmployee,
     VisitCreate,
     VisitFinish,
     VisitFull,
     VisitReport,
-    VisitUpdate,
+    VisitUpdate, VisitPersonCreate, VisitPerson,
 )
 from src.modules.visits.services.constants.consts import VisitRespSchemas
 
@@ -30,18 +30,15 @@ class VisitSrv(IVisitSrv):
         enums: VisitSrvEnums,
         consts: VisitSrvConsts,
         logger: logging.Logger,
-        visit_repo: IVisitPostgresRepo,
+        visit_pg_repo: IVisitPostgresRepo,
+        visit_person_pg_repo: IVisitPersonPostgresRepo,
     ):
         self._errors = errors
         self._enums = enums
         self._consts = consts
         self._logger = logger
-        self._visit_repo = visit_repo
-
-    async def create_visit(self, visit_in: VisitCreate) -> Visit:
-        return Visit.model_validate(
-            await self._visit_repo.create(obj_in=visit_in)
-        )
+        self._visit_pg_repo = visit_pg_repo
+        self._visit_person_pg_repo = visit_person_pg_repo
 
     async def get_by_sid(
         self,
@@ -68,7 +65,7 @@ class VisitSrv(IVisitSrv):
             self._enums.SrvReqCommon.RequirementFieldName.OPTIONS
         )()
 
-        visits = await self._visit_repo.get_all(
+        visits = await self._visit_pg_repo.get_all(
             filters=filters,
             sort_params=sort_params,
             custom_options=custom_options,
@@ -86,7 +83,7 @@ class VisitSrv(IVisitSrv):
         filters=None,
         sort_params: SortBase = None,
     ) -> PaginationResult[Visit]:
-        visits, total = await self._visit_repo.get_all_paginated(
+        visits, total = await self._visit_pg_repo.get_all_paginated(
             pagination_params=pagination_params,
             filters=filters,
             sort_params=sort_params,
@@ -99,7 +96,7 @@ class VisitSrv(IVisitSrv):
         )
 
     async def get_waiting_decision_visits(self) -> ListResult[VisitReport]:
-        visits = await self._visit_repo.get_all()
+        visits = await self._visit_pg_repo.get_all()
         return ListResult(
             items=[
                 VisitReport.model_validate(visit)
@@ -108,25 +105,44 @@ class VisitSrv(IVisitSrv):
             ]
         )
 
+    @LoggingFunctionInfo(description="Create a visit.")
+    async def create_visit(self, visit_in: VisitCreate) -> Visit:
+        return Visit.model_validate(
+            await self._visit_pg_repo.create(obj_in=visit_in)
+        )
+
+    @LoggingFunctionInfo(description="Create a visitor.")
+    async def create_visitor(self, visit_person_in: VisitPersonCreate) -> VisitPerson:
+        return VisitPerson.model_validate(
+            await self._visit_person_pg_repo.create(obj_in=visit_person_in)
+        )
+
     async def update_visit(self, sid: UUID, visit_in: VisitUpdate) -> Visit:
         visit = await self._get_model_by_sid(sid)
         return Visit.model_validate(
-            await self._visit_repo.update(db_obj=visit, obj_in=visit_in)
+            await self._visit_pg_repo.update(db_obj=visit, obj_in=visit_in)
         )
 
     async def call_employee(
         self,
         sid: UUID,
-        visit_call_employee_params: VisitCallEmployee | None = None,
+        reason: VisitHandoffReasonEnum,
     ) -> Visit:
-        params = visit_call_employee_params or VisitCallEmployee()
         return await self.update_visit(
             sid=sid,
             visit_in=VisitUpdate(
                 status=VisitStatusEnum.WAITING_DECISION,
-                visitor_goal=params.visitor_goal,
-                bot_granted_access=params.bot_granted_access,
+                handoff_reason=reason,
             ),
+        )
+
+    async def ask_want_to_enter(
+        self,
+        sid: UUID,
+    ) -> Visit:
+        return await self.update_visit(
+            sid=sid,
+            visit_in=VisitUpdate(status=VisitStatusEnum.ASKED_WANT_TO_ENTER),
         )
 
     async def finish_visit(
@@ -161,12 +177,12 @@ class VisitSrv(IVisitSrv):
 
     @LoggingFunctionInfo(description="Delete visit by identifier.")
     async def delete_visit(self, sid) -> Msg:
-        await self._visit_repo.delete(sid=sid)
+        await self._visit_pg_repo.delete(sid=sid)
         return Msg()
 
 
     async def _get_model_by_sid(self, sid: UUID):
-        visit = await self._visit_repo.get_by_sid(sid)
+        visit = await self._visit_pg_repo.get_by_sid(sid)
         if not visit:
             raise BackendException(error=self._errors.Visit.VISIT_NOT_FOUND)
         return visit

@@ -5,7 +5,8 @@ from fastapi import UploadFile
 
 from src.common.constants.enums import LanguageEnum
 from src.common.schemas import Msg
-from src.modules.intercoms.schemas import Decision, IntercomAnswer, IntercomStartedVisit
+from src.modules.intercoms.schemas import Decision, IntercomAnswer, \
+    IntercomStartedVisit, PhotoProcessingResult
 
 
 class IIntercomUC(ABC):
@@ -25,7 +26,11 @@ class IIntercomUC(ABC):
         ...
 
     @abstractmethod
-    async def process_visit_photo(self, visit_sid: UUID, photo: UploadFile) -> Msg:
+    async def process_visit_photo(
+        self,
+        visit_sid: UUID,
+        photo: UploadFile,
+    ) -> PhotoProcessingResult:
         """
         Process visit photo.
 

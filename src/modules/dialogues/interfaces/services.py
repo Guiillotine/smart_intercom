@@ -24,6 +24,13 @@ class IDialogueSrv(ABC):
         ...
 
     @abstractmethod
+    def get_recognized_bot_answer(
+        self,
+        lang: LanguageEnum = LanguageConsts.DEFAULT_LANG,
+    ) -> BotReplica:
+        ...
+
+    @abstractmethod
     def get_error_bot_answer(
         self,
         lang: LanguageEnum = LanguageConsts.DEFAULT_LANG,

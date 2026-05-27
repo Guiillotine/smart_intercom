@@ -1,19 +1,21 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
+from typing import TYPE_CHECKING
 
 from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
+from src.modules.visits.constants.enums import VisitHandoffReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.schemas import (
     Visit,
-    VisitCallEmployee,
     VisitCreate,
     VisitFinish,
     VisitFull,
     VisitReport,
-    VisitUpdate,
+    VisitUpdate, VisitPersonCreate, VisitPerson,
 )
-from src.modules.visits.services.constants.consts import VisitRespSchemas
+if TYPE_CHECKING:
+    from src.modules.visits.services.constants.consts import VisitRespSchemas
 
 
 class IVisitSrv(ABC):
@@ -22,17 +24,6 @@ class IVisitSrv(ABC):
 
     Defines business operations for visit state management.
     """
-
-    @abstractmethod
-    async def create_visit(self, visit_in: VisitCreate) -> Visit:
-        """
-        Create a visit.
-
-        :param visit_in: Visit creation schema.
-        :return: Created visit.
-        """
-        ...
-
     @abstractmethod
     async def get_by_sid(self, sid: UUID) -> Visit:
         """
@@ -59,7 +50,7 @@ class IVisitSrv(ABC):
         filters: VisitFilter | None = None,
         sort_params: SortBase | None = None,
         requirement: VisitRequirementsEnum | None = None,
-    ) -> ListResult[VisitRespSchemas.GET_ALL]:
+    ) -> ListResult["VisitRespSchemas.GET_ALL"]:
         """
         Get all visits.
 
@@ -94,6 +85,36 @@ class IVisitSrv(ABC):
         ...
 
     @abstractmethod
+    async def create_visit(self, visit_in: VisitCreate) -> Visit:
+        """
+        Create a visit.
+
+        :param visit_in: Visit creation schema.
+        :return: Created visit.
+        """
+        ...
+
+    @abstractmethod
+    async def create_visitor(self, visit_person_in: VisitPersonCreate) -> VisitPerson:
+        """
+        Create a visitor.
+
+        :param visit_person_in: Visitor creation schema.
+        :return: Created visitor.
+        """
+        ...
+
+    @abstractmethod
+    def create_visitor(self, visit_person_in: VisitPersonCreate) -> VisitPerson:
+        """
+        Create a visitor.
+
+        :param visit_person_in: Visitor creation schema.
+        :return: Created visitor.
+        """
+        ...
+
+    @abstractmethod
     async def update_visit(self, sid: UUID, visit_in: VisitUpdate) -> Visit:
         """
         Update a visit.
@@ -106,13 +127,28 @@ class IVisitSrv(ABC):
 
     @abstractmethod
     async def call_employee(
-        self, sid: UUID, visit_call_employee_params: VisitCallEmployee | None = None
+        self,
+        sid: UUID,
+        reason: VisitHandoffReasonEnum,
     ) -> Visit:
         """
         Move visit to employee decision state.
 
         :param sid: Visit identifier.
-        :param visit_call_employee_params: Optional call employee transition data.
+        :param reason: Call employee reason.
+        :return: Updated visit.
+        """
+        ...
+
+    @abstractmethod
+    async def ask_want_to_enter(
+        self,
+        sid: UUID,
+    ) -> Visit:
+        """
+        Set visit status to 'asked wanted to enter'.
+
+        :param sid: Visit identifier.
         :return: Updated visit.
         """
         ...

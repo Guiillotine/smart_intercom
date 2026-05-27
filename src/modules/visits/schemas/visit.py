@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
-from uuid import UUID, uuid4
-
-from pydantic import Field
+from datetime import datetime
+from uuid import UUID
 
 from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.common.constants.enums import GenderEnum, LanguageEnum
 from src.modules.messages.schemas import Message
-from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum
+from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum, \
+    VisitHandoffReasonEnum
 
 
 # Visit person
@@ -64,12 +63,6 @@ class VisitUpdate(VisitUpdateShort):
     decision_by_user_sid: UUID
 
 
-class VisitCallEmployee(CoreSchema):
-    visitor_goal: str | None = None
-    bot_granted_access: bool | None = None
-    finish_reason: VisitFinishReasonEnum | None = None
-
-
 class VisitFinish(CoreSchema):
     finish_reason: VisitFinishReasonEnum
     visitor_goal: str | None = None
@@ -83,6 +76,7 @@ class Visit(CoreSchema):
     finish_datetime: datetime | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
+    handoff_reason: VisitHandoffReasonEnum | None = None
     dialogue_lang: LanguageEnum
 
 

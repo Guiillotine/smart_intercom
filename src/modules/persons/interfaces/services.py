@@ -41,6 +41,16 @@ class IPersonSrv(ABC):
         ...
 
     @abstractmethod
+    async def search_by_face_embedding(self, embedding: list[float]) -> UUID | None:
+        """
+        Search person by face embedding.
+
+        :param embedding: Face embedding.
+        :return: Identifier of found person or None if not found.
+        """
+        ...
+
+    @abstractmethod
     async def create(self, person_in: PersonCreate) -> Person:
         """
         Create a person record.

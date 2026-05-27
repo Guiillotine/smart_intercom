@@ -12,6 +12,7 @@ class BotMessageConst:
   MESSAGE_LANG_MAP: ClassVar[dict[tuple[BotMessageEnum, LanguageEnum], str]] = {
       # RU
       (BotMessageEnum.HELLO, LanguageEnum.RU): "Здравствуйте. Вы позвонили в домофон компании Эстэсис. Пожалуйста, назовите цель вашего визита.",
+      (BotMessageEnum.RECOGNIZED, LanguageEnum.RU): "Узнала вас. Сейчас я вызову сотрудника.",
       (BotMessageEnum.ERROR, LanguageEnum.RU): "Извините, произошла ошибка. Сейчас я вызову сотрудника.",
       (BotMessageEnum.ACCESS_GRANTED, LanguageEnum.RU): "Добро пожаловать в компанию Эстэсис.",
       (BotMessageEnum.ACCESS_NOT_GRANTED, LanguageEnum.RU): "Извините, но мы не можем открыть дверь. Всего доброго.",
@@ -20,6 +21,7 @@ class BotMessageConst:
       (BotMessageEnum.GOODBYE, LanguageEnum.RU): "До свидания, всего доброго.",
       # EN
       (BotMessageEnum.HELLO, LanguageEnum.EN): "Hello. You have reached the Estesis intercom. Please state the purpose of your visit.",
+      (BotMessageEnum.RECOGNIZED, LanguageEnum.EN): "I recognized you. I'll call a staff member now.",
       (BotMessageEnum.ERROR, LanguageEnum.EN): "Sorry, there was an error. I'll call a member of staff right now.",
       (BotMessageEnum.ACCESS_GRANTED, LanguageEnum.EN): "Welcome to Estesis.",
       (BotMessageEnum.ACCESS_NOT_GRANTED, LanguageEnum.EN): "Sorry, but we can't open the door. Goodbye.",
