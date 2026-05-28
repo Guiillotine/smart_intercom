@@ -25,7 +25,7 @@ def upgrade() -> None:
     op.add_column('person', sa.Column('middle_name', sa.String(), nullable=True), schema='persons')
     op.drop_column('person', 'full_name', schema='persons')
     op.add_column('visit', sa.Column('visitor_goal', sa.String(), nullable=True, comment='Purpose of the visit detected by bot'), schema='visits')
-    op.alter_column('visit', 'photo',
+    op.alter_column('visit', 'photo_s3_path',
                existing_type=sa.VARCHAR(),
                nullable=True,
                existing_comment='S3 path to photo of the visit',
@@ -51,7 +51,7 @@ def downgrade() -> None:
     op.drop_column('visit_person', 'crop_coords', schema='visits')
     op.add_column('visit', sa.Column('finish_reason', sa.VARCHAR(), autoincrement=False, nullable=True, comment='The reason the visit was finished'), schema='visits')
     op.add_column('visit', sa.Column('purpose', sa.VARCHAR(), autoincrement=False, nullable=True, comment='Purpose of the visit detected by bot'), schema='visits')
-    op.alter_column('visit', 'photo',
+    op.alter_column('visit', 'photo_s3_path',
                existing_type=sa.VARCHAR(),
                nullable=False,
                existing_comment='S3 path to photo of the visit',

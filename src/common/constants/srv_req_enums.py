@@ -8,6 +8,7 @@ class RequirementFieldNameEnum(StrEnum):
 
 class VisitRequirementsEnum(StrEnum):
     EMPTY = auto()
+    FULL = auto()
     WITH_MESSAGES = auto()
 
 

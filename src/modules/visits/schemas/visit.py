@@ -7,6 +7,7 @@ from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.common.constants.enums import GenderEnum, LanguageEnum
 from src.modules.messages.schemas import Message
+from src.modules.persons.schemas import Person
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum, \
     VisitHandoffReasonEnum
 
@@ -30,36 +31,31 @@ class VisitPerson(VisitPersonBase):
     sid: UUID
 
 
+class VisitPersonFull(VisitPerson):
+    person: Person | None
+
+
 # Visit
 
 
 class VisitBase(CoreSchema):
     status: VisitStatusEnum
-    arrival_datetime: datetime
-    dialogue_lang: LanguageEnum
-
-
-class VisitCreate(CoreSchema):
-    status: VisitStatusEnum
     start_datetime: datetime
     dialogue_lang: LanguageEnum
-    photo: str | None = None
+
+
+class VisitCreate(VisitBase):
+    photo_s3_path: str | None = None
 
 
 @partial_schema
-class VisitUpdateShort(CoreSchema):
-    dialogue_lang: LanguageEnum
-
-
-@partial_schema
-class VisitUpdate(VisitUpdateShort):
-    status: VisitStatusEnum
+class VisitUpdate(VisitBase):
+    photo_s3_path: str
     visitor_goal: str
-    start_datetime: datetime
+    granted_access: bool
+    handoff_reason: VisitHandoffReasonEnum | None = None
     finish_datetime: datetime
     bot_granted_access: bool
-    granted_access: bool
-    photo: str
     decision_by_user_sid: UUID
 
 
@@ -69,15 +65,13 @@ class VisitFinish(CoreSchema):
     bot_granted_access: bool | None = None
 
 
-class Visit(CoreSchema):
+class Visit(VisitBase):
     sid: UUID
-    status: VisitStatusEnum
     visitor_goal: str | None = None
     finish_datetime: datetime | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
     handoff_reason: VisitHandoffReasonEnum | None = None
-    dialogue_lang: LanguageEnum
 
 
 class VisitWithMessages(Visit):
@@ -85,7 +79,7 @@ class VisitWithMessages(Visit):
 
 
 class VisitFull(VisitWithMessages):
-    visitors: list[VisitPerson]
+    visitors: list[VisitPersonFull]
 
 
 class VisitReport(VisitFull):

@@ -1,7 +1,6 @@
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
@@ -23,7 +22,7 @@ class PersonModel(CoreModel):
 
     middle_name: Mapped[str | None] = mapped_column(nullable=True)
 
-    photo: Mapped[str] = mapped_column(comment="S3 path to person photo")
+    photo_s3_path: Mapped[str] = mapped_column(comment="S3 path to person photo")
 
     face_embedding: Mapped[list[float]] = mapped_column(
         Vector(get_settings().postgres.DIMENSION)

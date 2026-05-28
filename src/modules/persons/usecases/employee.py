@@ -68,7 +68,7 @@ class EmployeeUC(IEmployeeUC):
             await self._employee_service.create(
                 person_in=PersonCreate(
                     **employee_in.model_dump(),
-                    photo=photo_s3_path,
+                    photo_s3_path=photo_s3_path,
                     face_embedding=face_embedding,
                 )
             )
@@ -92,7 +92,7 @@ class EmployeeUC(IEmployeeUC):
             random.seed(42)
             face_embedding = [random.random() for _ in range(1536)]
 
-            person_in.photo = photo_s3_path
+            person_in.photo_s3_path = photo_s3_path
             person_in.face_embedding = face_embedding
 
         return Employee.model_validate(

@@ -1,4 +1,4 @@
-from src.modules.speech.handlers import TTSModelManager
+from src.modules.speech.helpers import TTSModelManager
 from fastapi import Request
 
 

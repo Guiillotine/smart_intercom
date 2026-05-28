@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, UTC
 from uuid import UUID
 
+from sqlalchemy.sql.base import ExecutableOption
+
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.decorators import LoggingFunctionInfo
@@ -11,6 +13,7 @@ from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReas
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
     IVisitPersonPostgresRepo
+from src.modules.visits.models import VisitModel
 from src.modules.visits.services.constants import VisitSrvConsts, VisitSrvEnums
 from src.modules.visits.schemas import (
     Visit,
@@ -40,16 +43,27 @@ class VisitSrv(IVisitSrv):
         self._visit_pg_repo = visit_pg_repo
         self._visit_person_pg_repo = visit_person_pg_repo
 
+    @LoggingFunctionInfo(description="Get visit by identifier.")
     async def get_by_sid(
         self,
         sid: UUID,
+        requirement: VisitRequirementsEnum | None = None,
     ) -> Visit:
-        return Visit.model_validate(
-            await self._get_model_by_sid(sid),
+        if not requirement:
+            requirement = self._enums.SrvReqCommon.VisitRequirements.EMPTY
+
+        custom_options = self._consts.Requirements.GET_BY_SID.get(requirement).get(
+            self._enums.SrvReqCommon.RequirementFieldName.OPTIONS
+        )()
+
+        visit = await self._get_model_by_sid(sid, custom_options=custom_options)
+        visit.messages = sorted(visit.messages, key=lambda msg: msg.time)
+
+        response_schema = self._consts.Requirements.GET_BY_SID.get(requirement).get(
+            self._enums.SrvReqCommon.RequirementFieldName.RESPONSE_SCHEMA
         )
 
-    async def get_full_by_sid(self, sid: UUID) -> VisitFull:
-        return VisitFull.model_validate(await self._get_model_by_sid(sid))
+        return response_schema.model_validate(visit)
 
     @LoggingFunctionInfo(description="Get all visits.")
     async def get_all(
@@ -77,6 +91,7 @@ class VisitSrv(IVisitSrv):
 
         return ListResult[response_schema](items=visits)
 
+    @LoggingFunctionInfo(description="Get paginated visits.")
     async def get_all_paginated(
         self,
         pagination_params: Pagination,
@@ -95,6 +110,7 @@ class VisitSrv(IVisitSrv):
             total=total,
         )
 
+    @LoggingFunctionInfo(description="Get visits waiting for a door opening decision.")
     async def get_waiting_decision_visits(self) -> ListResult[VisitReport]:
         visits = await self._visit_pg_repo.get_all()
         return ListResult(
@@ -117,12 +133,14 @@ class VisitSrv(IVisitSrv):
             await self._visit_person_pg_repo.create(obj_in=visit_person_in)
         )
 
+    @LoggingFunctionInfo(description="Update a visit.")
     async def update_visit(self, sid: UUID, visit_in: VisitUpdate) -> Visit:
         visit = await self._get_model_by_sid(sid)
         return Visit.model_validate(
             await self._visit_pg_repo.update(db_obj=visit, obj_in=visit_in)
         )
 
+    @LoggingFunctionInfo(description="Move visit to employee decision state.")
     async def call_employee(
         self,
         sid: UUID,
@@ -136,6 +154,7 @@ class VisitSrv(IVisitSrv):
             ),
         )
 
+    @LoggingFunctionInfo(description="Set visit status to 'asked wanted to enter'.")
     async def ask_want_to_enter(
         self,
         sid: UUID,
@@ -145,6 +164,7 @@ class VisitSrv(IVisitSrv):
             visit_in=VisitUpdate(status=VisitStatusEnum.ASKED_WANT_TO_ENTER),
         )
 
+    @LoggingFunctionInfo(description="Finish a visit.")
     async def finish_visit(
         self,
         sid: UUID,
@@ -161,6 +181,7 @@ class VisitSrv(IVisitSrv):
             ),
         )
 
+    @LoggingFunctionInfo(description="Persist user door opening decision.")
     async def make_door_open_decision(
         self, sid: UUID, user_sid: UUID, door_open: bool
     ) -> Msg:
@@ -180,9 +201,12 @@ class VisitSrv(IVisitSrv):
         await self._visit_pg_repo.delete(sid=sid)
         return Msg()
 
-
-    async def _get_model_by_sid(self, sid: UUID):
-        visit = await self._visit_pg_repo.get_by_sid(sid)
+    async def _get_model_by_sid(
+        self,
+        sid: UUID,
+        custom_options: tuple[ExecutableOption, ...] = None,
+    ) -> VisitModel:
+        visit = await self._visit_pg_repo.get_by_sid(sid, custom_options=custom_options)
         if not visit:
             raise BackendException(error=self._errors.Visit.VISIT_NOT_FOUND)
         return visit

@@ -9,8 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.common.models import CoreModel
 from src.common.adapters.repositories.postgres.constants import SchemaNamesEnum
 from src.common.utils import table_args
+
 if TYPE_CHECKING:
     from src.modules.messages.models import MessageModel
+    from src.modules.persons.models import PersonModel
 
 
 class VisitModel(CoreModel):
@@ -38,9 +40,9 @@ class VisitModel(CoreModel):
         nullable=True, comment="Purpose of the visit detected by bot",
     )
 
-    dialogue_lang: Mapped[int] = mapped_column(comment="Visit dialogue language")
+    dialogue_lang: Mapped[str] = mapped_column(comment="Visit dialogue language")
 
-    photo: Mapped[str | None] = mapped_column(
+    photo_s3_path: Mapped[str | None] = mapped_column(
         nullable=True,
         comment="S3 path to photo of the visit",
     )
@@ -64,6 +66,8 @@ class VisitModel(CoreModel):
 
     messages: Mapped[list["MessageModel"]] = relationship(back_populates="visit")
 
+    visitors: Mapped[list["VisitPersonModel"]] = relationship(back_populates="visit")
+
 
 class VisitPersonModel(CoreModel):
     __table_args__ = table_args(schema=SchemaNamesEnum.VISITS)
@@ -86,3 +90,9 @@ class VisitPersonModel(CoreModel):
     visit_sid: Mapped[UUID] = mapped_column(
         ForeignKey(f"{SchemaNamesEnum.VISITS.value}.visit.sid"),
     )
+
+    # Relationships
+
+    visit: Mapped["VisitModel"] = relationship(back_populates="visitors")
+
+    person: Mapped["PersonModel | None"] = relationship()

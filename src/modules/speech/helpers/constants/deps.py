@@ -4,8 +4,8 @@ from fastapi import Depends
 
 from src.config.settings import Settings
 from src.config.settings.deps import get_settings
-from src.modules.speech.handlers import TTSModelManager
-from src.modules.speech.handlers.constants.consts import TTSModelManagerConsts
+from src.modules.speech.helpers import TTSModelManager
+from src.modules.speech.helpers.constants.consts import TTSModelManagerConsts
 from src.modules.speech.interfaces import ITTSModelManager
 
 

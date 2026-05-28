@@ -24,7 +24,7 @@ class MessageModel(CoreModel):
 
     time: Mapped[datetime] = mapped_column(DateTime())
 
-    audio: Mapped[str | None] = mapped_column(
+    audio_s3_path: Mapped[str | None] = mapped_column(
         nullable=True, comment="S3 path to audio file"
     )
 
@@ -34,4 +34,4 @@ class MessageModel(CoreModel):
 
     # Relationships
 
-    visit: Mapped[list["VisitModel"]] = relationship(back_populates="visit")
+    visit: Mapped["VisitModel"] = relationship(back_populates="messages")

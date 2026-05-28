@@ -6,7 +6,7 @@ import soundfile as sf
 from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.config.settings import Settings
-from src.modules.speech.handlers import TTSModelManager
+from src.modules.speech.helpers import TTSModelManager
 from src.modules.speech.interfaces import ITTSSrv, ISpeechS3Repo
 from src.modules.speech.schemas import AudioData
 

@@ -29,8 +29,13 @@ from src.modules.speech.interfaces import ITTSSrv, IASRSrv
 from src.modules.visits.constants.enums import VisitStatusEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitSrv
-from src.modules.visits.schemas import Visit, VisitFinish, \
-    VisitUpdateShort, VisitUpdate, VisitCreate, VisitPersonCreate
+from src.modules.visits.schemas import (
+    Visit,
+    VisitFinish,
+    VisitUpdate,
+    VisitCreate,
+    VisitPersonCreate,
+)
 
 
 class IntercomUC(IIntercomUC):
@@ -80,6 +85,7 @@ class IntercomUC(IIntercomUC):
 
         for visit in unfinished_visits.items:
             if visit.messages:
+                # TODO: author_sole == user
                 await self._visit_service.finish_visit(
                     sid=visit.sid,
                     visit_finish_params=VisitFinish(
@@ -306,9 +312,7 @@ class IntercomUC(IIntercomUC):
         if visit_dialogue_lang != detected_lang:
             await self._visit_service.update_visit(
                 sid=visit_sid,
-                visit_in=VisitUpdate.model_validate(
-                    VisitUpdateShort(dialogue_lang=detected_lang)
-                ),
+                visit_in=VisitUpdate(dialogue_lang=detected_lang),
             )
 
         return detected_lang
@@ -328,9 +332,7 @@ class IntercomUC(IIntercomUC):
 
         await self._visit_service.update_visit(
               sid=visit_sid,
-              visit_in=VisitUpdate.model_validate(
-                  VisitUpdateShort(dialogue_lang=dialogue_lang)
-              ),
+              visit_in=VisitUpdate(dialogue_lang=dialogue_lang),
           )
 
         return dialogue_lang
@@ -543,7 +545,7 @@ class IntercomUC(IIntercomUC):
 
         return await self._message_service.create_bot_message(
             message_in=MessageBotCreate(
-                audio=audio_data.audio,
+                audio=audio_data.data,
                 content=bot_replica.content,
                 visit_sid=visit_sid,
             )

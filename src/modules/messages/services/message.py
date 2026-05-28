@@ -68,7 +68,7 @@ class MessageSrv(IMessageSrv):
         audio_s3_path = await self._message_s3_repo.put_object(
             key=self._get_bot_message_key(message_in.visit_sid, created_message.sid),
             data=message_in.audio,
-            bucket=self._settings.s3.S3_BOT_MESSAGE_BUCKET_NAME,
+            bucket=self._settings.s3.BOT_MESSAGE_BUCKET_NAME,
         )
 
         return Message.model_validate(

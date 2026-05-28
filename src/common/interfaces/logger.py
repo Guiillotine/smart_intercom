@@ -8,7 +8,7 @@ class ILoggerManager(ABC):
     loggers used throughout the application.
 
     Each logger should be configured according to the project’s
-    logging standards (level, format, handlers, etc.).
+    logging standards (level, format, helpers, etc.).
     """
 
     @abstractmethod

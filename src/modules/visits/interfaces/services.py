@@ -25,22 +25,17 @@ class IVisitSrv(ABC):
     Defines business operations for visit state management.
     """
     @abstractmethod
-    async def get_by_sid(self, sid: UUID) -> Visit:
+    async def get_by_sid(
+        self,
+        sid: UUID,
+        requirement: VisitRequirementsEnum | None = None,
+    ) -> Visit:
         """
         Get visit by identifier.
 
         :param sid: Visit identifier.
+        :param requirement: Requirements for response schema.
         :return: Visit data.
-        """
-        ...
-
-    @abstractmethod
-    async def get_full_by_sid(self, sid: UUID) -> VisitFull:
-        """
-        Get full visit information by identifier.
-
-        :param sid: Visit identifier.
-        :return: Full visit data.
         """
         ...
 
@@ -96,16 +91,6 @@ class IVisitSrv(ABC):
 
     @abstractmethod
     async def create_visitor(self, visit_person_in: VisitPersonCreate) -> VisitPerson:
-        """
-        Create a visitor.
-
-        :param visit_person_in: Visitor creation schema.
-        :return: Created visitor.
-        """
-        ...
-
-    @abstractmethod
-    def create_visitor(self, visit_person_in: VisitPersonCreate) -> VisitPerson:
         """
         Create a visitor.
 

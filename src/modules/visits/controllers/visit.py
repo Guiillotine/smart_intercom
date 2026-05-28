@@ -81,7 +81,10 @@ class VisitController(IVisitController):
         ## Notes:
         - Is available for Administrator only.
         """
-        return await visit_usecase.get_visit(sid=sid, user_sid=user_sid)
+        return await visit_usecase.get_visit(
+            sid=sid,
+            user_sid=user_sid,
+        )
 
     @staticmethod
     async def get_all_visits(

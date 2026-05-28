@@ -1,11 +1,12 @@
 from enum import StrEnum, auto, IntEnum
 
 
-class VisitStatusEnum(StrEnum):
-    IN_PROCESS = auto()
-    ASKED_WANT_TO_ENTER = auto()
-    WAITING_DECISION = auto()
-    OVER = auto()
+class VisitStatusEnum(IntEnum):
+    """Visit state"""
+    IN_PROCESS = 1
+    ASKED_WANT_TO_ENTER = 2
+    WAITING_DECISION = 3
+    OVER = 4
 
 
 class VisitFinishReasonEnum(IntEnum):

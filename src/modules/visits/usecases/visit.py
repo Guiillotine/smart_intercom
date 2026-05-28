@@ -18,7 +18,10 @@ class VisitUC(IVisitUC):
         self._visit_service = visit_service
 
     async def get_visit(self, sid: UUID, user_sid: UUID) -> VisitFull:
-        return await self._visit_service.get_full_by_sid(sid)
+        return await self._visit_service.get_by_sid(
+            sid,
+            requirement=self._enums.SrvReqCommon.VisitRequirements.FULL,
+        )
 
     async def get_all_visits(
         self,

@@ -10,8 +10,10 @@ from src.modules.persons.constants.enums import PersonTypeEnum
 
 
 class PersonBase(CoreSchema):
-    photo: str
-    full_name: str | None = None
+    first_name: str
+    last_name: str
+    middle_name: str | None = None
+    photo_s3_path: str
     face_embedding: list[float]
 
 

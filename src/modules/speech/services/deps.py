@@ -8,8 +8,8 @@ from src.common.logger.deps import get_speech_logger
 from src.config.settings import Settings
 from src.config.settings.deps import get_settings
 from src.modules.speech.adapters.whisper.deps import get_whisper_model
-from src.modules.speech.handlers import TTSModelManager
-from src.modules.speech.handlers.deps import get_tts_model_manager
+from src.modules.speech.helpers import TTSModelManager
+from src.modules.speech.helpers.deps import get_tts_model_manager
 from src.modules.speech.interfaces import ITTSSrv, IASRSrv
 from src.modules.speech.services import ASRSrv, TTSSrv
 from src.modules.speech.services.constants import ASRServiceConsts

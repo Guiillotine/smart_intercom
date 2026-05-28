@@ -7,7 +7,9 @@ from src.common.schemas import CoreSchema
 
 
 class EmployeeBase(CoreSchema):
-    full_name: str
+    first_name: str
+    last_name: str
+    middle_name: str | None = None
 
 
 class EmployeeCreate(EmployeeBase):
@@ -16,10 +18,10 @@ class EmployeeCreate(EmployeeBase):
 
 @partial_schema
 class EmployeeUpdate(EmployeeBase):
-    photo: str
+    photo_s3_path: str
     face_embedding: list[float]
 
 
 class Employee(EmployeeBase):
     sid: UUID
-    photo: str
+    photo_s3_path: str

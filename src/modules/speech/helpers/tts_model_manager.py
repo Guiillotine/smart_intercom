@@ -4,8 +4,8 @@ import torch
 from fastapi import Path
 
 from src.common.constants.enums import LanguageEnum
-from src.modules.speech.handlers.constants.consts import TTSModelManagerConsts
-from src.modules.speech.handlers.protocols import SileroTTSProtocol
+from src.modules.speech.helpers.constants.consts import TTSModelManagerConsts
+from src.modules.speech.helpers.protocols import SileroTTSProtocol
 from src.modules.speech.interfaces import ITTSModelManager
 from src.modules.speech.schemas import TTSModelParams
 

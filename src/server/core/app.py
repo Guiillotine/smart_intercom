@@ -6,14 +6,16 @@ from pkgutil import extend_path
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from faster_whisper import WhisperModel
+from insightface.app import FaceAnalysis
 from openai import OpenAI
 from starlette.middleware.cors import CORSMiddleware
 
 from src.common.errors import BackendException
 from src.config.docs.deps import get_tags_metadata
 from src.config.settings.deps import get_settings
-from src.modules.speech.handlers import TTSModelManager
-from src.modules.speech.handlers.constants.deps import get_tts_model_manager_consts
+from src.modules.faces.helpers import FaceAnalysisModelManager
+from src.modules.speech.helpers import TTSModelManager
+from src.modules.speech.helpers.constants.deps import get_tts_model_manager_consts
 from src.server.core.controllers import api_controller
 from src.server.middleware.deps import get_backend_exception_handler, \
     get_postgres_context_session_middleware, get_exception_middleware, \
@@ -84,6 +86,12 @@ def initialize_app():
 
 
 def initialize_state():
+    app.state.client = OpenAI(
+        api_key=settings.bot.API_KEY,
+        base_url=settings.bot.BASE_URL,
+        max_retries=settings.bot.LLM_HTTP_RETRIES,
+        timeout=settings.bot.LLM_RESPONSE_TIMEOUT_SEC,
+    )
     app.state.whisper_model = WhisperModel(
         model_size_or_path=settings.asr.ASR_MODEL_SIZE,
         device=settings.runtime.DEVICE,
@@ -92,12 +100,7 @@ def initialize_state():
     app.state.tts_model_manager = TTSModelManager(
         consts=get_tts_model_manager_consts(settings),
     )
-    app.state.client = OpenAI(
-        api_key=settings.bot.API_KEY,
-        base_url=settings.bot.BASE_URL,
-        max_retries=settings.bot.LLM_HTTP_RETRIES,
-        timeout=settings.bot.LLM_RESPONSE_TIMEOUT_SEC,
-    )
+    app.state.face_analysis_model_manager = FaceAnalysisModelManager(settings=settings)
 
 
 def initialize_silero_submodule():
@@ -113,9 +116,10 @@ def initialize_silero_submodule():
 
 
 def clean_state():
+    del app.state.client
     del app.state.whisper_model
     del app.state.tts_model_manager
-    del app.state.client
+    del app.state.face_analysis_model_manager
 
 
 # === Run App Initialization === #

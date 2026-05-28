@@ -5,8 +5,8 @@ from sqlalchemy.sql.base import ExecutableOption
 
 from src.common.constants.srv_req_enums import RequirementFieldNameEnum, \
     VisitRequirementsEnum
-from src.modules.visits.models import VisitModel
-from src.modules.visits.schemas import Visit, VisitWithMessages
+from src.modules.visits.models import VisitModel, VisitPersonModel
+from src.modules.visits.schemas import Visit, VisitWithMessages, VisitFull
 
 
 class VisitCustomOptions:
@@ -17,6 +17,13 @@ class VisitCustomOptions:
     @staticmethod
     def with_messages() -> list[ExecutableOption]:
         return [selectinload(VisitModel.messages)]
+
+    @staticmethod
+    def full() -> list[ExecutableOption]:
+        return [
+            selectinload(VisitModel.messages),
+            selectinload(VisitModel.visitors).selectinload(VisitPersonModel.person),
+        ]
 
 
 class VisitRequirements:
@@ -32,10 +39,23 @@ class VisitRequirements:
             RequirementFieldNameEnum.RESPONSE_SCHEMA: VisitWithMessages,
         },
     }
+    GET_BY_SID: ClassVar[
+        dict[VisitRequirementsEnum, dict[RequirementFieldNameEnum, Callable]]
+    ] = {
+        VisitRequirementsEnum.EMPTY: {
+            RequirementFieldNameEnum.OPTIONS: VisitCustomOptions.empty,
+            RequirementFieldNameEnum.RESPONSE_SCHEMA: Visit,
+        },
+        VisitRequirementsEnum.FULL: {
+            RequirementFieldNameEnum.OPTIONS: VisitCustomOptions.full,
+            RequirementFieldNameEnum.RESPONSE_SCHEMA: VisitFull,
+        },
+    }
 
 
 class VisitRespSchemas:
     GET_ALL = Visit | VisitWithMessages
+    GET_BY_SID = Visit | VisitFull
 
 
 class VisitSrvConsts:

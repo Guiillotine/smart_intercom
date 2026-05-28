@@ -64,6 +64,7 @@ async def get_intercom_usecase(
         asr_service=asr_service,
         tts_service=tts_service,
         visit_service=visit_service,
+        person_service=person_service,
         message_service=message_service,
         custom_datetime=custom_datetime,
         dialogue_service=dialogue_service,

@@ -10,7 +10,8 @@ class FaceAnalysisModelManager(IFaceAnalysisModelManager):
         settings: Settings,
     ):
         self._app = FaceAnalysis(
-            name="buffalo_l", providers=[settings.face.FACE_PROVIDER]
+            name=settings.face.FACE_ANALYZE_MODEL,
+            providers=[settings.face.FACE_PROVIDER],
         )
         # Delete from pypeline extra stages
         self._app.prepare(
