@@ -15,7 +15,7 @@ class PostgresSettings(BaseSettings):
     DB: str = Field(default="example", alias="POSTGRES_DB")
     USER: str = Field(default="example", alias="POSTGRES_USER")
     PASSWORD: str = Field(default="example", alias="POSTGRES_PASSWORD")
-    DIMENSION: int = Field(default=1536)
+    DIMENSION: int = Field(default=512, alias="FACE_EMBEDDING_DIMENSION")
 
     def get_url(self, use_async_driver: bool = False) -> str:
         driver = "asyncpg" if use_async_driver else "psycopg2"

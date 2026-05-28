@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
+from sqlalchemy import Index
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.common.models import CoreModel
@@ -12,7 +13,15 @@ settings = get_settings()
 
 
 class PersonModel(CoreModel):
-    __table_args__ = table_args(schema=SchemaNamesEnum.PERSONS)
+    __table_args__ = (
+        Index(
+            "idx_person_face_embedding",
+            "face_embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"face_embedding": "vector_cosine_ops"},
+        ),
+        table_args(schema=SchemaNamesEnum.PERSONS),
+    )
 
     sid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 

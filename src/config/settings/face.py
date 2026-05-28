@@ -14,3 +14,7 @@ class FaceSettings(BaseSettings):
     FACE_PROVIDER: str = Field(default="CUDAExecutionProvider")
 
     DET_SCORE_THRESHOLD: float = Field(default=0.6)
+
+    FACE_RECOGNITION_MAX_DISTANCE: float = Field(default=0.55)
+
+    FACE_DET_SIZE: int = Field(default=640)
