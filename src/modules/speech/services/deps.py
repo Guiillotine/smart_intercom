@@ -17,7 +17,6 @@ from src.modules.speech.services.constants.deps import get_asr_service_consts
 
 
 def get_asr_service(
-    settings: Annotated[Settings, Depends(get_settings)],
     logger: Annotated[logging.Logger, Depends(get_speech_logger)],
     consts: Annotated[ASRServiceConsts, Depends(get_asr_service_consts)],
     whisper_model: Annotated[WhisperModel, Depends(get_whisper_model)],
@@ -25,7 +24,6 @@ def get_asr_service(
     return ASRSrv(
         consts=consts,
         logger=logger,
-        settings=settings,
         model=whisper_model,
     )
 

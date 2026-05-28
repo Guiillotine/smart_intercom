@@ -8,7 +8,8 @@ from src.modules.persons.models import PersonModel
 
 
 class PersonFilter(SQLFilterBase):
-    full_name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
     person_type: PersonTypeEnum | None = None
 
 

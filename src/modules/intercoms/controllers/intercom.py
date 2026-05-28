@@ -12,6 +12,7 @@ from src.modules.intercoms.schemas.intercom import (
     Decision,
     IntercomAnswer,
     IntercomStartedVisit,
+    PhotoProcessingResult,
 )
 from src.modules.intercoms.usecases.deps import get_intercom_usecase
 
@@ -56,7 +57,7 @@ class IntercomController(IIntercomController):
             path=self._enums.IntercomCtrlPath.process_visit_photo,
             endpoint=self.process_visit_photo,
             methods=[self._enums.Common.RequestType.POST],
-            response_model=Msg,
+            response_model=PhotoProcessingResult,
         )
         
         self._controller.add_api_route(
@@ -84,7 +85,7 @@ class IntercomController(IIntercomController):
     async def start_visit(
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
     ) -> IntercomStartedVisit:
-        """TODO"""
+        """Start a new intercom visit and return the greeting audio path."""
         return await intercom_usecase.start_visit()
 
     @staticmethod
@@ -92,8 +93,8 @@ class IntercomController(IIntercomController):
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         photo: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
-    ) -> Msg:
-        """TODO"""
+    ) -> PhotoProcessingResult:
+        """Analyze a visit photo and register detected visitors."""
         return await intercom_usecase.process_visit_photo(visit_sid, photo)
 
     @staticmethod

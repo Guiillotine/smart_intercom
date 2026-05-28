@@ -9,7 +9,8 @@ from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
-from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReasonEnum
+from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReasonEnum, \
+    VisitFinishReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
     IVisitPersonPostgresRepo
@@ -19,7 +20,6 @@ from src.modules.visits.schemas import (
     Visit,
     VisitCreate,
     VisitFinish,
-    VisitFull,
     VisitReport,
     VisitUpdate, VisitPersonCreate, VisitPerson,
 )
@@ -48,7 +48,7 @@ class VisitSrv(IVisitSrv):
         self,
         sid: UUID,
         requirement: VisitRequirementsEnum | None = None,
-    ) -> Visit:
+    ) -> VisitRespSchemas.GET_BY_SID:
         if not requirement:
             requirement = self._enums.SrvReqCommon.VisitRequirements.EMPTY
 
@@ -168,16 +168,14 @@ class VisitSrv(IVisitSrv):
     async def finish_visit(
         self,
         sid: UUID,
-        visit_finish_params: VisitFinish | None = None,
+        finish_reason: VisitFinishReasonEnum,
     ) -> Visit:
-        params = visit_finish_params or VisitFinish() # TODO: default
         return await self.update_visit(
             sid=sid,
             visit_in=VisitUpdate(
                 status=VisitStatusEnum.OVER,
                 finish_datetime=datetime.now(UTC),
-                visitor_goal=params.visitor_goal,
-                bot_granted_access=params.bot_granted_access,
+                finish_reason=finish_reason,
             ),
         )
 
@@ -190,8 +188,6 @@ class VisitSrv(IVisitSrv):
             visit_in=VisitUpdate(
                 granted_access=door_open,
                 decision_by_user_sid=user_sid,
-                status=VisitStatusEnum.OVER,
-                finish_datetime=datetime.now(UTC),
             ),
         )
         return Msg()

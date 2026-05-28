@@ -8,7 +8,6 @@ from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.interfaces import ICustomDateTime
-from src.common.schemas import Msg
 from src.config.settings import Settings
 from src.modules.dialogues.constants.enums import DialogueModeEnum
 from src.modules.dialogues.interfaces import IDialogueSrv
@@ -88,10 +87,7 @@ class IntercomUC(IIntercomUC):
                 # TODO: author_sole == user
                 await self._visit_service.finish_visit(
                     sid=visit.sid,
-                    visit_finish_params=VisitFinish(
-                        finish_reason
-                        =self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR
-                    )
+                    finish_reason=self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR,
                 )
             else:
                 await self._visit_service.delete_visit(sid=visit.sid)
@@ -125,7 +121,7 @@ class IntercomUC(IIntercomUC):
     ) -> PhotoProcessingResult:
         photo_processing_result = PhotoProcessingResult()
 
-        faces_info = self._face_analyzer_service.analyse_photo(photo)
+        faces_info = await self._face_analyzer_service.analyse_photo(photo)
 
         for face in faces_info:
             visit_person_in = VisitPersonCreate(
@@ -163,10 +159,13 @@ class IntercomUC(IIntercomUC):
         audio: UploadFile,
         visit_sid: UUID,
     ) -> IntercomAnswer:
-         # TODO: get visit, get dialogue_lang
+        visit = await self._visit_service.get_by_sid(visit_sid)
+
+        self._validate_get_answer(visit)
 
         speech_info = self._asr_service.speech_to_text(
             audio=audio,
+            dialogue_lang=visit.dialogue_lang,
         )
 
         return await self.get_answer_on_text_message(
@@ -441,11 +440,7 @@ class IntercomUC(IIntercomUC):
 
             await self._visit_service.finish_visit(
                 visit_sid,
-                visit_finish_params=VisitFinish(
-                    finish_reason=self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR,
-                    visitor_goal=visitor_goal,
-                    bot_granted_access=bot_granted_access,
-                ),
+                finish_reason=self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR,
             )
 
         return bot_replica
@@ -531,8 +526,8 @@ class IntercomUC(IIntercomUC):
 
     @LoggingFunctionInfo(description="Get user door opening decision for visit.")
     async def get_user_decision(self, visit_sid: UUID) -> Decision:
-        # TODO: get user decision
-        pass
+        visit = await self._visit_service.get_by_sid(visit_sid)
+        return Decision(open=visit.granted_access)
 
     async def _create_intercom_audio_and_text_message(
         self,

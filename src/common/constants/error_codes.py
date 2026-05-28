@@ -55,6 +55,8 @@ class PersonErrorsEnum(Enum):
 
 
 class UserErrorsEnum(Enum):
+    # 400
+    INCORRECT_PHOTO = ("incorrect_person_photo", 400, "Person photo is incorrect")
     # 404
     USER_NOT_FOUND = ("user_not_found", 404, "User not found")
 

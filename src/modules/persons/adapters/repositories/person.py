@@ -1,5 +1,7 @@
 import logging
+from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.base import ExecutableOption
 
@@ -68,3 +70,30 @@ class PersonPostgresRepo(
         obj_in.person_type = person_type
 
         return await super().create(obj_in=obj_in)
+
+    @LoggingFunctionInfo(description="Search nearest person by face embedding.")
+    async def search_by_face_embedding(
+        self,
+        embedding: list[float],
+        max_distance: float,
+    ) -> UUID | None:
+        distance = PersonModel.face_embedding.cosine_distance(embedding).label(
+            "distance"
+        )
+        query = (
+            select(PersonModel.sid, distance)
+            .where(PersonModel.is_archived.is_(False))
+            .order_by(distance)
+            .limit(1)
+        )
+
+        if self._person_type is not None:
+            query = query.where(PersonModel.person_type == self._person_type)
+
+        result = await self._db.execute(query)
+        row = result.first()
+
+        if row is None or row.distance is None or row.distance > max_distance:
+            return None
+
+        return row.sid

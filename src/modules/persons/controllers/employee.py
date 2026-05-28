@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, UploadFile, File, Body
 from fastapi.params import Form
+from starlette.requests import Request
 
 from src.common.schemas import Msg, Pagination, PaginationResult
 from src.modules.persons.controllers.constants import EmployeeCtrlEnums
@@ -57,18 +58,21 @@ class EmployeeCtrl(IEmployeeCtrl):
             methods=[self._enums.Common.RequestType.GET],
             response_model=PaginationResult[Employee],
         )
+
         self._controller.add_api_route(
             path=self._enums.EmployeeCtrlPath.create_employee,
             endpoint=self.create_employee,
             methods=[self._enums.Common.RequestType.POST],
             response_model=Employee,
         )
+
         self._controller.add_api_route(
             path=self._enums.EmployeeCtrlPath.update_employee,
             endpoint=self.update_employee,
             methods=[self._enums.Common.RequestType.PUT],
             response_model=Employee,
         )
+
         self._controller.add_api_route(
             path=self._enums.EmployeeCtrlPath.delete_employee,
             endpoint=self.delete_employee,
@@ -93,24 +97,29 @@ class EmployeeCtrl(IEmployeeCtrl):
     @staticmethod
     async def create_employee(
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
-        full_name: Annotated[
-            str, Form(..., alias="fullName", validation_alias="fullName")
-        ],
         photo: Annotated[UploadFile, File(...)],
+        first_name: str = Form(alias="firstName"),
+        last_name: str = Form(alias="lastName"),
+        middle_name: str | None = Form(None, alias="middleName"),
     ) -> Employee:
         return await employee_usecase.create(
             photo=photo,
-            employee_in=EmployeeCreate(full_name=full_name),
+            employee_in=EmployeeCreate(
+                first_name=first_name,
+                last_name=last_name,
+                middle_name=middle_name,
+            ),
         )
 
     @staticmethod
     async def update_employee(
         sid: UUID,
+        request: Request,
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
-        full_name: str | None = Form(
-            None, alias="fullName", validation_alias="fullName"
-        ),
         photo: UploadFile | None = File(None),
+        first_name: str | None = Form(None, alias="firstName"),
+        last_name: str | None = Form(None, alias="lastName"),
+        middle_name: str | None = Form(None, alias="middleName"),
     ) -> Employee:
         """
         Update an employee person record.
@@ -118,11 +127,15 @@ class EmployeeCtrl(IEmployeeCtrl):
         ## Returns:
         - Updated employee data.
         """
-
         return await employee_usecase.update(
             sid=sid,
             photo=photo,
-            employee_in=EmployeeUpdate(full_name=full_name),
+            employee_in=await EmployeeCtrl._build_employee_update(
+                request=request,
+                first_name=first_name,
+                last_name=last_name,
+                middle_name=middle_name,
+            ),
         )
 
     @staticmethod
@@ -138,3 +151,22 @@ class EmployeeCtrl(IEmployeeCtrl):
         """
 
         return await employee_usecase.delete(sid=sid)
+
+    @staticmethod
+    async def _build_employee_update(
+        request: Request,
+        first_name: str | None,
+        last_name: str | None,
+        middle_name: str | None,
+    ) -> EmployeeUpdate:
+        form = await request.form()
+        update_data = {}
+
+        if "firstName" in form:
+            update_data["first_name"] = first_name
+        if "lastName" in form:
+            update_data["last_name"] = last_name
+        if "middleName" in form:
+            update_data["middle_name"] = middle_name or None
+
+        return EmployeeUpdate(**update_data)

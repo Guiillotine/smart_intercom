@@ -2,7 +2,8 @@ from enum import Enum
 
 
 class PersonSortFieldEnum(str, Enum):
-    full_name = "fullName"
+    first_name = "firstName"
+    last_name = "lastName"
     created_at = "createdAt"
 
 

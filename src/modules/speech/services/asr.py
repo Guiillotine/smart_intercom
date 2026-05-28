@@ -16,18 +16,11 @@ class ASRSrv(IASRSrv):
         self,
         consts: ASRServiceConsts,
         logger: logging.Logger,
-        settings: Settings,
         model: WhisperModel,
     ):
         self._consts = consts
         self._logger = logger
         self._model = model
-
-        self._model = WhisperModel(
-            model_size_or_path=settings.asr.ASR_MODEL_SIZE,
-            device=settings.runtime.DEVICE,
-            compute_type=settings.asr.ASR_COMPUTE_TYPE,
-        )
 
     @LoggingFunctionInfo("Recognize text from audio.")
     def speech_to_text(

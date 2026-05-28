@@ -231,7 +231,7 @@ class PostgresBaseRepo(
             update_data = (
                 obj_in
                 if isinstance(obj_in, dict)
-                else obj_in.model_dump(exclude_unset=True, exclude_none=True)
+                else obj_in.model_dump(exclude_unset=True)
             )
 
             for field, value in update_data.items():

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import UploadFile
 
-from src.common.schemas import Msg, Pagination, PaginationResult
+from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
 from src.modules.persons.schemas import EmployeeCreate, Employee, EmployeeUpdate, \
     EmployeeCreate
 
@@ -17,11 +17,13 @@ class IEmployeeUC(ABC):
     async def get_all(
         self,
         pagination_params: Pagination,
+        sort_params: SortBase | None = None,
     ) -> PaginationResult[Employee]:
         """
         Retrieve a paginated list of employee person records.
 
         :param pagination_params: Pagination settings.
+        :param sort_params: Optional sort params.
         :return: Paginated list of employees.
         """
         ...

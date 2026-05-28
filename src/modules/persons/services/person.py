@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -6,6 +7,7 @@ from src.common.constants import ErrorCodesEnums
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
+from src.config.settings import Settings
 from src.modules.persons.filters import PersonFilter
 from src.modules.persons.interfaces import IPersonPostgresRepo, IPersonSrv
 from src.modules.persons.schemas import PersonCreate, Person, PersonUpdate
@@ -26,18 +28,16 @@ class PersonSrv(IPersonSrv):
         self,
         errors: ErrorCodesEnums,
         logger: logging.Logger,
+        settings: Settings,
         person_postgres_repo: IPersonPostgresRepo,
     ):
         """
         Initialize the person service with dependencies.
-
-        :param errors: ErrorCodesEnums instance for standardized error handling.
-        :param logger: Configured logger instance.
-        :param person_postgres_repo: Person repository.
         """
 
         self._errors = errors
         self._logger = logger
+        self._settings = settings
         self._person_postgres_repo = person_postgres_repo
 
     @LoggingFunctionInfo(description="Get person by sid.")
@@ -48,8 +48,10 @@ class PersonSrv(IPersonSrv):
 
     @LoggingFunctionInfo(description="Search person by face embedding.")
     async def search_by_face_embedding(self, embedding: list[float]) -> UUID | None:
-        # TODO: search by embedding
-        pass
+        return await self._person_postgres_repo.search_by_face_embedding(
+            embedding=embedding,
+            max_distance=self._settings.face.FACE_RECOGNITION_MAX_DISTANCE,
+        )
 
     @LoggingFunctionInfo(description="Create person.")
     async def create(self, person_in: PersonCreate) -> Person:
@@ -77,6 +79,8 @@ class PersonSrv(IPersonSrv):
     ) -> PaginationResult[Person]:
         persons, total = await self._person_postgres_repo.get_all_paginated(
             pagination_params=pagination_params,
+            sort_params=sort_params,
+            filters=filters,
         )
 
         return PaginationResult(

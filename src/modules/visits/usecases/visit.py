@@ -42,6 +42,14 @@ class VisitUC(IVisitUC):
     async def make_door_open_decision(
         self, sid: UUID, user_sid: UUID, door_open: bool
     ) -> Msg:
-        return await self._visit_service.make_door_open_decision(
+        await self._visit_service.make_door_open_decision(
             sid=sid, user_sid=user_sid, door_open=door_open
         )
+
+        await self._visit_service.finish_visit(
+            sid,
+            finish_reason=self._enums.Visit.FinishReason.EMPLOYEE_DECISION,
+        )
+
+        return Msg()
+

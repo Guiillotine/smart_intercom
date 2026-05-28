@@ -53,22 +53,18 @@ class VisitUpdate(VisitBase):
     photo_s3_path: str
     visitor_goal: str
     granted_access: bool
-    handoff_reason: VisitHandoffReasonEnum | None = None
     finish_datetime: datetime
     bot_granted_access: bool
     decision_by_user_sid: UUID
-
-
-class VisitFinish(CoreSchema):
     finish_reason: VisitFinishReasonEnum
-    visitor_goal: str | None = None
-    bot_granted_access: bool | None = None
+    handoff_reason: VisitHandoffReasonEnum
 
 
 class Visit(VisitBase):
     sid: UUID
     visitor_goal: str | None = None
     finish_datetime: datetime | None = None
+    granted_access: bool | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
     handoff_reason: VisitHandoffReasonEnum | None = None

@@ -6,7 +6,8 @@ from fastapi import APIRouter, UploadFile
 from src.common.constants.enums import LanguageEnum
 from src.common.schemas import Msg
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
-from src.modules.intercoms.schemas import Decision, IntercomAnswer, IntercomStartedVisit
+from src.modules.intercoms.schemas import Decision, IntercomAnswer, \
+    IntercomStartedVisit, PhotoProcessingResult
 
 
 class IIntercomController(ABC):
@@ -43,7 +44,7 @@ class IIntercomController(ABC):
         visit_sid: UUID,
         photo: UploadFile,
         intercom_usecase: IIntercomUC,
-    ) -> Msg:
+    ) -> PhotoProcessingResult:
         """
         Process visit photo.
 

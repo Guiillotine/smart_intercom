@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING
 
 from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
-from src.modules.visits.constants.enums import VisitHandoffReasonEnum
+from src.modules.visits.constants.enums import VisitHandoffReasonEnum, \
+    VisitFinishReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.schemas import (
     Visit,
     VisitCreate,
-    VisitFinish,
-    VisitFull,
     VisitReport,
     VisitUpdate, VisitPersonCreate, VisitPerson,
 )
@@ -29,7 +28,7 @@ class IVisitSrv(ABC):
         self,
         sid: UUID,
         requirement: VisitRequirementsEnum | None = None,
-    ) -> Visit:
+    ) -> "VisitRespSchemas.GET_BY_SID":
         """
         Get visit by identifier.
 
@@ -140,13 +139,15 @@ class IVisitSrv(ABC):
 
     @abstractmethod
     async def finish_visit(
-        self, sid: UUID, visit_finish_params: VisitFinish | None = None
+        self,
+        sid: UUID,
+        finish_reason: VisitFinishReasonEnum,
     ) -> Visit:
         """
         Finish a visit.
 
         :param sid: Visit identifier.
-        :param visit_finish_params: Optional finish transition data.
+        :param finish_reason: Why visit was finished.
         :return: Updated visit.
         """
         ...

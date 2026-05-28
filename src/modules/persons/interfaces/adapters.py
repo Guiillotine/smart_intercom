@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from sqlalchemy.sql.base import ExecutableOption
 
@@ -49,3 +50,18 @@ class IPersonPostgresRepo(
         :param with_commit: Whether to immediately commit the transaction.
         :return: The newly created person instance.
         """
+
+    @abstractmethod
+    async def search_by_face_embedding(
+        self,
+        embedding: list[float],
+        max_distance: float,
+    ) -> UUID | None:
+        """
+        Find the nearest active person by cosine distance.
+
+        :param embedding: Normalized face embedding.
+        :param max_distance: Maximum accepted cosine distance.
+        :return: Person sid or None.
+        """
+        ...

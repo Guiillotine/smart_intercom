@@ -1,4 +1,5 @@
 import logging
+from asyncio import to_thread
 
 import cv2
 import numpy as np
@@ -34,14 +35,14 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
     @LoggingFunctionInfo(
         description="Analyze an image and return information about all detected faces."
     )
-    def analyse_photo(
+    async def analyse_photo(
         self,
         image: np.ndarray | UploadFile,
     ) -> list[FaceInfo]:
-        if type(image) == UploadFile:
-            image = self._upload_file_to_ndarray(image)
+        if isinstance(image, UploadFile):
+            image = await self._upload_file_to_ndarray(image)
 
-        faces = self._app.get(image)
+        faces = await to_thread(self._app.get, image)
 
         h, w = image.shape[:2]
 
@@ -54,8 +55,12 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
 
             faces_info.append(
                 FaceInfo(
-                    detected_age=face.age,
-                    detected_sex=self._enums.Common.Gender(face.gender),
+                    detected_age=getattr(face, "age", None),
+                    detected_sex=(
+                        self._enums.Common.Gender(face.gender)
+                        if getattr(face, "gender", None) is not None
+                        else None
+                    ),
                     face_embedding=face_embedding,
                     crop_coords=[y1, y2, x1, x2],
                 )
@@ -81,13 +86,14 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
                 self._logger.warning(msg=f"Skip invalid bbox: {face.bbox}")
                 continue
 
-            face.bbox = map(int, (x1, y1, x2, y2))
+            face.bbox = np.array((x1, y1, x2, y2), dtype=np.int32)
 
     @staticmethod
     def _l2_norm_embedding(embedding: list[float]) -> list[float]:
         n = np.linalg.norm(embedding)
 
-        return embedding / n if n != 0 else embedding
+        normalized = embedding / n if n != 0 else embedding
+        return normalized.astype(np.float32).tolist()
 
     @staticmethod
     def _get_vector_len(v: list[float]) -> float:

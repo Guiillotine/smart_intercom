@@ -16,7 +16,7 @@ class IFaceAnalyzerSrv(ABC):
     """
 
     @abstractmethod
-    def analyse_photo(
+    async def analyse_photo(
         self,
         image: np.ndarray | UploadFile,
     ) -> list[FaceInfo]:
