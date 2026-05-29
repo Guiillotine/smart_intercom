@@ -64,6 +64,7 @@ class Visit(VisitBase):
     sid: UUID
     visitor_goal: str | None = None
     finish_datetime: datetime | None = None
+    photo_s3_path: str | None
     granted_access: bool | None = None
     bot_granted_access: bool | None = None
     finish_reason: VisitFinishReasonEnum | None = None
@@ -80,3 +81,7 @@ class VisitFull(VisitWithMessages):
 
 class VisitReport(VisitFull):
     pass
+
+
+class VisitPhotoResponse(CoreSchema):
+    path: str

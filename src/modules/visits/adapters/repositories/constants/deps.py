@@ -1,7 +1,5 @@
-from src.modules.visits.adapters.repositories.constants import (
-    VisitRepoConsts,
-    VisitRepoEnums,
-)
+from src.modules.visits.adapters.repositories.constants import VisitRepoEnums, \
+    VisitRepoConsts
 
 
 def get_visit_repo_enums() -> VisitRepoEnums:

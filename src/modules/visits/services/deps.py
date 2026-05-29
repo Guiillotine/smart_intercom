@@ -6,10 +6,13 @@ from fastapi import Depends
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.deps import get_error_codes_enums
 from src.common.logger.deps import get_visit_logger
-from src.modules.visits.adapters.repositories.deps import get_visit_pg_repo, \
-    get_visit_person_pg_repo
+from src.config.settings import Settings
+from src.config.settings.deps import get_settings
+from src.modules.visits.adapters.repositories.postgres.deps import \
+    get_visit_person_pg_repo, get_visit_pg_repo
+from src.modules.visits.adapters.repositories.s3.deps import get_visit_s3_repo
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
-    IVisitPersonPostgresRepo
+    IVisitPersonPostgresRepo, IVisitS3Repo
 from src.modules.visits.services.constants import VisitSrvConsts, VisitSrvEnums
 from src.modules.visits.services.constants.deps import (
     get_visit_srv_consts,
@@ -23,7 +26,9 @@ async def get_visit_service(
     error_codes: Annotated[ErrorCodesEnums, Depends(get_error_codes_enums)],
     enums: Annotated[VisitSrvEnums, Depends(get_visit_srv_enums)],
     consts: Annotated[VisitSrvConsts, Depends(get_visit_srv_consts)],
+    settings: Annotated[Settings, Depends(get_settings)],
     visit_pg_repo: Annotated[IVisitPostgresRepo, Depends(get_visit_pg_repo)],
+    visit_s3_repo: Annotated[IVisitS3Repo, Depends(get_visit_s3_repo)],
     visit_person_pg_repo: Annotated[
         IVisitPersonPostgresRepo, Depends(get_visit_person_pg_repo)
     ],
@@ -33,6 +38,8 @@ async def get_visit_service(
         enums=enums,
         consts=consts,
         logger=logger,
+        settings=settings,
         visit_pg_repo=visit_pg_repo,
+        visit_s3_repo=visit_s3_repo,
         visit_person_pg_repo=visit_person_pg_repo,
     )

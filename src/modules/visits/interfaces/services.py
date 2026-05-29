@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 from typing import TYPE_CHECKING
 
+from fastapi import UploadFile
+
 from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.modules.visits.constants.enums import VisitHandoffReasonEnum, \
@@ -11,7 +13,7 @@ from src.modules.visits.schemas import (
     Visit,
     VisitCreate,
     VisitReport,
-    VisitUpdate, VisitPersonCreate, VisitPerson,
+    VisitUpdate, VisitPersonCreate, VisitPerson, VisitPhotoResponse,
 )
 if TYPE_CHECKING:
     from src.modules.visits.services.constants.consts import VisitRespSchemas
@@ -95,6 +97,20 @@ class IVisitSrv(ABC):
 
         :param visit_person_in: Visitor creation schema.
         :return: Created visitor.
+        """
+        ...
+
+    @abstractmethod
+    async def save_visit_photo(
+        self,
+        sid: UUID,
+        photo: UploadFile,
+    ) -> VisitPhotoResponse:
+        """
+        Upload visit photo
+        :param sid: Visit identifier.
+        :param photo: Upload photo data.
+        :return: Visit photo path.
         """
         ...
 

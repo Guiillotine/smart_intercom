@@ -30,7 +30,6 @@ from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitSrv
 from src.modules.visits.schemas import (
     Visit,
-    VisitFinish,
     VisitUpdate,
     VisitCreate,
     VisitPersonCreate,
@@ -119,6 +118,9 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         photo: UploadFile,
     ) -> PhotoProcessingResult:
+        await self._visit_service.save_visit_photo(sid=visit_sid, photo=photo)
+        await photo.seek(0)
+
         photo_processing_result = PhotoProcessingResult()
 
         faces_info = await self._face_analyzer_service.analyse_photo(photo)
@@ -226,8 +228,6 @@ class IntercomUC(IIntercomUC):
                 bot_replica = await self._process_want_to_enter_visitor_answer(
                     visit_sid=visit_sid,
                     message=message,
-                    visitor_goal=visit.visitor_goal,
-                    bot_granted_access=visit.bot_granted_access,
                     dialogue_lang=visit.dialogue_lang,
                 )
 
@@ -408,8 +408,6 @@ class IntercomUC(IIntercomUC):
         self,
         message: str,
         visit_sid: UUID,
-        visitor_goal: str,
-        bot_granted_access: bool,
         dialogue_lang: LanguageEnum,
     ) -> BotReplica:
         # TODO

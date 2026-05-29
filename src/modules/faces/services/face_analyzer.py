@@ -3,7 +3,7 @@ from asyncio import to_thread
 
 import cv2
 import numpy as np
-from fastapi import UploadFile
+from starlette.datastructures import UploadFile
 from insightface.app.common import Face
 
 from src.common.constants import ErrorCodesEnums
@@ -103,9 +103,10 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
     async def _upload_file_to_ndarray(image: UploadFile) -> np.ndarray:
         content = await image.read()
         image_array = np.frombuffer(content, dtype=np.uint8)
-        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+        image_as_ndarray = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-        if image is None:
+        if image_as_ndarray is None:
             raise ValueError("Can't decode image")
 
-        return image
+        await image.seek(0)
+        return image_as_ndarray

@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, UTC
 from uuid import UUID
 
+from fastapi import UploadFile
 from sqlalchemy.sql.base import ExecutableOption
 
 from src.common.constants import ErrorCodesEnums
@@ -9,19 +10,19 @@ from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.decorators import LoggingFunctionInfo
 from src.common.errors import BackendException
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
+from src.config.settings import Settings
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReasonEnum, \
     VisitFinishReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
-    IVisitPersonPostgresRepo
+    IVisitPersonPostgresRepo, IVisitS3Repo
 from src.modules.visits.models import VisitModel
 from src.modules.visits.services.constants import VisitSrvConsts, VisitSrvEnums
 from src.modules.visits.schemas import (
     Visit,
     VisitCreate,
-    VisitFinish,
     VisitReport,
-    VisitUpdate, VisitPersonCreate, VisitPerson,
+    VisitUpdate, VisitPersonCreate, VisitPerson, VisitPhotoResponse,
 )
 from src.modules.visits.services.constants.consts import VisitRespSchemas
 
@@ -33,14 +34,18 @@ class VisitSrv(IVisitSrv):
         enums: VisitSrvEnums,
         consts: VisitSrvConsts,
         logger: logging.Logger,
+        settings: Settings,
         visit_pg_repo: IVisitPostgresRepo,
+        visit_s3_repo: IVisitS3Repo,
         visit_person_pg_repo: IVisitPersonPostgresRepo,
     ):
         self._errors = errors
         self._enums = enums
         self._consts = consts
         self._logger = logger
+        self._visit_photo_bucket_name = settings.s3.VISIT_PHOTO_BUCKET_NAME
         self._visit_pg_repo = visit_pg_repo
+        self._visit_s3_repo = visit_s3_repo
         self._visit_person_pg_repo = visit_person_pg_repo
 
     @LoggingFunctionInfo(description="Get visit by identifier.")
@@ -133,6 +138,30 @@ class VisitSrv(IVisitSrv):
             await self._visit_person_pg_repo.create(obj_in=visit_person_in)
         )
 
+    @LoggingFunctionInfo(description="Upload visit photo.")
+    async def save_visit_photo(
+        self,
+        sid: UUID,
+        photo: UploadFile,
+    ) -> VisitPhotoResponse:
+        visit = await self._get_model_by_sid(sid)
+
+        if visit.photo_s3_path is not None:
+            await self._delete_visit_photo(key=visit.photo_s3_path)
+
+        key = f"{self._enums.Common.S3Prefix.VISIT}/{sid}/{photo.filename}"
+        self._logger.debug("Uploading photo with key: %s", key)
+
+        key = await self._visit_s3_repo.put_object(
+            bucket=self._visit_photo_bucket_name,
+            key=key,
+            data=await photo.read(), # TODO: придёт уже прочитанным
+        )
+
+        path = await self._update_visit_photo(key=key, visit=visit)
+
+        return VisitPhotoResponse(path=path)
+
     @LoggingFunctionInfo(description="Update a visit.")
     async def update_visit(self, sid: UUID, visit_in: VisitUpdate) -> Visit:
         visit = await self._get_model_by_sid(sid)
@@ -206,3 +235,26 @@ class VisitSrv(IVisitSrv):
         if not visit:
             raise BackendException(error=self._errors.Visit.VISIT_NOT_FOUND)
         return visit
+
+    @LoggingFunctionInfo(description="Update visit photo path in the database.")
+    async def _update_visit_photo(
+        self,
+        key: str,
+        visit: VisitModel,
+    ) -> str:
+        self._logger.debug("Updating photo for visit: %s", visit.sid)
+        photo_s3_path = f"{self._visit_photo_bucket_name}/" + key
+
+        obj_in = VisitUpdate(photo_s3_path=photo_s3_path)
+        await self._visit_pg_repo.update(db_obj=visit, obj_in=obj_in)
+
+        return photo_s3_path
+
+    @LoggingFunctionInfo(description="Delete visit photo from S3 storage.")
+    async def _delete_visit_photo(self, key: str) -> None:
+        key = key.replace(f"{self._visit_photo_bucket_name}/", "/")
+
+        self._logger.debug("Deleting photo with key: %s", key)
+        await self._visit_s3_repo.delete_object(
+            bucket=self._visit_photo_bucket_name, key=key
+        )

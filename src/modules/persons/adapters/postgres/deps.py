@@ -8,7 +8,7 @@ from src.client.storages.deps import get_db
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.deps import get_error_codes_enums
 from src.common.logger.deps import get_base_logger
-from src.modules.persons.adapters.repositories import PersonPostgresRepo
+from src.modules.persons.adapters.postgres.person import PersonPostgresRepo
 
 from src.modules.persons.constants.enums import PersonTypeEnum
 from src.modules.persons.interfaces import IPersonPostgresRepo

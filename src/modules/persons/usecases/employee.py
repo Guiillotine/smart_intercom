@@ -67,17 +67,20 @@ class EmployeeUC(IEmployeeUC):
         photo: UploadFile,
         employee_in: EmployeeCreate,
     ) -> Employee:
-        # TODO: save photo
-        photo_s3_path = self._employee_service.save_photo(photo)
-
-        face_embedding = await self._get_single_face_embedding(photo)
+        embedding = await self._get_single_face_embedding(photo)
+        photo_s3_path = (
+            await self._employee_service.save_person_photo(
+                photo=photo,
+                embedding=embedding,
+            )
+        ).path
 
         return Employee.model_validate(
             await self._employee_service.create(
                 person_in=PersonCreate(
                     **employee_in.model_dump(),
                     photo_s3_path=photo_s3_path,
-                    face_embedding=face_embedding,
+                    face_embedding=embedding,
                 )
             )
         )
@@ -88,20 +91,16 @@ class EmployeeUC(IEmployeeUC):
         employee_in: EmployeeUpdate,
         photo: UploadFile | None = None,
     ) -> Employee:
-        employee = await self._employee_service.get_by_sid(sid)
-
-        person_in = PersonUpdate.model_validate(employee_in)
-
         if photo is not None:
-            # TODO: replace photo employee.photo -> photo
-            self._employee_service.delete_photo(employee.photo)
-            person_in.photo_s3_path = self._employee_service.save_photo(photo)
-            person_in.face_embedding = await self._get_single_face_embedding(photo)
+            embedding = await self._get_single_face_embedding(photo)
+            await self._employee_service.update_person_photo(
+                sid=sid, photo=photo, embedding=embedding,
+            )
 
         return Employee.model_validate(
             await self._employee_service.update(
                 sid=sid,
-                person_in=person_in,
+                person_in=PersonUpdate.model_validate(employee_in),
             )
         )
 

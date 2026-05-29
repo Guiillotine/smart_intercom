@@ -22,6 +22,7 @@ class VisitModel(CoreModel):
 
     granted_access: Mapped[bool | None] = mapped_column(
         nullable=True,
+        index=True,
         comment="User's decision to grant access",
     )
 
@@ -34,7 +35,7 @@ class VisitModel(CoreModel):
 
     finish_datetime: Mapped[datetime] = mapped_column(DateTime(), nullable=True,)
 
-    status: Mapped[int] = mapped_column()
+    status: Mapped[int] = mapped_column(index=True)
 
     visitor_goal: Mapped[str | None] = mapped_column(
         nullable=True, comment="Purpose of the visit detected by bot",

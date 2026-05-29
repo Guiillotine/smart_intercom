@@ -98,9 +98,11 @@ class EmployeeCtrl(IEmployeeCtrl):
     async def create_employee(
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
         photo: Annotated[UploadFile, File(...)],
-        first_name: str = Form(alias="firstName"),
-        last_name: str = Form(alias="lastName"),
-        middle_name: str | None = Form(None, alias="middleName"),
+        first_name: str = Form(alias="firstName", validation_alias="firstName"),
+        last_name: str = Form(alias="lastName", validation_alias="lastName"),
+        middle_name: str | None = Form(
+            None, alias="middleName", validation_alias="middleName"
+        ),
     ) -> Employee:
         return await employee_usecase.create(
             photo=photo,
@@ -117,9 +119,15 @@ class EmployeeCtrl(IEmployeeCtrl):
         request: Request,
         employee_usecase: Annotated[IEmployeeUC, Depends(get_employee_usecase)],
         photo: UploadFile | None = File(None),
-        first_name: str | None = Form(None, alias="firstName"),
-        last_name: str | None = Form(None, alias="lastName"),
-        middle_name: str | None = Form(None, alias="middleName"),
+        first_name: str | None = Form(
+            None, alias="firstName", validation_alias="firstName"
+        ),
+        last_name: str | None = Form(
+            None, alias="lastName", validation_alias="lastName"
+        ),
+        middle_name: str | None = Form(
+            None, alias="middleName", validation_alias="middleName"
+        ),
     ) -> Employee:
         """
         Update an employee person record.

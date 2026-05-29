@@ -29,3 +29,7 @@ class PersonUpdate(PersonBase):
 class Person(PersonBase):
     sid: UUID
     person_type: PersonTypeEnum
+
+
+class PersonPhotoResponse(CoreSchema):
+    path: str

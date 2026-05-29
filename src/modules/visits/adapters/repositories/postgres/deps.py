@@ -13,7 +13,7 @@ from src.modules.visits.adapters.repositories.constants.deps import (
     get_visit_repo_consts,
     get_visit_repo_enums,
 )
-from src.modules.visits.adapters.repositories.visit import (
+from src.modules.visits.adapters.repositories.postgres.visit import (
     VisitPersonPostgresRepo,
     VisitPostgresRepo,
 )

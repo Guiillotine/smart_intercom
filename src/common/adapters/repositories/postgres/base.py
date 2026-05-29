@@ -194,6 +194,12 @@ class PostgresBaseRepo(
             query=select(self._model), filters=filters, options=custom_options
         )
 
+        if filters:
+            query = filters.filter(query)
+
+        if sort_params:
+            query = await self._apply_sorts(query, sort_params)
+
         return await self._apply_pagination(
             query=query,
             pagination_params=pagination_params,

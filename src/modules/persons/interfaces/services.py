@@ -3,9 +3,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from fastapi import UploadFile
+
 from src.common.schemas import Msg, Pagination, PaginationResult, SortBase
 from src.modules.persons.filters import PersonFilter
-from src.modules.persons.schemas import PersonCreate, PersonUpdate, Person
+from src.modules.persons.schemas import PersonCreate, PersonUpdate, Person, \
+    PersonPhotoResponse
 
 
 class IPersonSrv(ABC):
@@ -57,6 +60,36 @@ class IPersonSrv(ABC):
 
         :param person_in: Person data for creation.
         :return: Created person data.
+        """
+        ...
+
+    @abstractmethod
+    async def save_person_photo(
+        self,
+        photo: UploadFile,
+        embedding: list[float],
+    ) -> PersonPhotoResponse:
+        """
+        Upload person photo
+        :param photo: Upload photo data.
+        :param embedding: Face embedding.
+        :return: Person photo path.
+        """
+        ...
+
+    @abstractmethod
+    async def update_person_photo(
+        self,
+        sid: UUID,
+        photo: UploadFile,
+        embedding: list[float],
+    ) -> PersonPhotoResponse:
+        """
+        Upload person photo
+        :param sid: Person identifier.
+        :param photo: Upload photo data.
+        :param embedding: Face embedding.
+        :return: Person photo path.
         """
         ...
 

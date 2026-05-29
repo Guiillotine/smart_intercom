@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.sql.base import ExecutableOption
 
-from src.common.interfaces import IPostgresBaseRepo
+from src.common.interfaces import IPostgresBaseRepo, IS3BaseRepo
 from src.common.schemas import Pagination, SortBase
 from src.modules.persons.filters import PersonFilter
 from src.modules.persons.models import PersonModel
@@ -65,3 +65,12 @@ class IPersonPostgresRepo(
         :return: Person sid or None.
         """
         ...
+
+
+class IPersonS3Repo(IS3BaseRepo, ABC):
+    """
+    Interface for a person-specific S3 repository.
+
+    Defines additional person-related S3 operations beyond the basic S3 repository
+    functionality.
+    """

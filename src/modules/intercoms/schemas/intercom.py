@@ -22,5 +22,5 @@ class Decision(CoreSchema):
 class PhotoProcessingResult(CoreSchema):
     detected_employee: bool = False
     message_audio_path: str | None = Field(
-        None, description="Sets if person was identified"
+        default=None, description="Sets if person was identified"
     )

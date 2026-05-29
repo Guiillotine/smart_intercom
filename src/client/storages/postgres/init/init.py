@@ -34,8 +34,6 @@ class PostgresInitializer:
     async def _init_user_roles(self):
         self._logger.info("Starting user roles initialization")
 
-        # TODO: add user roles initialization
-
         for id_, name in self._enums.User.Role.get_all_roles():
             role = await self._role_postgres_repo.get_by_id(id=id_)
             if role is not None:
