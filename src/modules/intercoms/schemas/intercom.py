@@ -15,6 +15,10 @@ class IntercomAnswer(CoreSchema):
     dialogue_finished: bool = False
 
 
+class IntercomAnswerWithText(IntercomAnswer):
+    answer_message_text: str
+
+
 class Decision(CoreSchema):
     open: bool
 

@@ -7,7 +7,7 @@ from src.common.constants.enums import LanguageEnum
 from src.common.schemas import Msg
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
 from src.modules.intercoms.schemas import Decision, IntercomAnswer, \
-    IntercomStartedVisit, PhotoProcessingResult
+    IntercomStartedVisit, PhotoProcessingResult, IntercomAnswerWithText
 
 
 class IIntercomController(ABC):
@@ -78,7 +78,7 @@ class IIntercomController(ABC):
         visit_sid: UUID,
         message: str,
         intercom_usecase: IIntercomUC,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         """
         Get intercom answer for text message.
 

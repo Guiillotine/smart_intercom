@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi.params import Query, File, Body
 
-from src.common.schemas import Msg
 from src.modules.intercoms.controllers.constants import IntercomCtrlEnums
 from src.modules.intercoms.interfaces import IIntercomController
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
@@ -12,7 +11,7 @@ from src.modules.intercoms.schemas.intercom import (
     Decision,
     IntercomAnswer,
     IntercomStartedVisit,
-    PhotoProcessingResult,
+    PhotoProcessingResult, IntercomAnswerWithText,
 )
 from src.modules.intercoms.usecases.deps import get_intercom_usecase
 
@@ -71,7 +70,7 @@ class IntercomController(IIntercomController):
             path=self._enums.IntercomCtrlPath.get_answer_on_text_message,
             endpoint=self.get_answer_on_text_message,
             methods=[self._enums.Common.RequestType.POST],
-            response_model=IntercomAnswer,
+            response_model=IntercomAnswerWithText,
         )
         
         self._controller.add_api_route(
@@ -113,7 +112,7 @@ class IntercomController(IIntercomController):
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         message: Annotated[str, Body()],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         return await intercom_usecase.get_answer_on_text_message(
             message=message,
             visit_sid=visit_sid,

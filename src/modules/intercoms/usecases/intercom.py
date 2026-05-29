@@ -19,7 +19,7 @@ from src.modules.dialogues.schemas.dialogue import (
 from src.modules.faces.interfaces import IFaceAnalyzerSrv
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
 from src.modules.intercoms.schemas.intercom import IntercomStartedVisit, IntercomAnswer, \
-    Decision, PhotoProcessingResult
+    Decision, PhotoProcessingResult, IntercomAnswerWithText
 from src.modules.intercoms.usecases.constants import IntercomUCEnums, IntercomUCConsts
 from src.modules.messages.interfaces import IMessageSrv
 from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate, Message
@@ -170,18 +170,19 @@ class IntercomUC(IIntercomUC):
             dialogue_lang=visit.dialogue_lang,
         )
 
-        return await self.get_answer_on_text_message(
+        intercom_answer = await self.get_answer_on_text_message(
             message=speech_info.text,
             visit_sid=visit_sid,
             dialogue_lang=speech_info.lang,
         )
+        return IntercomAnswer.model_validate(intercom_answer)
 
     async def get_answer_on_text_message(
         self,
         message: str,
         visit_sid: UUID,
         dialogue_lang: LanguageEnum | None = None,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         detect_language = dialogue_lang is None
 
         visit = await self._visit_service.get_by_sid(visit_sid)
@@ -486,7 +487,7 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         visit_status: VisitStatusEnum,
         bot_replica: BotReplica,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         try:
             created_message = await self._create_intercom_audio_and_text_message(
                 visit_sid, bot_replica,
@@ -496,9 +497,10 @@ class IntercomUC(IIntercomUC):
                 visit_status == self._enums.Visit.Status.WAITING_DECISION
             )
 
-            return IntercomAnswer(
+            return IntercomAnswerWithText(
                 answer_message_audio_path=created_message.audio_s3_path,
                 dialogue_finished=dialogue_finished,
+                answer_message_text=created_message.content,
             )
 
         except Exception as e:

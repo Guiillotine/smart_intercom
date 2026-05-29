@@ -62,7 +62,8 @@ class VisitSrv(IVisitSrv):
         )()
 
         visit = await self._get_model_by_sid(sid, custom_options=custom_options)
-        visit.messages = sorted(visit.messages, key=lambda msg: msg.time)
+        if requirement == self._enums.SrvReqCommon.VisitRequirements.WITH_MESSAGES:
+            visit.messages = sorted(visit.messages, key=lambda msg: msg.time)
 
         response_schema = self._consts.Requirements.GET_BY_SID.get(requirement).get(
             self._enums.SrvReqCommon.RequirementFieldName.RESPONSE_SCHEMA

@@ -23,4 +23,4 @@ class BotSettings(BaseSettings):
 
     LLM_RESPONSE_TIMEOUT_SEC: float = Field(default=10.0)
 
-    MIN_CHARS_TO_SWITCH_DIALOG_LANG: int = Field(default=15)
+    MIN_CHARS_TO_SWITCH_DIALOGUE_LANG: int = Field(default=15)

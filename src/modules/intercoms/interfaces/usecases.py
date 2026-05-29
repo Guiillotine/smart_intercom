@@ -6,7 +6,7 @@ from fastapi import UploadFile
 from src.common.constants.enums import LanguageEnum
 from src.common.schemas import Msg
 from src.modules.intercoms.schemas import Decision, IntercomAnswer, \
-    IntercomStartedVisit, PhotoProcessingResult
+    IntercomStartedVisit, PhotoProcessingResult, IntercomAnswerWithText
 
 
 class IIntercomUC(ABC):
@@ -61,7 +61,7 @@ class IIntercomUC(ABC):
         message: str,
         visit_sid: UUID,
         dialogue_lang: LanguageEnum | None = None,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         """
         Get intercom answer for text message.
 
