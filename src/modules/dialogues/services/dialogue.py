@@ -189,7 +189,7 @@ class DialogueSrv(IDialogueSrv):
             response_format={"type": "json_object"}
 
         return self._client.chat.completions.create(
-            model=self._settings.face.FACE_ANALYZE_MODEL,
+            model=self._settings.bot.MODEL,
             messages=[message.model_dump() for message in messages],
             temperature=0.2,
             n=1,

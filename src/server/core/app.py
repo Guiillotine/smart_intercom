@@ -118,7 +118,7 @@ def initialize_silero_submodule():
 
 
 def clean_state():
-    del app.state.client
+    del app.state.openai_client
     del app.state.whisper_model
     del app.state.tts_model_manager
     del app.state.face_analysis_model_manager

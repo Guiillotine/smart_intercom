@@ -455,7 +455,7 @@ class IntercomUC(IIntercomUC):
           messages = []
 
         try:
-            bot_answer = await self._dialogue_service.get_bot_answer(
+            bot_answer = self._dialogue_service.get_bot_answer(
               mode=mode,
               messages=messages,
               dialogue_lang=dialogue_lang,
@@ -463,6 +463,8 @@ class IntercomUC(IIntercomUC):
             self._logger.debug(f"Bot answer: {bot_answer.content}")
 
         except Exception as e:
+            self._logger.exception(e)
+
             await self._visit_service.call_employee(
                 sid=visit_sid,
                 reason=self._enums.Visit.HandoffReason.BOT_ERROR,
