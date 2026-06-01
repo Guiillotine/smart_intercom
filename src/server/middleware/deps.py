@@ -6,7 +6,7 @@ from src.common.logger.deps import get_base_logger, get_logger_manager
 from src.config.settings.deps import get_settings
 from src.server.middleware import BackendExceptionHandler
 from src.server.middleware.exception import ValidationExceptionHandler, \
-    ExceptionMiddleware
+    ExceptionMiddleware, BotDialogueExceptionHandler
 from src.server.middleware.psql_context_manager import PostgresContextSessionMiddleware
 
 
@@ -36,13 +36,13 @@ def get_validation_exception_handler() -> ValidationExceptionHandler:
     )
 
 
+def get_bot_dialogue_exception_handler() -> BotDialogueExceptionHandler:
+    return BotDialogueExceptionHandler()
+
+
 def get_postgres_context_session_middleware() -> PostgresContextSessionMiddleware:
     return PostgresContextSessionMiddleware(
         errors=get_error_codes_enums(),
         postgres_session_context_manager=get_psql_session_context_manager(),
         postgres_session_provider=get_postgres_session_provider(settings=get_settings())
     )
-
-
-#def get_jwt_context_middleware() -> IJWTContextMiddleware:
-#    return JWTContextMiddleware()

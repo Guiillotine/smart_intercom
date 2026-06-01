@@ -3,6 +3,21 @@ x-env: &default-env
     - ../.env
 
 services:
+  smart-intercom-backend:
+    container_name: smart-intercom-backend
+    build:
+      context: ..
+      dockerfile: deploy/dev.Dockerfile
+    ports:
+      - "8000:8000"
+    <<: *default-env
+    networks:
+      - smart-intercom-network
+    depends_on:
+      - postgres-smart-intercom
+      - redis-smart-intercom
+      - minio-smart-intercom
+
   postgres-smart-intercom:
     container_name: postgres-smart-intercom
     image: pgvector/pgvector:pg15

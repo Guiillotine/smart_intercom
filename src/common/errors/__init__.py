@@ -1,1 +1,1 @@
-from .exception import BackendException
+from .exception import BackendException, BotDialogueException

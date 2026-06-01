@@ -6,7 +6,7 @@ from fastapi import UploadFile
 from src.common.constants import ErrorCodesEnums
 from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
-from src.common.errors import BackendException
+from src.common.errors import BackendException, BotDialogueException
 from src.common.interfaces import ICustomDateTime
 from src.config.settings import Settings
 from src.modules.dialogues.constants.enums import DialogueModeEnum
@@ -462,7 +462,7 @@ class IntercomUC(IIntercomUC):
             )
             self._logger.debug(f"Bot answer: {bot_answer.content}")
 
-        except Exception:
+        except Exception as e:
             await self._visit_service.call_employee(
                 sid=visit_sid,
                 reason=self._enums.Visit.HandoffReason.BOT_ERROR,
@@ -475,10 +475,15 @@ class IntercomUC(IIntercomUC):
                     lang=dialogue_lang or self._consts.Common.DefaultLanguage
                 )
             )
-            # TODO: try, catch
-            raise BotDialogueError(
-                message_audio_path=message.audio_s3_path
-            )
+            if isinstance(e, BackendException):
+                raise BotDialogueException.from_backend_exception(
+                    exc=e, audio_s3_path=message.audio_s3_path,
+                ) from e
+
+            raise BotDialogueException(
+                error=self._errors.Common.UNDEFINED,
+                audio_s3_path=message.audio_s3_path,
+            ) from e
 
         return bot_answer
 

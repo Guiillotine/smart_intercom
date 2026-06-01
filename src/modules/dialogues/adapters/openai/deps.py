@@ -3,4 +3,4 @@ from openai import OpenAI
 
 
 def get_openai_client(request: Request) -> OpenAI:
-    return request.app.state.whisper_model
+    return request.app.state.openai_client

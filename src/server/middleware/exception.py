@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
 
 from src.common.constants import ErrorCodesEnums
-from src.common.errors import BackendException
+from src.common.errors import BackendException, BotDialogueException
 
 
 class ExceptionMiddleware:
@@ -124,3 +124,22 @@ class ValidationExceptionHandler:
             content=content,
             status_code=unprocessable_entity_error.status_code,
         )
+
+class BotDialogueExceptionHandler:
+    """
+    Handles BotDialogueException errors by formatting the error response.
+
+    This class is responsible for catching and formatting bot exceptions
+    into a structured response with path to bot audio answer.
+    """
+
+    @staticmethod
+    async def handle(_: Request, exc: BotDialogueException) -> JSONResponse:
+        content = {
+            "code": exc.error_code,
+            "detail": exc.detail,
+            "cause": exc.cause,
+            "audio_s3_path": exc.audio_s3_path,
+        }
+
+        return JSONResponse(content, status_code=exc.status_code)
