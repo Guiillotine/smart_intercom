@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from src.common.schemas import PaginationResult, Pagination
+from src.common.schemas import PaginationResult, Pagination, ListResult
 from src.modules.messages.schemas import (
     Message,
     MessageBotCreate,
@@ -40,7 +40,7 @@ class IMessageSrv(ABC):
         ...
 
     @abstractmethod
-    async def get_messages(self, visit_sid: UUID) -> list[Message]:
+    async def get_messages(self, visit_sid: UUID) -> ListResult[Message]:
         """
         Get full message models for a visit.
 

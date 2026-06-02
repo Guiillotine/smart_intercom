@@ -45,7 +45,7 @@ class IIntercomUC(ABC):
         self,
         audio: UploadFile,
         visit_sid: UUID,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         """
         Get intercom answer for uploaded audio.
 

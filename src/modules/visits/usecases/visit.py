@@ -37,7 +37,9 @@ class VisitUC(IVisitUC):
         )
 
     async def get_waiting_decision_visits(self) -> ListResult[VisitReport]:
-        return await self._visit_service.get_waiting_decision_visits()
+        return await self._visit_service.get_waiting_decision_visits(
+
+        )
 
     async def make_door_open_decision(
         self, sid: UUID, user_sid: UUID, door_open: bool

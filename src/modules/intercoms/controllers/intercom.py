@@ -63,7 +63,7 @@ class IntercomController(IIntercomController):
             path=self._enums.IntercomCtrlPath.get_answer,
             endpoint=self.get_answer,
             methods=[self._enums.Common.RequestType.POST],
-            response_model=IntercomAnswer,
+            response_model=IntercomAnswerWithText,
         )
         
         self._controller.add_api_route(
@@ -101,7 +101,7 @@ class IntercomController(IIntercomController):
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         audio: Annotated[UploadFile, File(...)],
         intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         return await intercom_usecase.get_answer(
             audio=audio,
             visit_sid=visit_sid,

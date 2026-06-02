@@ -38,6 +38,10 @@ class VisitRequirements:
             RequirementFieldNameEnum.OPTIONS: VisitCustomOptions.with_messages,
             RequirementFieldNameEnum.RESPONSE_SCHEMA: VisitWithMessages,
         },
+        VisitRequirementsEnum.FULL: {
+            RequirementFieldNameEnum.OPTIONS: VisitCustomOptions.full,
+            RequirementFieldNameEnum.RESPONSE_SCHEMA: VisitFull,
+        }
     }
     GET_BY_SID: ClassVar[
         dict[VisitRequirementsEnum, dict[RequirementFieldNameEnum, Callable]]

@@ -39,7 +39,6 @@ class DialogueSrv(IDialogueSrv):
         messages: list[ChatMessage] = None,
         dialogue_lang: LanguageEnum | None = None,
     ) -> ChatBotAnswer:
-
         if messages is None:
             messages = []
 

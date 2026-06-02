@@ -160,7 +160,7 @@ class IntercomUC(IIntercomUC):
         self,
         audio: UploadFile,
         visit_sid: UUID,
-    ) -> IntercomAnswer:
+    ) -> IntercomAnswerWithText:
         visit = await self._visit_service.get_by_sid(visit_sid)
 
         self._validate_get_answer(visit)
@@ -170,12 +170,11 @@ class IntercomUC(IIntercomUC):
             dialogue_lang=visit.dialogue_lang,
         )
 
-        intercom_answer = await self.get_answer_on_text_message(
+        return await self.get_answer_on_text_message(
             message=speech_info.text,
             visit_sid=visit_sid,
             dialogue_lang=speech_info.lang,
         )
-        return IntercomAnswer.model_validate(intercom_answer)
 
     async def get_answer_on_text_message(
         self,
@@ -354,7 +353,7 @@ class IntercomUC(IIntercomUC):
     ) -> BotReplica:
         messages = await self._message_service.get_messages(visit_sid=visit_sid)
 
-        chat_message_history = [ChatMessage(role=msg.role, content=msg.content) for msg in messages]
+        chat_message_history = [ChatMessage(role=msg.role, content=msg.content) for msg in messages.items]
 
         bot_goal_answer = await self._get_bot_answer(
             visit_sid,
@@ -364,6 +363,9 @@ class IntercomUC(IIntercomUC):
         )
 
         bot_replica_content = bot_goal_answer.content
+
+        if bot_goal_answer.goal_identified and not bot_goal_answer.visitor_goal:
+            bot_goal_answer.goal_identified = False
 
         if bot_goal_answer.goal_identified:
             want_to_enter_question = (
@@ -460,7 +462,7 @@ class IntercomUC(IIntercomUC):
               messages=messages,
               dialogue_lang=dialogue_lang,
             )
-            self._logger.debug(f"Bot answer: {bot_answer.content}")
+            self._logger.debug(f"Bot answer: {bot_answer}")
 
         except Exception as e:
             self._logger.exception(e)
@@ -501,7 +503,10 @@ class IntercomUC(IIntercomUC):
             )
 
             dialogue_finished = (
-                visit_status == self._enums.Visit.Status.WAITING_DECISION
+                visit_status in (
+                    self._enums.Visit.Status.OVER,
+                    self._enums.Visit.Status.WAITING_DECISION,
+                )
             )
 
             return IntercomAnswerWithText(

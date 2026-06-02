@@ -7,7 +7,7 @@ from src.common.decorators import partial_schema
 from src.common.schemas import CoreSchema
 from src.common.constants.enums import GenderEnum, LanguageEnum
 from src.modules.messages.schemas import Message
-from src.modules.persons.schemas import Person
+from src.modules.persons.schemas import Person, PersonShort
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum, \
     VisitHandoffReasonEnum
 
@@ -32,7 +32,7 @@ class VisitPerson(VisitPersonBase):
 
 
 class VisitPersonFull(VisitPerson):
-    person: Person | None
+    person: PersonShort | None
 
 
 # Visit

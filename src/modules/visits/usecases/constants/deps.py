@@ -4,15 +4,21 @@ from fastapi import Depends
 
 from src.common.constants import SrvReqCommonEnums
 from src.common.constants.deps import get_srv_req_common_enums
+from src.modules.visits.constants import VisitEnums
+from src.modules.visits.constants.deps import get_visit_enums
 from src.modules.visits.usecases.constants import VisitUCConsts, VisitUCEnums
 
 
 def get_visit_uc_enums(
+    visit_common_enums: Annotated[VisitEnums, Depends(get_visit_enums)],
     srv_req_common_enums: Annotated[
         SrvReqCommonEnums, Depends(get_srv_req_common_enums)
     ]
 ) -> VisitUCEnums:
-    return VisitUCEnums(srv_req_common_enums=srv_req_common_enums)
+    return VisitUCEnums(
+        visit_common_enums=visit_common_enums,
+        srv_req_common_enums=srv_req_common_enums,
+    )
 
 
 def get_visit_uc_consts() -> VisitUCConsts:

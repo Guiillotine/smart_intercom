@@ -118,8 +118,14 @@ class VisitSrv(IVisitSrv):
 
     @LoggingFunctionInfo(description="Get visits waiting for a door opening decision.")
     async def get_waiting_decision_visits(self) -> ListResult[VisitReport]:
-        visits = await self._visit_pg_repo.get_all()
-        return ListResult(
+        requirement = self._enums.SrvReqCommon.VisitRequirements.FULL
+        custom_options = self._consts.Requirements.GET_ALL.get(requirement).get(
+            self._enums.SrvReqCommon.RequirementFieldName.OPTIONS
+        )()
+
+        visits = await self._visit_pg_repo.get_all(custom_options=custom_options)
+
+        return ListResult[VisitReport](
             items=[
                 VisitReport.model_validate(visit)
                 for visit in visits
