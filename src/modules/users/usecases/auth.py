@@ -11,7 +11,13 @@ from src.common.schemas import Msg
 from src.config.settings import Settings
 from src.modules.users.constants.enums import RoleEnum
 from src.modules.users.interfaces import IAuthUC, IUserSrv, IAuthSrv, ITokenProviderSrv
-from src.modules.users.schemas import LoginToken, UserCreate, UserCreateInDB
+from src.modules.users.schemas import (
+    LoginToken,
+    UserCreate,
+    UserCreateByAdmin,
+    UserCreateInDB,
+    UserWithRole,
+)
 from src.modules.users.usecases.constants import AuthUCEnums
 from src.modules.users.usecases.constants.consts import AuthUCConsts
 
@@ -132,6 +138,7 @@ class AuthUC(IAuthUC):
             user_in=UserCreateInDB(
                 **user_in.model_dump(exclude={"password"}),
                 password_hash=self._password_helper.get_password_hash(user_in.password),
+                role_id=RoleEnum.USER,
             )
         )
 
@@ -141,3 +148,30 @@ class AuthUC(IAuthUC):
         )
 
         return await self._token_provider_service.create_token_pair(payload=payload)
+
+    @LoggingFunctionInfo(
+        description="Register a new user with selected role by administrator."
+    )
+    async def register_by_admin(
+        self,
+        user_in: UserCreateByAdmin,
+        admin_user_sid: UUID,
+    ) -> UserWithRole:
+        admin_user = await self._user_service.get_by_sid(admin_user_sid)
+        admin_role = RoleEnum(admin_user.role_id)
+
+        if admin_role not in RoleEnum.get_admin_roles():
+            raise BackendException(self._errors.Common.FORBIDDEN)
+
+        if user_in.role_id == RoleEnum.SUPERUSER:
+            raise BackendException(
+                self._errors.Common.UNPROCESSABLE_ENTITY,
+                cause="SUPERUSER can be created only during database initialization",
+            )
+
+        return await self._user_service.create(
+            user_in=UserCreateInDB(
+                **user_in.model_dump(exclude={"password"}),
+                password_hash=self._password_helper.get_password_hash(user_in.password),
+            )
+        )

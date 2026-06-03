@@ -1,4 +1,5 @@
 import logging
+from time import perf_counter
 
 import openai
 from openai import OpenAI
@@ -67,11 +68,20 @@ class DialogueSrv(IDialogueSrv):
 
         message_history += messages
 
-        for _ in range(0, self._settings.bot.LLM_INVALID_JSON_RETRIES + 1):
+        for attempt in range(0, self._settings.bot.LLM_INVALID_JSON_RETRIES + 1):
             try:
+                llm_started_at = perf_counter()
                 completion = self._send_to_llm(
                     messages=message_history,
                     bot_answer_schema=config.bot_answer_schema,
+                )
+                self._logger.info(
+                    "[perf] llm_http_request_ms=%.2f mode=%s attempt=%d "
+                    "messages=%d",
+                    self._elapsed_ms(llm_started_at),
+                    mode,
+                    attempt + 1,
+                    len(message_history),
                 )
 
                 self._logger.debug("SENT TO LLM:")
@@ -196,3 +206,7 @@ class DialogueSrv(IDialogueSrv):
             max_tokens=200,
             response_format=response_format,
         )
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return (perf_counter() - started_at) * 1000

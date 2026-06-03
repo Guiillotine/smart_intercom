@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Body, Path
 
-from src.common.deps import get_user_sid
+from src.common.deps import get_user_sid, require_admin
 from src.common.schemas import ListResult, PaginationResult, Msg, Pagination, SortBase
 from src.modules.visits.constants.enums import VisitSortFieldsEnum
 from src.modules.visits.controllers.constants import VisitCtrlEnums
@@ -72,7 +72,7 @@ class VisitController(IVisitController):
     @staticmethod
     async def get_visit(
         sid: Annotated[UUID, Path()],
-        user_sid: Annotated[UUID, Depends(get_user_sid)],
+        user_sid: Annotated[UUID, Depends(require_admin)],
         visit_usecase: Annotated[IVisitUC, Depends(get_visit_usecase)],
     ) -> VisitFull:
         """
@@ -88,7 +88,7 @@ class VisitController(IVisitController):
 
     @staticmethod
     async def get_all_visits(
-        user_sid: Annotated[UUID, Depends(get_user_sid)],
+        user_sid: Annotated[UUID, Depends(require_admin)],
         sort_schema: Annotated[
             SortBase, Depends(SortBase[VisitSortFieldsEnum])
         ],

@@ -1,4 +1,5 @@
 import logging
+from time import perf_counter
 from uuid import UUID
 
 from src.common.constants.enums import MessageAuthorRoleEnum
@@ -41,7 +42,8 @@ class MessageSrv(IMessageSrv):
     async def create_visitor_message(
         self, message_in: MessageVisitorCreate
     ) -> Message:
-        return Message.model_validate(
+        started_at = perf_counter()
+        message = Message.model_validate(
             await self._message_postgres_repo.create(
                 obj_in=MessageCreate(
                     role=MessageAuthorRoleEnum.USER,
@@ -51,11 +53,19 @@ class MessageSrv(IMessageSrv):
                 )
             )
         )
+        self._logger.info(
+            "[perf] visitor_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
+            self._elapsed_ms(started_at),
+            message_in.visit_sid,
+            message.sid,
+        )
+        return message
 
     async def create_bot_message(
         self,
         message_in: MessageBotCreate,
     ) -> Message:
+        db_started_at = perf_counter()
         created_message = await self._message_postgres_repo.create(
             obj_in=MessageCreate(
                 role=MessageAuthorRoleEnum.ASSISTANT,
@@ -64,19 +74,45 @@ class MessageSrv(IMessageSrv):
                 visit_sid=message_in.visit_sid,
             )
         )
+        self._logger.info(
+            "[perf] bot_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
+            self._elapsed_ms(db_started_at),
+            message_in.visit_sid,
+            created_message.sid,
+        )
 
+        s3_started_at = perf_counter()
         audio_s3_path = await self._message_s3_repo.put_object(
-            key=self._get_bot_message_key(message_in.visit_sid, created_message.sid),
+            key=self._get_bot_message_key(
+                sid=created_message.sid,
+                visit_sid=message_in.visit_sid,
+            ),
             data=message_in.audio,
             bucket=self._settings.s3.BOT_MESSAGE_BUCKET_NAME,
         )
+        self._logger.info(
+            "[perf] bot_message_s3_upload_ms=%.2f visit_sid=%s message_sid=%s "
+            "audio_bytes=%d",
+            self._elapsed_ms(s3_started_at),
+            message_in.visit_sid,
+            created_message.sid,
+            len(message_in.audio),
+        )
 
-        return Message.model_validate(
+        update_started_at = perf_counter()
+        message = Message.model_validate(
             await self._message_postgres_repo.update(
                 db_obj=created_message,
                 obj_in=MessageUpdate(audio_s3_path=audio_s3_path),
             )
         )
+        self._logger.info(
+            "[perf] bot_message_db_update_ms=%.2f visit_sid=%s message_sid=%s",
+            self._elapsed_ms(update_started_at),
+            message_in.visit_sid,
+            created_message.sid,
+        )
+        return message
 
     async def get_messages(
         self,
@@ -123,3 +159,7 @@ class MessageSrv(IMessageSrv):
         visit_sid: UUID,
     ) -> str:
         return f"{self._enums.Common.S3Prefix.BOT_MESSAGE}/{visit_sid}/{sid}"
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return (perf_counter() - started_at) * 1000

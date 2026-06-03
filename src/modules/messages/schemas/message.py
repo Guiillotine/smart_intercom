@@ -31,6 +31,7 @@ class MessageUpdate(CoreSchema):
 
 
 class Message(MessageBase):
+    sid: UUID
     role: MessageAuthorRoleEnum
     time: datetime
     audio_s3_path: str | None = None

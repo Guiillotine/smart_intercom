@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, Body
 from fastapi.params import Form
 from starlette.requests import Request
 
+from src.common.deps import require_admin
 from src.common.schemas import Msg, Pagination, PaginationResult
 from src.modules.persons.controllers.constants import EmployeeCtrlEnums
 from src.modules.persons.interfaces import IEmployeeCtrl
@@ -33,7 +34,7 @@ class EmployeeCtrl(IEmployeeCtrl):
         Initializes the EmployeeCtrl and sets up routes.
         """
 
-        self._controller = APIRouter()
+        self._controller = APIRouter(dependencies=[Depends(require_admin)])
         self._enums = enums
         self._add_controllers()
 

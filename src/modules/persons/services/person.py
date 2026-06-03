@@ -1,5 +1,6 @@
 import logging
 from typing import TYPE_CHECKING
+from time import perf_counter
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -57,10 +58,17 @@ class PersonSrv(IPersonSrv):
 
     @LoggingFunctionInfo(description="Search person by face embedding.")
     async def search_by_face_embedding(self, embedding: list[float]) -> UUID | None:
-        return await self._person_postgres_repo.search_by_face_embedding(
+        started_at = perf_counter()
+        person_sid = await self._person_postgres_repo.search_by_face_embedding(
             embedding=embedding,
             max_distance=self._settings.face.FACE_RECOGNITION_MAX_DISTANCE,
         )
+        self._logger.info(
+            "[perf] face_embedding_match_search_ms=%.2f matched=%s",
+            self._elapsed_ms(started_at),
+            person_sid is not None,
+        )
+        return person_sid
 
     @LoggingFunctionInfo(description="Create person.")
     async def create(self, person_in: PersonCreate) -> Person:
@@ -199,3 +207,7 @@ class PersonSrv(IPersonSrv):
         await self._person_s3_repo.delete_object(
             bucket=self._person_photo_bucket_name, key=key
         )
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return (perf_counter() - started_at) * 1000

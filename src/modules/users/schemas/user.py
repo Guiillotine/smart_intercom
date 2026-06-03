@@ -55,7 +55,6 @@ class UserWithSid(UserBase):
 
 class UserCreate(UserBase):
     password: str
-    role_id: RoleEnum | None = None
 
     @field_validator("password")
     @classmethod
@@ -81,6 +80,10 @@ class UserCreate(UserBase):
                 cause="Password must contain at least one special symbol",
             )
         return v
+
+
+class UserCreateByAdmin(UserCreate):
+    role_id: RoleEnum
 
 
 class UserCreateInDB(UserBase):

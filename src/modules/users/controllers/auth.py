@@ -1,13 +1,21 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header
 from fastapi.security import OAuth2PasswordRequestForm
 
+from src.common.deps import require_admin
 from src.common.deps.oauth_scheme import oauth2_scheme
 from src.common.schemas import Msg
 from src.modules.users.controllers.constants import AuthCtrlEnums
 from src.modules.users.interfaces import IAuthCtrl, IAuthUC
-from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate
+from src.modules.users.schemas import (
+    LoginToken,
+    RefreshToken,
+    UserCreate,
+    UserCreateByAdmin,
+    UserWithRole,
+)
 from src.modules.users.usecases.deps import get_auth_usecase
 
 
@@ -74,6 +82,12 @@ class AuthCtrl(IAuthCtrl):
             endpoint=self.register,
             methods=[self._enums.Common.RequestType.POST],
             response_model=LoginToken,
+        )
+        self._controller.add_api_route(
+            path=self._enums.AuthCtrlPath.register_by_admin,
+            endpoint=self.register_by_admin,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=UserWithRole,
         )
 
     @staticmethod
@@ -160,3 +174,22 @@ class AuthCtrl(IAuthCtrl):
         """
 
         return await auth_usecase.register(user_in=user_in)
+
+    @staticmethod
+    async def register_by_admin(
+        user_in: UserCreateByAdmin,
+        admin_user_sid: Annotated[UUID, Depends(require_admin)],
+        auth_usecase: Annotated[IAuthUC, Depends(get_auth_usecase)],
+    ) -> UserWithRole:
+        """
+        Register a new user with an explicit role.
+
+        ## Notes:
+        - Requires Administrator or Superuser role.
+        - SUPERUSER accounts are created only by database initialization.
+        """
+
+        return await auth_usecase.register_by_admin(
+            user_in=user_in,
+            admin_user_sid=admin_user_sid,
+        )

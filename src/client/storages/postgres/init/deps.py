@@ -5,8 +5,16 @@ from src.client.storages.postgres.init.constants.deps import get_postgres_init_e
 from src.common.constants.deps import get_common_enums, get_error_codes_enums
 from src.common.logger.constants.deps import get_logger_config
 from src.common.logger.deps import get_base_logger, get_logger_manager
+from src.common.helpers.deps import get_password_helper
 from src.config.settings.deps import get_settings
-from src.modules.users.adapters.repositories.postgres.deps import get_role_pg_repo
+from src.modules.users.adapters.repositories.postgres.constants.deps import (
+    get_user_repo_consts,
+    get_user_repo_enums,
+)
+from src.modules.users.adapters.repositories.postgres.deps import (
+    get_role_pg_repo,
+    get_user_pg_repo,
+)
 from src.modules.users.constants.deps import get_user_common_enums
 
 
@@ -20,6 +28,13 @@ async def get_postgres_initializer(db: AsyncSession) -> PostgresInitializer:
         logger=logger,
         error_codes=error_codes,
     )
+    user_postgres_repo = await get_user_pg_repo(
+        db=db,
+        logger=logger,
+        error_codes=error_codes,
+        enums=get_user_repo_enums(),
+        consts=get_user_repo_consts(),
+    )
     common_enums = get_common_enums()
 
     return PostgresInitializer(
@@ -31,4 +46,6 @@ async def get_postgres_initializer(db: AsyncSession) -> PostgresInitializer:
         ),
         settings=get_settings(),
         role_postgres_repo=role_postgres_repo,
+        user_postgres_repo=user_postgres_repo,
+        password_helper=get_password_helper(),
     )

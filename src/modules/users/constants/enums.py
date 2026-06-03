@@ -7,9 +7,14 @@ class RoleEnum(IntEnum):
     USER = 10
     ADMIN = 20
     SUPERUSER = 30
+
     @classmethod
     def get_all_roles(cls) -> list[tuple[int, str]]:
         return [(i.value, i.name) for i in cls]
+
+    @classmethod
+    def get_admin_roles(cls) -> set["RoleEnum"]:
+        return {cls.ADMIN, cls.SUPERUSER}
 
 
 class UserEnums:

@@ -8,7 +8,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import JSONResponse
 
 from src.modules.users.interfaces.usecases import IAuthUC, IUserUC
-from src.modules.users.schemas import LoginToken, RefreshToken, UserCreate, UserWithRole
+from src.modules.users.schemas import (
+    LoginToken,
+    RefreshToken,
+    UserCreate,
+    UserCreateByAdmin,
+    UserWithRole,
+)
 
 
 class IAuthCtrl(ABC):
@@ -85,6 +91,23 @@ class IAuthCtrl(ABC):
         :param user_in: User registration schema.
         :param auth_usecase: Auth use case dependency.
         :return: Access and refresh token pair.
+        """
+        ...
+
+    @staticmethod
+    @abstractmethod
+    async def register_by_admin(
+        user_in: UserCreateByAdmin,
+        admin_user_sid: UUID,
+        auth_usecase: IAuthUC,
+    ) -> UserWithRole:
+        """
+        Register a user with an explicit role by an administrator.
+
+        :param user_in: User registration schema with role.
+        :param admin_user_sid: Current administrator SID.
+        :param auth_usecase: Auth use case dependency.
+        :return: Created user data with role.
         """
         ...
 

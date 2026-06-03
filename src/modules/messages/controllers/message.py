@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from src.common.deps import get_user_sid
+from src.common.deps import require_admin
 from src.common.schemas import PaginationResult, Pagination
 from src.modules.messages.controllers.constants import MessageCtrlEnums
 from src.modules.messages.interfaces import IMessageCtrl
@@ -56,7 +56,7 @@ class MessageCtrl(IMessageCtrl):
 
     @staticmethod
     async def get_visit_message_history(
-        user_sid: Annotated[UUID, Depends(get_user_sid)],
+        user_sid: Annotated[UUID, Depends(require_admin)],
         visit_sid: Annotated[UUID, Query(alias="visitSid")],
         pagination_params: Annotated[Pagination, Depends(Pagination)],
         message_usecase: Annotated[IMessageUC, Depends(get_message_usecase)],

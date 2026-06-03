@@ -7,6 +7,8 @@ class CommonErrorsEnum(Enum):
     INCORRECT_SORT_FIELD = ("incorrect_sort_field", 400, "Incorrect sort field")
     # 409 Conflict
     NOT_UNIQUE = ("not_unique", 409, "Non-unique field(s) during creation")
+    # 403
+    FORBIDDEN = ("forbidden", 403, "Forbidden")
     # 422
     UNPROCESSABLE_ENTITY = ("unprocessable_entity", 422, "Unprocessable entity")
     NUMBER_OUT_OF_BOUNDS = (

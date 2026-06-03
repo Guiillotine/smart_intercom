@@ -1,4 +1,5 @@
 import logging
+from time import perf_counter
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -124,6 +125,7 @@ class IntercomUC(IIntercomUC):
 
         photo_processing_result = PhotoProcessingResult()
 
+        frame_analysis_started_at = perf_counter()
         faces_info = await self._face_analyzer_service.analyse_photo(photo)
 
         for face in faces_info:
@@ -142,6 +144,15 @@ class IntercomUC(IIntercomUC):
                 photo_processing_result.detected_employee = True
 
             await self._visit_service.create_visitor(visit_person_in)
+
+        self._logger.info(
+            "[perf] visit_photo_frame_analysis_ms=%.2f visit_sid=%s faces=%d "
+            "detected_employee=%s",
+            self._elapsed_ms(frame_analysis_started_at),
+            visit_sid,
+            len(faces_info),
+            photo_processing_result.detected_employee,
+        )
 
         if photo_processing_result.detected_employee:
             created_message = await self._create_intercom_audio_and_text_message(
@@ -162,20 +173,36 @@ class IntercomUC(IIntercomUC):
         audio: UploadFile,
         visit_sid: UUID,
     ) -> IntercomAnswerWithText:
+        audio_answer_started_at = perf_counter()
         visit = await self._visit_service.get_by_sid(visit_sid)
 
         self._validate_get_answer(visit)
 
+        asr_started_at = perf_counter()
         speech_info = self._asr_service.speech_to_text(
             audio=audio,
             dialogue_lang=visit.dialogue_lang,
         )
+        self._logger.info(
+            "[perf] asr_ms=%.2f visit_sid=%s text_chars=%d lang=%s",
+            self._elapsed_ms(asr_started_at),
+            visit_sid,
+            len(speech_info.text),
+            speech_info.lang,
+        )
 
-        return await self.get_answer_on_text_message(
+        answer = await self.get_answer_on_text_message(
             message=speech_info.text,
             visit_sid=visit_sid,
             dialogue_lang=speech_info.lang,
         )
+        self._logger.info(
+            "[perf] visitor_audio_to_bot_audio_ms=%.2f visit_sid=%s text_chars=%d",
+            self._elapsed_ms(audio_answer_started_at),
+            visit_sid,
+            len(speech_info.text),
+        )
+        return answer
 
     async def get_answer_on_text_message(
         self,
@@ -183,6 +210,7 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         dialogue_lang: LanguageEnum | None = None,
     ) -> IntercomAnswerWithText:
+        text_answer_started_at = perf_counter()
         detect_language = dialogue_lang is None
 
         visit = await self._visit_service.get_by_sid(visit_sid)
@@ -238,11 +266,18 @@ class IntercomUC(IIntercomUC):
 
         current_visit = await self._visit_service.get_by_sid(visit_sid)
 
-        return await self._get_intercom_answer(
+        answer = await self._get_intercom_answer(
             visit_sid=visit_sid,
             visit_status=current_visit.status,
             bot_replica=bot_replica,
         )
+        self._logger.info(
+            "[perf] visitor_text_to_bot_audio_ms=%.2f visit_sid=%s text_chars=%d",
+            self._elapsed_ms(text_answer_started_at),
+            visit_sid,
+            len(message),
+        )
+        return answer
 
     def _validate_get_answer(self, visit: Visit) -> None:
         if visit.status in (
@@ -455,10 +490,19 @@ class IntercomUC(IIntercomUC):
           messages = []
 
         try:
+            started_at = perf_counter()
             bot_answer = self._dialogue_service.get_bot_answer(
               mode=mode,
               messages=messages,
               dialogue_lang=dialogue_lang,
+            )
+            self._logger.info(
+                "[perf] bot_dialogue_answer_ms=%.2f visit_sid=%s mode=%s "
+                "messages=%d",
+                self._elapsed_ms(started_at),
+                visit_sid,
+                mode,
+                len(messages),
             )
             self._logger.debug(f"Bot answer: {bot_answer}")
 
@@ -544,17 +588,34 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         bot_replica: BotReplica,
     ) -> Message:
+        tts_started_at = perf_counter()
         audio_data = self._tts_service.synthesize(
             text=bot_replica.content, lang=bot_replica.lang,
         )
+        self._logger.info(
+            "[perf] tts_ms=%.2f visit_sid=%s text_chars=%d audio_bytes=%d lang=%s",
+            self._elapsed_ms(tts_started_at),
+            visit_sid,
+            len(bot_replica.content),
+            len(audio_data.data),
+            bot_replica.lang,
+        )
 
-        return await self._message_service.create_bot_message(
+        message_save_started_at = perf_counter()
+        message = await self._message_service.create_bot_message(
             message_in=MessageBotCreate(
                 audio=audio_data.data,
                 content=bot_replica.content,
                 visit_sid=visit_sid,
             )
         )
+        self._logger.info(
+            "[perf] bot_message_audio_save_ms=%.2f visit_sid=%s message_sid=%s",
+            self._elapsed_ms(message_save_started_at),
+            visit_sid,
+            message.sid,
+        )
+        return message
 
     async def _call_employee(
         self,
@@ -587,3 +648,7 @@ class IntercomUC(IIntercomUC):
         )
 
         return bot_replica
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return (perf_counter() - started_at) * 1000

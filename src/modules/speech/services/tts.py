@@ -1,5 +1,6 @@
 import io
 from logging import Logger
+from time import perf_counter
 
 import soundfile as sf
 
@@ -24,6 +25,7 @@ class TTSSrv(ITTSSrv):
 
     @LoggingFunctionInfo("Synthesize speech from text.")
     def synthesize(self, text: str, lang: LanguageEnum=LanguageEnum.RU) -> AudioData:
+        started_at = perf_counter()
         model, params = self._tts_model_manager.get_model(lang=lang)
 
         audio = model.apply_tts(
@@ -41,7 +43,19 @@ class TTSSrv(ITTSSrv):
             format="WAV",
         )
 
-        return AudioData(
+        audio_data = AudioData(
             data=buffer.getvalue(),
             content_type="audio/wav",
         )
+        self._logger.info(
+            "[perf] synthesize_speech_ms=%.2f lang=%s text_chars=%d audio_bytes=%d",
+            self._elapsed_ms(started_at),
+            lang,
+            len(text),
+            len(audio_data.data),
+        )
+        return audio_data
+
+    @staticmethod
+    def _elapsed_ms(started_at: float) -> float:
+        return (perf_counter() - started_at) * 1000

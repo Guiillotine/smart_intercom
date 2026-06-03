@@ -21,6 +21,7 @@ class AuthCtrlPathEnum(StrEnum):
     logout = "/logout"
     refresh_token = "/refresh_token"
     register = "/register"
+    register_by_admin = "/admin/register"
 
 
 class UserCtrlEnums:

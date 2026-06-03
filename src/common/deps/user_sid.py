@@ -10,6 +10,7 @@ from src.common.deps import oauth2_scheme
 from src.common.errors import BackendException
 from src.common.helpers.deps import get_token_helper
 from src.common.interfaces import ITokenHelper
+from src.modules.users.constants.enums import RoleEnum
 
 
 async def get_user_sid(
@@ -56,3 +57,24 @@ async def get_token_data(
     except Exception as err:
         raise BackendException(error_codes.Auth.INVALID_ACCESS_TOKEN) from err
     return payload
+
+
+async def get_user_role(
+    token_data: Annotated[dict, Depends(get_token_data)],
+    enums: Annotated[TokenEnums, Depends(get_token_enums)],
+    error_codes: Annotated[ErrorCodesEnums, Depends(get_error_codes_enums)],
+) -> RoleEnum:
+    try:
+        return RoleEnum(token_data[enums.AuthPayloadFields.STATUS])
+    except (KeyError, TypeError, ValueError) as err:
+        raise BackendException(error_codes.Auth.INVALID_ACCESS_TOKEN) from err
+
+
+async def require_admin(
+    user_sid: Annotated[UUID, Depends(get_user_sid)],
+    role: Annotated[RoleEnum, Depends(get_user_role)],
+    error_codes: Annotated[ErrorCodesEnums, Depends(get_error_codes_enums)],
+) -> UUID:
+    if role not in RoleEnum.get_admin_roles():
+        raise BackendException(error=error_codes.Common.FORBIDDEN)
+    return user_sid
