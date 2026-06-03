@@ -25,7 +25,8 @@ from src.modules.messages.interfaces import IMessageSrv
 from src.modules.messages.schemas import MessageVisitorCreate, MessageBotCreate, Message
 from src.modules.persons.interfaces import IPersonSrv
 from src.modules.speech.interfaces import ITTSSrv, IASRSrv
-from src.modules.visits.constants.enums import VisitStatusEnum
+from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum, \
+    VisitHandoffReasonEnum
 from src.modules.visits.filters.visit import VisitFilter
 from src.modules.visits.interfaces import IVisitSrv
 from src.modules.visits.schemas import (
@@ -273,15 +274,11 @@ class IntercomUC(IIntercomUC):
             lang=dialogue_lang,
         )
 
+        # Transition from state 1 to state 5
         if bot_answer.call_employee:
-            bot_replica.content = self._dialogue_service.get_call_employee_bot_answer(
-                lang=dialogue_lang
-            ).content
-
-            # Transition from state 1 to state 5
-            await self._visit_service.call_employee(
-                sid=visit_sid,
-                reason=self._enums.Visit.HandoffReason.VISITOR_REQUESTED_EMPLOYEE,
+            call_reason = self._enums.Visit.HandoffReason.VISITOR_REQUESTED_EMPLOYEE
+            bot_replica = await self._call_employee(
+                visit_sid, dialogue_lang, call_reason
             )
 
         return bot_replica, bot_answer.call_employee
@@ -374,7 +371,7 @@ class IntercomUC(IIntercomUC):
                 ).content
             )
 
-            bot_replica_content = f"{bot_goal_answer.content} {want_to_enter_question}"
+            bot_replica_content = bot_goal_answer.content
 
             # Transition from state 2 to state 3
             bot_goal_relevant_answer = await self._get_bot_answer(
@@ -399,8 +396,18 @@ class IntercomUC(IIntercomUC):
                 )
             )
 
+            # Transition from state 3 to state 5
+            if grant_access:
+                call_reason=self._enums.Visit.HandoffReason.READY_FOR_EMPLOYEE_DECISION
+                bot_call_employee_replica = await self._call_employee(
+                    visit_sid, dialogue_lang, call_reason
+                )
+                bot_replica_content = f"{bot_replica_content} {bot_call_employee_replica.content}"
+
             # Transition from state 3 to state 4
-            await self._visit_service.ask_want_to_enter(visit_sid)
+            else:
+                await self._visit_service.ask_want_to_enter(visit_sid)
+                bot_replica_content = f"{bot_replica_content} {want_to_enter_question}"
 
         return BotReplica(
             content=bot_replica_content,
@@ -413,7 +420,6 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         dialogue_lang: LanguageEnum,
     ) -> BotReplica:
-        # TODO
         messages = [
             ChatMessage(role=self._enums.Common.MessageAuthorRole.USER, content=message)
         ]
@@ -425,23 +431,15 @@ class IntercomUC(IIntercomUC):
         )
 
         if bot_answer.want_to_enter:
-            bot_replica = self._dialogue_service.get_call_employee_bot_answer(
-                lang=dialogue_lang
+            call_reason=self._enums.Visit.HandoffReason.READY_FOR_EMPLOYEE_DECISION
+            bot_replica = await self._call_employee(
+                visit_sid, dialogue_lang, call_reason
             )
-
-            await self._visit_service.call_employee(
-              visit_sid,
-              reason=self._enums.Visit.HandoffReason.READY_FOR_EMPLOYEE_DECISION,
-          )
 
         else:
-            bot_replica = self._dialogue_service.get_goodbye_bot_answer(
-                lang=dialogue_lang
-            )
-
-            await self._visit_service.finish_visit(
-                visit_sid,
-                finish_reason=self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR,
+            finish_reason = self._enums.Visit.FinishReason.CANCELLED_BY_VISITOR
+            bot_replica = await self._finish_visit(
+                visit_sid, dialogue_lang, finish_reason
             )
 
         return bot_replica
@@ -557,3 +555,35 @@ class IntercomUC(IIntercomUC):
                 visit_sid=visit_sid,
             )
         )
+
+    async def _call_employee(
+        self,
+        visit_sid: UUID,
+        dialogue_lang: LanguageEnum,
+        call_reason: VisitHandoffReasonEnum,
+    ) -> BotReplica:
+        bot_replica = self._dialogue_service.get_call_employee_bot_answer(
+            lang=dialogue_lang
+        )
+
+        await self._visit_service.call_employee(
+            visit_sid, reason=call_reason,
+        )
+
+        return bot_replica
+
+    async def _finish_visit(
+        self,
+        visit_sid: UUID,
+        dialogue_lang: LanguageEnum,
+        finish_reason: VisitFinishReasonEnum,
+    ) -> BotReplica:
+        bot_replica = self._dialogue_service.get_goodbye_bot_answer(
+            lang=dialogue_lang
+        )
+
+        await self._visit_service.finish_visit(
+            sid=visit_sid, finish_reason=finish_reason,
+        )
+
+        return bot_replica

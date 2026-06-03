@@ -13,7 +13,8 @@ from src.config.settings import Settings
 from src.modules.dialogues.constants import DialogueEnums, DialogueConsts
 from src.modules.dialogues.constants.enums import DialogueModeEnum
 from src.modules.dialogues.interfaces import IDialogueSrv
-from src.modules.dialogues.schemas import ChatMessage, ChatBotAnswer, BotReplica
+from src.modules.dialogues.schemas import ChatMessage, ChatBotAnswer, BotReplica, \
+    ChatBotAnswerBase
 
 
 class DialogueSrv(IDialogueSrv):
@@ -173,8 +174,8 @@ class DialogueSrv(IDialogueSrv):
     def _send_to_llm(
         self,
         messages: list[ChatMessage],
-        bot_answer_schema: type[CoreSchema]
-    ): # TODO: заменить на ChatBotAnswerBase
+        bot_answer_schema: type[ChatBotAnswerBase],
+    ):
         if self._settings.bot.MODEL_SUPPORTS_STRUCTURED_OUTPUTS:
             response_format = {
                 "type": "json_schema",

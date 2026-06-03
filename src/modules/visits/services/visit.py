@@ -162,7 +162,7 @@ class VisitSrv(IVisitSrv):
         key = await self._visit_s3_repo.put_object(
             bucket=self._visit_photo_bucket_name,
             key=key,
-            data=await photo.read(), # TODO: придёт уже прочитанным
+            data=await photo.read(),
         )
 
         path = await self._update_visit_photo(key=key, visit=visit)

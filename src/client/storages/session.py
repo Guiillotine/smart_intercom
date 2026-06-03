@@ -31,7 +31,7 @@ class PostgresSessionProvider(IPostgresSessionProvider):
 
     def get_session(self) -> AsyncSession:
         """Return current scoped AsyncSession."""
-        session: AsyncSession = self._scoped_session() # TODO: проверить, меняла
+        session: AsyncSession = self._scoped_session()
 
         return session
 

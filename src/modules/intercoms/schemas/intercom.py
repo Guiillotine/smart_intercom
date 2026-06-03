@@ -20,7 +20,7 @@ class IntercomAnswerWithText(IntercomAnswer):
 
 
 class Decision(CoreSchema):
-    open: bool
+    open: bool | None
 
 
 class PhotoProcessingResult(CoreSchema):

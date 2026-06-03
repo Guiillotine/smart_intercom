@@ -103,7 +103,7 @@ class PersonSrv(IPersonSrv):
         key = await self._person_s3_repo.put_object(
             bucket=self._person_photo_bucket_name,
             key=key,
-            data=await photo.read(), # TODO: придёт уже прочитанным
+            data=await photo.read(),
         )
 
         path = await self._update_person_photo(
