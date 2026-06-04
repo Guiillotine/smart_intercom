@@ -44,10 +44,8 @@ class ASRSrv(IASRSrv):
 
         text = " ".join(seg.text.strip() for seg in segments).strip()
         self._logger.info(
-            "[perf] speech_to_text_ms=%.2f lang=%s text_chars=%d",
-            self._elapsed_ms(started_at),
-            lang,
-            len(text),
+            "[PERF] asr_ms=%.2f lang=%s",
+            self._elapsed_ms(started_at), lang,
         )
 
         return SpeechInfo(

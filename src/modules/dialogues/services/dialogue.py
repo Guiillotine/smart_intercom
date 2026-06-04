@@ -76,7 +76,7 @@ class DialogueSrv(IDialogueSrv):
                     bot_answer_schema=config.bot_answer_schema,
                 )
                 self._logger.info(
-                    "[perf] llm_http_request_ms=%.2f mode=%s attempt=%d "
+                    "[PERF] llm_http_request_ms=%.2f mode=%s attempt=%d "
                     "messages=%d",
                     self._elapsed_ms(llm_started_at),
                     mode,

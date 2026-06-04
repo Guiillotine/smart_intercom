@@ -16,16 +16,8 @@ class AuthSettings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30
 
     SUPERUSER_EMAIL: str = Field(
-        default="superuser@example.com",
-        alias="SUPERUSER_LOGIN",
+        default="superuser@example.com", alias="SUPERUSER_LOGIN",
     )
-    SUPERUSER_PASSWORD: str = Field(
-        default="Superuser_123",
-        alias="SUPERUSER_PASSW",
-    )
+    SUPERUSER_PASSWORD: str = Field(default="Superuser_123", alias="SUPERUSER_PASSW")
     SUPERUSER_FIRST_NAME: str = Field(default="System", alias="SUPERUSER_FIRST_NAME")
     SUPERUSER_LAST_NAME: str = Field(default="Administrator", alias="SUPERUSER_LAST_NAME")
-    SUPERUSER_MIDDLE_NAME: str | None = Field(
-        default=None,
-        alias="SUPERUSER_MIDDLE_NAME",
-    )

@@ -64,7 +64,7 @@ class PersonSrv(IPersonSrv):
             max_distance=self._settings.face.FACE_RECOGNITION_MAX_DISTANCE,
         )
         self._logger.info(
-            "[perf] face_embedding_match_search_ms=%.2f matched=%s",
+            "[PERF] face_embedding_search_ms=%.2f matched=%s",
             self._elapsed_ms(started_at),
             person_sid is not None,
         )

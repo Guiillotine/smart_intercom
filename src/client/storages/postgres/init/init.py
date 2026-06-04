@@ -67,7 +67,6 @@ class PostgresInitializer:
             obj_in=UserCreateInDB(
                 first_name=self._settings.auth.SUPERUSER_FIRST_NAME,
                 last_name=self._settings.auth.SUPERUSER_LAST_NAME,
-                middle_name=self._settings.auth.SUPERUSER_MIDDLE_NAME,
                 email=email,
                 password_hash=self._password_helper.get_password_hash(
                     self._settings.auth.SUPERUSER_PASSWORD,

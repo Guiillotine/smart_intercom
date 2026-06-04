@@ -48,11 +48,7 @@ class TTSSrv(ITTSSrv):
             content_type="audio/wav",
         )
         self._logger.info(
-            "[perf] synthesize_speech_ms=%.2f lang=%s text_chars=%d audio_bytes=%d",
-            self._elapsed_ms(started_at),
-            lang,
-            len(text),
-            len(audio_data.data),
+            "[PERF] tts_ms=%.2f", self._elapsed_ms(started_at),
         )
         return audio_data
 

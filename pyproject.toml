@@ -28,13 +28,13 @@ dependencies = [
     "python-multipart (>=0.0.20,<0.0.21)",
     "insightface (>=0.7.3,<0.8.0)",
     "onnx (>=1.21.0,<2.0.0)",
-    "onnxruntime (>=1.25.1,<2.0.0)",
     "python-jose (>=3.4.0,<4.0.0)",
     "faster-whisper (>=1.2.1,<2.0.0)",
     "soundfile (>=0.13.1,<0.14.0)",
     "openai (>=2.38.0,<3.0.0)",
     "passlib (>=1.7.4,<2.0.0)",
     "omegaconf (>=2.3.0,<3.0.0)",
+    "onnxruntime-gpu (>=1.26.0,<2.0.0)",
 ]
 
 

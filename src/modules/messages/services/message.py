@@ -54,10 +54,7 @@ class MessageSrv(IMessageSrv):
             )
         )
         self._logger.info(
-            "[perf] visitor_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
-            self._elapsed_ms(started_at),
-            message_in.visit_sid,
-            message.sid,
+            "[PERF] visitor_message_create_ms=%.2f", self._elapsed_ms(started_at),
         )
         return message
 
@@ -75,7 +72,7 @@ class MessageSrv(IMessageSrv):
             )
         )
         self._logger.info(
-            "[perf] bot_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
+            "[PERF] bot_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
             self._elapsed_ms(db_started_at),
             message_in.visit_sid,
             created_message.sid,
@@ -91,12 +88,8 @@ class MessageSrv(IMessageSrv):
             bucket=self._settings.s3.BOT_MESSAGE_BUCKET_NAME,
         )
         self._logger.info(
-            "[perf] bot_message_s3_upload_ms=%.2f visit_sid=%s message_sid=%s "
-            "audio_bytes=%d",
-            self._elapsed_ms(s3_started_at),
-            message_in.visit_sid,
-            created_message.sid,
-            len(message_in.audio),
+            "[PERF] bot_message_s3_upload_ms=%.2f audio_bytes=%d",
+            self._elapsed_ms(s3_started_at), len(message_in.audio),
         )
 
         update_started_at = perf_counter()
@@ -107,10 +100,8 @@ class MessageSrv(IMessageSrv):
             )
         )
         self._logger.info(
-            "[perf] bot_message_db_update_ms=%.2f visit_sid=%s message_sid=%s",
+            "[PERF] bot_message_db_update_ms=%.2f",
             self._elapsed_ms(update_started_at),
-            message_in.visit_sid,
-            created_message.sid,
         )
         return message
 

@@ -32,6 +32,8 @@ class AuthErrorsEnum(Enum):
 
 
 class VisitErrorsEnum(Enum):
+    # 400
+    VISIT_NOT_IN_PROCESS = ("visit_not_in_process", 400, "Visit is not in process")
     # 404
     VISIT_NOT_FOUND = ("visit_not_found", 404, "Visit not found")
 

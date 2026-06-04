@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi.params import Query, File, Body
 
+from src.common.schemas import Msg
 from src.modules.intercoms.controllers.constants import IntercomCtrlEnums
 from src.modules.intercoms.interfaces import IIntercomController
 from src.modules.intercoms.interfaces.usecases import IIntercomUC
@@ -51,6 +52,13 @@ class IntercomController(IIntercomController):
             methods=[self._enums.Common.RequestType.POST],
             response_model=IntercomStartedVisit,
         )
+
+        self._controller.add_api_route(
+            path=self._enums.IntercomCtrlPath.visit_timeout,
+            endpoint=self.visit_timeout,
+            methods=[self._enums.Common.RequestType.POST],
+            response_model=Msg,
+        )
         
         self._controller.add_api_route(
             path=self._enums.IntercomCtrlPath.process_visit_photo,
@@ -86,6 +94,14 @@ class IntercomController(IIntercomController):
     ) -> IntercomStartedVisit:
         """Start a new intercom visit and return the greeting audio path."""
         return await intercom_usecase.start_visit()
+
+    @staticmethod
+    async def visit_timeout(
+        visit_sid: Annotated[UUID, Query(alias="visitSid")],
+        intercom_usecase: Annotated[IIntercomUC, Depends(get_intercom_usecase)],
+    ) -> Msg:
+        """Finish active visit due to timeout."""
+        return await intercom_usecase.visit_timeout(visit_sid)
 
     @staticmethod
     async def process_visit_photo(

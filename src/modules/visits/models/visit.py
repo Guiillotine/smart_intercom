@@ -65,7 +65,10 @@ class VisitModel(CoreModel):
 
     # Relationships
 
-    messages: Mapped[list["MessageModel"]] = relationship(back_populates="visit")
+    messages: Mapped[list["MessageModel"]] = relationship(
+        back_populates="visit",
+        cascade="all, delete-orphan",
+    )
 
     visitors: Mapped[list["VisitPersonModel"]] = relationship(back_populates="visit")
 

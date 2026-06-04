@@ -39,6 +39,20 @@ class IIntercomController(ABC):
         ...
 
     @staticmethod
+    async def visit_timeout(
+        visit_sid: UUID,
+        intercom_usecase: IIntercomUC,
+    ) -> Msg:
+        """
+        Finish active visit due to timeout.
+
+        :param visit_sid: Visit identifier.
+        :param intercom_usecase: Intercom use case dependency.
+        :return: Operation result message.
+        """
+        return await intercom_usecase.visit_timeout(visit_sid)
+
+    @staticmethod
     @abstractmethod
     async def process_visit_photo(
         visit_sid: UUID,

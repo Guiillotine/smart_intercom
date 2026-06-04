@@ -26,6 +26,15 @@ class IIntercomUC(ABC):
         ...
 
     @abstractmethod
+    async def visit_timeout(self, visit_sid: UUID) -> Msg:
+        """
+        Finish active visit due to timeout.
+        :param visit_sid: visit identifier.
+        :return: Msg.
+        """
+        ...
+
+    @abstractmethod
     async def process_visit_photo(
         self,
         visit_sid: UUID,

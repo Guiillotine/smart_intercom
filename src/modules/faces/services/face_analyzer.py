@@ -42,27 +42,15 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
     ) -> list[FaceInfo]:
         started_at = perf_counter()
         if isinstance(image, UploadFile):
-            decode_started_at = perf_counter()
             image = await self._upload_file_to_ndarray(image)
-            self._logger.info(
-                "[perf] face_image_decode_ms=%.2f",
-                self._elapsed_ms(decode_started_at),
-            )
 
-        model_started_at = perf_counter()
         faces = await to_thread(self._app.get, image)
-        self._logger.info(
-            "[perf] face_detection_embedding_model_ms=%.2f faces=%d",
-            self._elapsed_ms(model_started_at),
-            len(faces),
-        )
 
         h, w = image.shape[:2]
 
         self._clamp_bbox_coords_to_bounds(y_bound=h, x_bound=w, faces=faces)
 
         faces_info: list[FaceInfo] = []
-        embedding_normalization_started_at = perf_counter()
         for face in faces:
             face_embedding = self._l2_norm_embedding(embedding=face.embedding)
             x1, y1, x2, y2 = face.bbox
@@ -81,19 +69,8 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
             )
 
         self._logger.info(
-            "[perf] face_embedding_normalization_ms=%.2f faces=%d",
-            self._elapsed_ms(embedding_normalization_started_at),
-            len(faces_info),
+            "[PERF] FACE_ANALYSE_MS=%.2f", self._elapsed_ms(started_at),
         )
-        self._logger.info(
-            "[perf] face_analyse_photo_ms=%.2f faces=%d image_width=%d "
-            "image_height=%d",
-            self._elapsed_ms(started_at),
-            len(faces_info),
-            w,
-            h,
-        )
-
         return faces_info
 
     def _clamp_bbox_coords_to_bounds(

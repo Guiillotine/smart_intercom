@@ -9,6 +9,7 @@ class IntercomCtrlPathEnum(StrEnum):
     Defines all API route paths used by intercoms controllers.
     """
     start_visit = "/doorbell"
+    visit_timeout = "/timeout"
     process_visit_photo = "/frame"
     get_answer = "/answer"
     get_answer_on_text_message = "/answer_on_text"
