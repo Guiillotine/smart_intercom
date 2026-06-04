@@ -2,11 +2,13 @@ FROM nvidia/cuda:12.6.0-cudnn-runtime-ubuntu24.04
 
 WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-venv python3-pip pipx \
     build-essential python3-dev \
     cmake pkg-config \
+    curl git ffmpeg libsndfile1 libgl1 libglib2.0-0 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/root/.local/bin:${PATH}"
