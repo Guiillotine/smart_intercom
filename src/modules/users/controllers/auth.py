@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.deps import require_admin

@@ -44,7 +44,12 @@ class FaceAnalyzerSrv(IFaceAnalyzerSrv):
         if isinstance(image, UploadFile):
             image = await self._upload_file_to_ndarray(image)
 
+        model_started_at = perf_counter()
         faces = await to_thread(self._app.get, image)
+        self._logger.info(
+            "[perf] face_detection_embedding_model_ms=%.2f faces=%d",
+            self._elapsed_ms(model_started_at), len(faces),
+        )
 
         h, w = image.shape[:2]
 

@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from faster_whisper import WhisperModel
 from openai import OpenAI
 from starlette.middleware.cors import CORSMiddleware
+import onnxruntime as ort
 
 from src.common.errors import BackendException, BotDialogueException
 from src.config.docs.deps import get_tags_metadata
@@ -102,6 +103,7 @@ def initialize_state():
     app.state.tts_model_manager = TTSModelManager(
         consts=get_tts_model_manager_consts(settings),
     )
+    ort.preload_dlls()
     app.state.face_analysis_model_manager = FaceAnalysisModelManager(settings=settings)
 
 

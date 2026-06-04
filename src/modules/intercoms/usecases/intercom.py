@@ -143,6 +143,8 @@ class IntercomUC(IIntercomUC):
 
         photo_processing_result = PhotoProcessingResult()
 
+
+        frame_analysis_started_at = perf_counter()
         faces_info = await self._face_analyzer_service.analyse_photo(photo)
 
         for face in faces_info:
@@ -161,6 +163,11 @@ class IntercomUC(IIntercomUC):
                 photo_processing_result.detected_employee = True
 
             await self._visit_service.create_visitor(visit_person_in)
+
+        self._logger.info(
+            "[perf] intercom_visit_photo_frame_analysis_ms=%.2f",
+            self._elapsed_ms(frame_analysis_started_at),
+        )
 
         if photo_processing_result.detected_employee:
             created_message = await self._create_intercom_audio_and_text_message(
@@ -186,9 +193,13 @@ class IntercomUC(IIntercomUC):
 
         self._validate_get_answer(visit)
 
+        asr_started_at = perf_counter()
         speech_info = self._asr_service.speech_to_text(
             audio=audio,
             dialogue_lang=visit.dialogue_lang,
+        )
+        self._logger.info(
+            "[perf] asr_ms=%.2f", self._elapsed_ms(asr_started_at),
         )
 
         answer = await self.get_answer_on_text_message(
@@ -269,10 +280,8 @@ class IntercomUC(IIntercomUC):
             bot_replica=bot_replica,
         )
         self._logger.info(
-            "[PERF] BOT_ANSWER_ON_TEXT=%.2f visit_sid=%s text_chars=%d",
+            "[PERF] BOT_ANSWER_ON_TEXT=%.2f",
             self._elapsed_ms(text_answer_started_at),
-            visit_sid,
-            len(message),
         )
         return answer
 
@@ -576,9 +585,13 @@ class IntercomUC(IIntercomUC):
         visit_sid: UUID,
         bot_replica: BotReplica,
     ) -> Message:
+        tts_started_at = perf_counter()
         audio_data = self._tts_service.synthesize(
             text=bot_replica.content, lang=bot_replica.lang,
         )
+
+        self._logger.info("[perf] tts_ms=%.2f", self._elapsed_ms(tts_started_at))
+
         message = await self._message_service.create_bot_message(
             message_in=MessageBotCreate(
                 audio=audio_data.data,

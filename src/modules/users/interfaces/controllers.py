@@ -102,12 +102,12 @@ class IAuthCtrl(ABC):
         auth_usecase: IAuthUC,
     ) -> UserWithRole:
         """
-        Register a user with an explicit role by an administrator.
+        Register a new user with an explicit role.
 
         :param user_in: User registration schema with role.
-        :param admin_user_sid: Current administrator SID.
+        :param admin_user_sid: Admin user identifier.
         :param auth_usecase: Auth use case dependency.
-        :return: Created user data with role.
+        :return: Created user data
         """
         ...
 

@@ -4,7 +4,12 @@ from uuid import UUID
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.common.schemas import Msg
-from src.modules.users.schemas import LoginToken, UserCreate, UserCreateByAdmin, UserWithRole
+from src.modules.users.schemas import (
+    LoginToken,
+    UserCreate,
+    UserCreateByAdmin,
+    UserWithRole,
+)
 
 
 class IUserUC(ABC):
@@ -102,5 +107,20 @@ class IAuthUC(ABC):
 
         :param token: Current bearer token.
         :return: Operation result message.
+        """
+        ...
+
+    @abstractmethod
+    async def register_by_admin(
+        self,
+        user_in: UserCreateByAdmin,
+        admin_user_sid: UUID,
+    ) -> UserWithRole:
+        """
+        Register a user with an explicit role by an authorized administrator.
+
+        :param user_in: User registration schema with role.
+        :param admin_user_sid: Current administrator SID.
+        :return: Created user data with role.
         """
         ...

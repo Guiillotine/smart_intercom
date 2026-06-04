@@ -6,7 +6,6 @@ from faster_whisper import WhisperModel
 
 from src.common.constants.enums import LanguageEnum
 from src.common.decorators import LoggingFunctionInfo
-from src.config.settings import Settings
 from src.modules.speech.interfaces import IASRSrv
 from src.modules.speech.schemas import SpeechInfo
 from src.modules.speech.services.constants import ASRServiceConsts
@@ -44,8 +43,7 @@ class ASRSrv(IASRSrv):
 
         text = " ".join(seg.text.strip() for seg in segments).strip()
         self._logger.info(
-            "[PERF] asr_ms=%.2f lang=%s",
-            self._elapsed_ms(started_at), lang,
+            "[PERF] asr_ms=%.2f lang=%s", self._elapsed_ms(started_at), lang,
         )
 
         return SpeechInfo(

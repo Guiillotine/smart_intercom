@@ -76,12 +76,10 @@ class DialogueSrv(IDialogueSrv):
                     bot_answer_schema=config.bot_answer_schema,
                 )
                 self._logger.info(
-                    "[PERF] llm_http_request_ms=%.2f mode=%s attempt=%d "
-                    "messages=%d",
+                    "[PERF] llm_http_request_ms=%.2f mode=%s attempt=%d",
                     self._elapsed_ms(llm_started_at),
                     mode,
                     attempt + 1,
-                    len(message_history),
                 )
 
                 self._logger.debug("SENT TO LLM:")
@@ -196,7 +194,7 @@ class DialogueSrv(IDialogueSrv):
                 },
             }
         else:
-            response_format={"type": "json_object"}
+            response_format = {"type": "json_object"}
 
         return self._client.chat.completions.create(
             model=self._settings.bot.MODEL,

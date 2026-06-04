@@ -164,10 +164,7 @@ class AuthUC(IAuthUC):
             raise BackendException(self._errors.Common.FORBIDDEN)
 
         if user_in.role_id == RoleEnum.SUPERUSER:
-            raise BackendException(
-                self._errors.Common.UNPROCESSABLE_ENTITY,
-                cause="SUPERUSER can be created only during database initialization",
-            )
+            raise BackendException(self._errors.Auth.INCORRECT_USER_ROLE)
 
         return await self._user_service.create(
             user_in=UserCreateInDB(

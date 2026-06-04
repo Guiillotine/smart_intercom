@@ -72,10 +72,7 @@ class MessageSrv(IMessageSrv):
             )
         )
         self._logger.info(
-            "[PERF] bot_message_db_create_ms=%.2f visit_sid=%s message_sid=%s",
-            self._elapsed_ms(db_started_at),
-            message_in.visit_sid,
-            created_message.sid,
+            "[PERF] bot_message_db_create_ms=%.2fs", self._elapsed_ms(db_started_at),
         )
 
         s3_started_at = perf_counter()
@@ -100,8 +97,7 @@ class MessageSrv(IMessageSrv):
             )
         )
         self._logger.info(
-            "[PERF] bot_message_db_update_ms=%.2f",
-            self._elapsed_ms(update_started_at),
+            "[PERF] bot_message_db_update_ms=%.2f", self._elapsed_ms(update_started_at),
         )
         return message
 

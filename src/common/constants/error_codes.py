@@ -5,7 +5,9 @@ class CommonErrorsEnum(Enum):
     # 400
     NOT_FOUND = ("not_found", 404, "Entry not found")
     INCORRECT_SORT_FIELD = ("incorrect_sort_field", 400, "Incorrect sort field")
-    # 409 Conflict
+    # 403
+    FORBIDDEN = ("forbidden", 403, "Forbidden")
+    # 409
     NOT_UNIQUE = ("not_unique", 409, "Non-unique field(s) during creation")
     # 403
     FORBIDDEN = ("forbidden", 403, "Forbidden")
@@ -22,14 +24,15 @@ class CommonErrorsEnum(Enum):
 
 class AuthErrorsEnum(Enum):
     # 400
-    INVALID_REFRESH_TOKEN = ("invalid_refresh_token", 401, "Invalid refresh token")
-    INVALID_ACCESS_TOKEN = ("invalid_access_token", 401, "Invalid access token")
     INCORRECT_CREDENTIALS = (
         "incorrect_credentials",
         400,
         "Incorrect login or password",
     )
-
+    INCORRECT_USER_ROLE = ("incorrect_user_role", 400, "Incorrect user role")
+    # 401
+    INVALID_REFRESH_TOKEN = ("invalid_refresh_token", 401, "Invalid refresh token")
+    INVALID_ACCESS_TOKEN = ("invalid_access_token", 401, "Invalid access token")
 
 class VisitErrorsEnum(Enum):
     # 400

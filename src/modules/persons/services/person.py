@@ -1,4 +1,5 @@
 import logging
+from time import perf_counter
 from typing import TYPE_CHECKING
 from time import perf_counter
 from uuid import UUID
@@ -65,8 +66,7 @@ class PersonSrv(IPersonSrv):
         )
         self._logger.info(
             "[PERF] face_embedding_search_ms=%.2f matched=%s",
-            self._elapsed_ms(started_at),
-            person_sid is not None,
+            self._elapsed_ms(started_at), person_sid is not None,
         )
         return person_sid
 
@@ -121,7 +121,6 @@ class PersonSrv(IPersonSrv):
         )
 
         return PersonPhotoResponse(path=path)
-
 
     @LoggingFunctionInfo(description="Update person.")
     async def update(self, sid: UUID, person_in: PersonUpdate) -> Person:

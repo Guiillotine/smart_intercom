@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from src.common.deps import require_admin
+from src.common.deps.user_sid import require_admin
 from src.common.schemas import PaginationResult, Pagination
 from src.modules.messages.controllers.constants import MessageCtrlEnums
 from src.modules.messages.interfaces import IMessageCtrl

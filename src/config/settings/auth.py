@@ -20,4 +20,6 @@ class AuthSettings(BaseSettings):
     )
     SUPERUSER_PASSWORD: str = Field(default="Superuser_123", alias="SUPERUSER_PASSW")
     SUPERUSER_FIRST_NAME: str = Field(default="System", alias="SUPERUSER_FIRST_NAME")
-    SUPERUSER_LAST_NAME: str = Field(default="Administrator", alias="SUPERUSER_LAST_NAME")
+    SUPERUSER_LAST_NAME: str = Field(
+        default="Administrator", alias="SUPERUSER_LAST_NAME"
+    )
