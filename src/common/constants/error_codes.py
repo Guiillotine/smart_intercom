@@ -9,8 +9,6 @@ class CommonErrorsEnum(Enum):
     FORBIDDEN = ("forbidden", 403, "Forbidden")
     # 409
     NOT_UNIQUE = ("not_unique", 409, "Non-unique field(s) during creation")
-    # 403
-    FORBIDDEN = ("forbidden", 403, "Forbidden")
     # 422
     UNPROCESSABLE_ENTITY = ("unprocessable_entity", 422, "Unprocessable entity")
     NUMBER_OUT_OF_BOUNDS = (

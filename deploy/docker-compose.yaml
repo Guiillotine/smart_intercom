@@ -11,17 +11,6 @@ services:
     ports:
       - "8000:8000"
     <<: *default-env
-    environment:
-      HOST: 0.0.0.0
-      PORT: 8000
-      POSTGRES_HOST: postgres-smart-intercom
-      POSTGRES_PORT: 5432
-      REDIS_HOST: redis-smart-intercom
-      REDIS_PORT: 6379
-      S3_ENDPOINT_URL: http://minio-smart-intercom:9000
-      DEVICE: cpu
-      FACE_PROVIDER: CPUExecutionProvider
-      ASR_COMPUTE_TYPE: int8
     deploy:
       resources:
         reservations:
@@ -48,7 +37,7 @@ services:
     ports:
       - "5455:5432"
     volumes:
-      - smart-intercom-postgres:/var/lib/postgresql/data
+      - /docker-volumes/smart-intercom/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -66,7 +55,7 @@ services:
       - "9006:9000"
       - "9007:9001"
     volumes:
-      - smart-intercom-minio:/data
+      - /docker-volumes/smart-intercom/minio:/data
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 30s
@@ -101,7 +90,7 @@ services:
     image: redis/redis-stack:6.2.6-v5
     <<: *default-env
     volumes:
-      - smart-intercom-redis:/data
+      - /docker-volumes/smart-intercom/redis:/data
     restart: on-failure
     ports:
       - "6366:6379"
@@ -116,8 +105,3 @@ services:
 networks:
   smart-intercom-network:
     name: smart-intercom-network
-
-volumes:
-  smart-intercom-postgres:
-  smart-intercom-minio:
-  smart-intercom-redis:
