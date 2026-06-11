@@ -112,7 +112,7 @@ class DialogueSrv(IDialogueSrv):
 
             except openai.APITimeoutError as e:
                 self._logger.exception(e)
-                raise BackendException(error=self._errors.Dialogue.TIMEOUT)
+                raise BackendException(error=self._errors.Dialogue.WAITING_DECISION_TIMEOUT)
 
             except Exception as e:
                 self._logger.exception(e)

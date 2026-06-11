@@ -64,3 +64,10 @@ class IVisitUC(ABC):
         :return: Operation result message.
         """
         ...
+
+    @abstractmethod
+    async def finish_waiting_decision_visits(self) -> None:
+        """
+        Finish waiting decision visits cause of timeout.
+        """
+        ...

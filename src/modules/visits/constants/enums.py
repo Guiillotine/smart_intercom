@@ -13,7 +13,7 @@ class VisitFinishReasonEnum(IntEnum):
     """Why visit was finished"""
     EMPLOYEE_DECISION = 1
     CANCELLED_BY_VISITOR = 2
-    TIMEOUT = 3
+    WAITING_DECISION_TIMEOUT = 3
 
 
 class VisitHandoffReasonEnum(IntEnum):

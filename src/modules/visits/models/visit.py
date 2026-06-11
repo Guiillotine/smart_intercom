@@ -35,6 +35,8 @@ class VisitModel(CoreModel):
 
     finish_datetime: Mapped[datetime] = mapped_column(DateTime(), nullable=True,)
 
+    call_employee_datetime: Mapped[datetime] = mapped_column(DateTime(), nullable=True,)
+
     status: Mapped[int] = mapped_column(index=True)
 
     visitor_goal: Mapped[str | None] = mapped_column(

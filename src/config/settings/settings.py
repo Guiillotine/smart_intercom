@@ -7,10 +7,12 @@ from src.config.settings.redis import RedisSettings
 from src.config.settings.runtime import RuntimeSettings
 from src.config.settings.s3 import S3Settings
 from src.config.settings.auth import AuthSettings
+from src.config.settings.scheduler import SchedulerSettings
 from src.config.settings.tts import TTSSettings
 
 
 class Settings:
+    scheduler = SchedulerSettings()
     postgres = PostgresSettings()
     project = ProjectSettings()
     runtime = RuntimeSettings()

@@ -127,7 +127,7 @@ class IntercomUC(IIntercomUC):
 
         await self._visit_service.finish_visit(
             sid=visit.sid,
-            finish_reason=self._enums.Visit.FinishReason.TIMEOUT,
+            finish_reason=self._enums.Visit.FinishReason.WAITING_DECISION_TIMEOUT,
         )
 
         return Msg()

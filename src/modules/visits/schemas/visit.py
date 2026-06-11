@@ -54,6 +54,7 @@ class VisitUpdate(VisitBase):
     visitor_goal: str
     granted_access: bool
     finish_datetime: datetime
+    call_employee_datetime: datetime
     bot_granted_access: bool
     decision_by_user_sid: UUID
     finish_reason: VisitFinishReasonEnum
@@ -64,6 +65,7 @@ class Visit(VisitBase):
     sid: UUID
     visitor_goal: str | None = None
     finish_datetime: datetime | None = None
+    call_employee_datetime: datetime | None = None
     photo_s3_path: str | None
     granted_access: bool | None = None
     bot_granted_access: bool | None = None
