@@ -5,6 +5,7 @@ from src.common.constants.enums import LanguageEnum
 from src.config.settings import Settings
 from src.modules.speech.schemas import TTSModelParams
 
+
 class RepoDirConsts:
     PATH: Path = Path("").resolve() / "vendor" / "silero-models"
 
@@ -22,3 +23,4 @@ class TTSModelManagerConsts:
             ),
         }
         self.DirPath = RepoDirConsts.PATH
+        self.Device = settings.tts.DEVICE

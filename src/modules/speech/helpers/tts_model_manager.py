@@ -34,6 +34,7 @@ class TTSModelManager(ITTSModelManager[SileroTTSProtocol]):
                 speaker=params.model_id,
                 source="local",
             )
+            model.to(self._consts.Device)
 
             self._models[lang] = model
 
