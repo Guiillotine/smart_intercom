@@ -35,6 +35,10 @@ class PostgresSessionProvider(IPostgresSessionProvider):
 
         return session
 
+    def get_session_factory(self) -> async_sessionmaker[AsyncSession]:
+        """Return the raw asynchronous SQLAlchemy session factory."""
+        return self._session_factory
+
 
 class S3SessionProvider(IS3SessionProvider):
     """

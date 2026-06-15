@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from src.workers.scheduler.services.deps import provide_scheduler
+import src.common.adapters.repositories.postgres.models
 
 
 async def run():

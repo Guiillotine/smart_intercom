@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 
 from redis.asyncio import Redis as AIORedis
-from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
+from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session, \
+    async_sessionmaker
 
 
 class IPostgresSessionProvider(ABC):
@@ -22,6 +23,9 @@ class IPostgresSessionProvider(ABC):
         """Return current scoped AsyncSession."""
         ...
 
+    @abstractmethod
+    def get_session_factory(self) -> async_sessionmaker[AsyncSession]:
+        ...
 
 class IS3SessionProvider(ABC):
     """

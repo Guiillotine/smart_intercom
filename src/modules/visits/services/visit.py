@@ -187,6 +187,7 @@ class VisitSrv(IVisitSrv):
             visit_in=VisitUpdate(
                 status=VisitStatusEnum.WAITING_DECISION,
                 handoff_reason=reason,
+                call_employee_datetime=datetime.now(UTC),
             ),
         )
 

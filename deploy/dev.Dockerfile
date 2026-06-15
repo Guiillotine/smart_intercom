@@ -16,3 +16,4 @@ ENV PYTHONPATH=.
 RUN chmod +x ./scripts/backend-dev-start.sh
 
 CMD ["bash", "./scripts/backend-dev-start.sh" ]
+CMD ["bash", "./scripts/scheduler-dev-start.sh" ]

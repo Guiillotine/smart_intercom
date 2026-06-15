@@ -1,3 +1,5 @@
+from email.policy import default
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -10,6 +12,8 @@ class ProjectSettings(BaseSettings):
     )
 
     TZ: str = Field(default="Europe/Moscow")
+
+    MAX_WAITING_DECISION_TIME_SEC: int = Field(default=300)
 
     # API
     API_V1_STR: str = "/api/v1"

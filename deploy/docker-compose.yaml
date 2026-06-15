@@ -102,6 +102,18 @@ services:
     networks:
       - smart-intercom-network
 
+  scheduler-smart-intercom:
+    container_name: scheduler-smart-intercom
+    <<: *default-env
+    build:
+      context: ..
+      dockerfile: deploy/dev.Dockerfile
+      args:
+        - PYPI_TOKEN=${PYPI_TOKEN}
+    restart: always
+    networks:
+      - smart-intercom-network
+
 networks:
   smart-intercom-network:
     name: smart-intercom-network

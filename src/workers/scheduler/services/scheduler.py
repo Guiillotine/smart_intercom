@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from src.config.settings import Settings
 from src.workers.scheduler.interfaces import IScheduler
-from src.workers.scheduler.runners import visitJobRunner
+from src.workers.scheduler.runners import VisitJobRunner
 
 
 class Scheduler(IScheduler):
@@ -13,7 +13,7 @@ class Scheduler(IScheduler):
         self,
         logger: logging.Logger,
         settings: Settings,
-        visit_job_runner: visitJobRunner,
+        visit_job_runner: VisitJobRunner,
     ):
         """
         Initialize scheduler and register periodic background jobs.
@@ -26,12 +26,10 @@ class Scheduler(IScheduler):
         self._scheduler = AsyncIOScheduler()
         # Visit
         self._scheduler.add_job(
-            visit_job_runner.start_visits,
-            trigger=IntervalTrigger(seconds=settings.scheduler.visit_START_SEC),
-        )
-        self._scheduler.add_job(
-            visit_job_runner.finish_visits,
-            trigger=IntervalTrigger(seconds=settings.scheduler.visit_FINISH_SEC),
+            visit_job_runner.finish_waiting_decision_visits,
+            trigger=IntervalTrigger(
+                seconds=settings.scheduler.CALL_EMPLOYEE_TIMEOUT_SEC
+            ),
         )
 
     @property
