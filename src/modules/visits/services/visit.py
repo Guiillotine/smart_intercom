@@ -13,7 +13,7 @@ from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, So
 from src.config.settings import Settings
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitHandoffReasonEnum, \
     VisitFinishReasonEnum
-from src.modules.visits.filters.visit import VisitFilter
+from src.modules.visits.filters.visit import VisitFilterFull
 from src.modules.visits.interfaces import IVisitPostgresRepo, IVisitSrv, \
     IVisitPersonPostgresRepo, IVisitS3Repo
 from src.modules.visits.models import VisitModel
@@ -74,7 +74,7 @@ class VisitSrv(IVisitSrv):
     @LoggingFunctionInfo(description="Get all visits.")
     async def get_all(
         self,
-        filters: VisitFilter | None = None,
+        filters: VisitFilterFull | None = None,
         sort_params: SortBase | None = None,
         requirement: VisitRequirementsEnum | None = None,
     ) -> ListResult[VisitRespSchemas.GET_ALL]:
@@ -101,8 +101,8 @@ class VisitSrv(IVisitSrv):
     async def get_all_paginated(
         self,
         pagination_params: Pagination,
-        filters=None,
         sort_params: SortBase = None,
+        filters: VisitFilterFull = None,
     ) -> PaginationResult[Visit]:
         visits, total = await self._visit_pg_repo.get_all_paginated(
             pagination_params=pagination_params,

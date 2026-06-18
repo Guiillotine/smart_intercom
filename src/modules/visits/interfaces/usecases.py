@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
+from src.modules.visits.filters.visit import VisitFilterFull, VisitFilter
 from src.modules.visits.schemas import Visit, VisitFull, VisitReport
 
 
@@ -27,8 +28,8 @@ class IVisitUC(ABC):
     async def get_all_visits(
         self,
         user_sid: UUID,
+        filter_fields: VisitFilter,
         pagination_params: Pagination,
-        filter_fields=None,
         sort_schema: SortBase = None,
     ) -> PaginationResult[Visit]:
         """
@@ -36,7 +37,7 @@ class IVisitUC(ABC):
 
         :param user_sid: Current authorized user SID.
         :param pagination_params: Pagination parameters.
-        :param filter_fields: Optional filter schema.
+        :param filter_fields: Filter schema.
         :param sort_schema: Optional sorting parameters.
         :return: Paginated visit list.
         """

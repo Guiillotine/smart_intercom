@@ -8,7 +8,7 @@ from src.common.constants.srv_req_enums import VisitRequirementsEnum
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.modules.visits.constants.enums import VisitHandoffReasonEnum, \
     VisitFinishReasonEnum
-from src.modules.visits.filters.visit import VisitFilter
+from src.modules.visits.filters.visit import VisitFilterFull
 from src.modules.visits.schemas import (
     Visit,
     VisitCreate,
@@ -43,7 +43,7 @@ class IVisitSrv(ABC):
     @abstractmethod
     async def get_all(
         self,
-        filters: VisitFilter | None = None,
+        filters: VisitFilterFull | None = None,
         sort_params: SortBase | None = None,
         requirement: VisitRequirementsEnum | None = None,
     ) -> ListResult["VisitRespSchemas.GET_ALL"]:
@@ -59,7 +59,10 @@ class IVisitSrv(ABC):
 
     @abstractmethod
     async def get_all_paginated(
-        self, pagination_params: Pagination, filters=None, sort_params: SortBase = None
+        self,
+        pagination_params: Pagination,
+        filters: VisitFilterFull = None,
+        sort_params: SortBase = None
     ) -> PaginationResult[Visit]:
         """
         Get paginated visits.

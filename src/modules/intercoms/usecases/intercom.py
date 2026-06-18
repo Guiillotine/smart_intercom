@@ -29,7 +29,7 @@ from src.modules.persons.interfaces import IPersonSrv
 from src.modules.speech.interfaces import ITTSSrv, IASRSrv
 from src.modules.visits.constants.enums import VisitStatusEnum, VisitFinishReasonEnum, \
     VisitHandoffReasonEnum
-from src.modules.visits.filters.visit import VisitFilter
+from src.modules.visits.filters.visit import VisitFilterFull
 from src.modules.visits.interfaces import IVisitSrv
 from src.modules.visits.schemas import (
     Visit,
@@ -80,8 +80,13 @@ class IntercomUC(IIntercomUC):
 
     @LoggingFunctionInfo(description="Start new visit and finish all unfinished.")
     async def start_visit(self) -> IntercomStartedVisit:
+        unfinished_statuses = [
+            self._enums.Visit.Status.IN_PROCESS,
+            self._enums.Visit.Status.ASKED_WANT_TO_ENTER,
+        ]
+
         unfinished_visits = await self._visit_service.get_all(
-            filters=VisitFilter(status=self._enums.Visit.Status.IN_PROCESS),
+            filters=VisitFilterFull(status__in=unfinished_statuses),
             requirement=self._enums.SrvReqCommon.VisitRequirements.WITH_MESSAGES,
         )
 

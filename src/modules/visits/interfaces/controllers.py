@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.modules.visits.constants.enums import VisitSortFieldsEnum
+from src.modules.visits.filters.visit import VisitFilterFull, VisitFilter
 from src.modules.visits.interfaces.usecases import IVisitUC
 from src.modules.visits.schemas import Visit, VisitFull, VisitReport
 
@@ -48,6 +49,7 @@ class IVisitController(ABC):
     async def get_all_visits(
         user_sid: UUID,
         sort_schema: SortBase[VisitSortFieldsEnum],
+        filter_fields: VisitFilter,
         pagination_params: Pagination,
         visit_usecase: IVisitUC,
     ) -> PaginationResult[Visit]:
@@ -58,6 +60,7 @@ class IVisitController(ABC):
         :param pagination_params: Pagination parameters.
         :param visit_usecase: Visit use case dependency.
         :param sort_schema: Optional sorting parameters.
+        :param filter_fields: Filter fields.
         :return: Paginated visit list.
         """
         ...

@@ -2,11 +2,13 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Body, Path
+from fastapi_filter import FilterDepends
 
 from src.common.deps import get_user_sid, require_admin
 from src.common.schemas import ListResult, PaginationResult, Msg, Pagination, SortBase
 from src.modules.visits.constants.enums import VisitSortFieldsEnum
 from src.modules.visits.controllers.constants import VisitCtrlEnums
+from src.modules.visits.filters.visit import VisitFilterFull, VisitFilter
 from src.modules.visits.interfaces import IVisitController
 from src.modules.visits.interfaces.usecases import IVisitUC
 from src.modules.visits.schemas import VisitReport, VisitFull, Visit
@@ -92,6 +94,7 @@ class VisitController(IVisitController):
         sort_schema: Annotated[
             SortBase, Depends(SortBase[VisitSortFieldsEnum])
         ],
+        filter_fields: Annotated[VisitFilterFull, FilterDepends(VisitFilter)],
         pagination_params: Annotated[Pagination, Depends(Pagination)],
         visit_usecase: Annotated[IVisitUC, Depends(get_visit_usecase)],
     ) -> PaginationResult[Visit]:
@@ -106,8 +109,9 @@ class VisitController(IVisitController):
         """
         return await visit_usecase.get_all_visits(
             user_sid=user_sid,
-            pagination_params=pagination_params,
             sort_schema=sort_schema,
+            filter_fields=filter_fields,
+            pagination_params=pagination_params,
         )
 
     @staticmethod

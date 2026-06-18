@@ -5,7 +5,7 @@ from uuid import UUID
 from src.common.interfaces import ICustomDateTime
 from src.common.schemas import ListResult, Msg, Pagination, PaginationResult, SortBase
 from src.config.settings import Settings
-from src.modules.visits.filters.visit import VisitFilter
+from src.modules.visits.filters.visit import VisitFilterFull, VisitFilter
 from src.modules.visits.interfaces import IVisitSrv, IVisitUC
 from src.modules.visits.schemas import Visit, VisitFull, VisitReport
 from src.modules.visits.usecases.constants import VisitUCConsts, VisitUCEnums
@@ -38,14 +38,16 @@ class VisitUC(IVisitUC):
     async def get_all_visits(
         self,
         user_sid: UUID,
+        filter_fields: VisitFilter,
         pagination_params: Pagination,
-        filter_fields=None,
         sort_schema: SortBase = None,
     ) -> PaginationResult[Visit]:
         return await self._visit_service.get_all_paginated(
-            pagination_params=pagination_params,
-            filters=filter_fields,
+            filters=VisitFilterFull.model_validate(
+                filter_fields.model_dump(exclude_none=True)
+            ),
             sort_params=sort_schema,
+            pagination_params=pagination_params,
         )
 
     async def get_waiting_decision_visits(self) -> ListResult[VisitReport]:
@@ -74,7 +76,7 @@ class VisitUC(IVisitUC):
         )
 
         visits = await self._visit_service.get_all(
-            filters=VisitFilter(
+            filters=VisitFilterFull(
                 status=self._enums.Visit.Status.WAITING_DECISION,
                 call_employee_datetime__lt=timeout_threshold,
             ),
